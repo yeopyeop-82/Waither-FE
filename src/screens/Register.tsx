@@ -1,7 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useTransition } from 'react';
 import styled from 'styled-components/native';
 import waitherLogo from '../assets/images/waither-logo.png';
-import { MAIN_COLOR } from '../styles/color';
+import { ERROR_COLOR, GREY_COLOR, MAIN_COLOR } from '../styles/color';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import { Animated } from 'react-native';
+import { useRef } from 'react';
+import Error from '../assets/images/Error.png';
+import notError from '../assets/images/notError.png';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -18,16 +23,16 @@ const Logo = styled.Image`
 `;
 const RegisterTitle = styled.Text`
   margin-bottom: 60px;
-  font-size: 22px;
+  font-size: 20px;
 `;
 
-const EmailForm = styled.TextInput`
+const EmailInput = styled.TextInput`
   font-size: 22px;
   padding: 5.5px 0px;
   width: 80%;
 `;
 
-const EmailFormView = styled.TouchableOpacity`
+const EmailInputView = styled.TouchableOpacity`
   width: 90%;
   border-color: #ced4da;
   border-bottom-width: 1px;
@@ -51,6 +56,24 @@ const DuplicationCheckTitle = styled.Text`
   position: relative;
 `;
 
+const MessageView = styled.View`
+  flex-direction: row;
+
+  display: flex;
+  width: 90%;
+`;
+
+const Message = styled.Text`
+  color: ${ERROR_COLOR};
+  font-size: 10px;
+  margin-top: 6px;
+`;
+
+const ErrorImage = styled.Image`
+  margin-top: 6px;
+  margin-right: 3px;
+`;
+
 const EmailVerifyTitle = styled.Text`
   margin-top: 45px;
   right: 134px;
@@ -64,13 +87,13 @@ const EmailVerifyDetailTitle = styled.Text`
   right: 85px;
 `;
 
-const PasswordForm = styled.TextInput`
-  font-size: 22px;
+const VerifyInput = styled.TextInput`
+  font-size: 20px;
   padding: 5.5px 0px;
   width: 80%;
 `;
 
-const PasswordFormView = styled.TouchableOpacity`
+const VerifyInputView = styled.TouchableOpacity`
   width: 90%;
   border-color: #ced4da;
   border-bottom-width: 1px;
@@ -114,41 +137,78 @@ const Register = () => {
   const [EmailisPress, setEmailIsPress] = useState(false);
   const [PasswordisPress, setPasswordIsPress] = useState(false);
 
+  const [email, setEmail] = useState('');
+  const [emailMessage, setEmailMessage] = useState('');
+  const [isEmail, setIsEmail] = useState(false);
+
+  const onChangeEmail = (text) => {
+    setEmail(text);
+    const emailRegExp =
+      /^[A-Za-z0-9_]+[A-Za-z0-9]*[@]{1}[A-Za-z0-9]+[A-Za-z0-9]*[.]{1}[A-Za-z]{1,3}$/;
+
+    if (!emailRegExp.test(text)) {
+      setEmailMessage('올바른 이메일 형식을 입력해주세요.');
+      setIsEmail(false);
+    } else {
+      setEmailMessage('사용할 수 있는 이메일이에요.');
+      setIsEmail(true);
+    }
+  };
+
   return (
     <Wrapper>
       <Logo source={waitherLogo} />
       <RegisterTitle>회원가입</RegisterTitle>
-      <EmailFormView
+      <EmailInputView
         style={{
-          borderBottomColor: EmailisPress ? `${MAIN_COLOR}` : '#ced4da',
+          borderBottomColor:
+            EmailisPress && isEmail
+              ? `${MAIN_COLOR}`
+              : (EmailisPress || isEmail) && email.length >= 1
+                ? `${ERROR_COLOR}`
+                : `${GREY_COLOR}`,
         }}
       >
-        <EmailForm
-          placeholder="이메일"
+        <EmailInput
+          placeholder="이메일@naver.com"
           placeholderTextColor="#ced4da"
+          value={email}
+          onChangeText={onChangeEmail}
           onFocus={() => {
             setEmailIsPress(true);
           }}
           onBlur={() => {
             setEmailIsPress(false);
           }}
-        ></EmailForm>
+        ></EmailInput>
         <DuplicationCheckBtn>
           <DuplicationCheckTitle>중복확인</DuplicationCheckTitle>
         </DuplicationCheckBtn>
-      </EmailFormView>
+      </EmailInputView>
+      <MessageView>
+        {isEmail ? <ErrorImage source={notError} /> : null}
+        {EmailisPress && !isEmail && email.length >= 1 ? (
+          <ErrorImage source={Error} />
+        ) : null}
+
+        <Message
+          style={{ color: isEmail ? `${MAIN_COLOR}` : `${ERROR_COLOR}` }}
+        >
+          {email.length >= 1 ? emailMessage : null}
+        </Message>
+      </MessageView>
 
       <EmailVerifyTitle>이메일 인증하기</EmailVerifyTitle>
       <EmailVerifyDetailTitle>
         입려하신 이메일로 발송된 인증번호를 입력해주세요.
       </EmailVerifyDetailTitle>
-      <PasswordFormView
+      <VerifyInputView
         style={{
           borderBottomColor: PasswordisPress ? `${MAIN_COLOR}` : '#ced4da',
         }}
       >
-        <PasswordForm
-          placeholder="비밀번호"
+        <VerifyInput
+          placeholder="인증번호 입력"
           placeholderTextColor="#ced4da"
           onFocus={() => {
             setPasswordIsPress(true);
@@ -156,14 +216,14 @@ const Register = () => {
           onBlur={() => {
             setPasswordIsPress(false);
           }}
-        ></PasswordForm>
+        ></VerifyInput>
         <VerifyBtn>
           <VerifyTitle>인증하기</VerifyTitle>
         </VerifyBtn>
-      </PasswordFormView>
+      </VerifyInputView>
 
       <RegisterCompleteBtn>
-        <RegisterCompleteTitle>인증하기</RegisterCompleteTitle>
+        <RegisterCompleteTitle>회원가입 완료</RegisterCompleteTitle>
       </RegisterCompleteBtn>
     </Wrapper>
   );
