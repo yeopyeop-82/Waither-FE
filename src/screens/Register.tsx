@@ -6,7 +6,6 @@ import { MAIN_COLOR } from '../styles/color';
 const Wrapper = styled.View`
   flex-direction: column;
   align-items: center;
-
   background-color: white;
   flex: 1;
 `;
@@ -22,21 +21,29 @@ const RegisterTitle = styled.Text`
   font-size: 22px;
 `;
 
-const EmailTextForm = styled.TextInput`
+const EmailForm = styled.TextInput`
   font-size: 22px;
   padding: 5.5px 0px;
+  width: 80%;
+`;
+
+const EmailFormView = styled.TouchableOpacity`
   width: 90%;
   border-color: #ced4da;
   border-bottom-width: 1px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 `;
 
 const DuplicationCheckBtn = styled.TouchableOpacity`
   border-radius: 30px;
   background-color: #ced4da;
   width: 60px;
-  height: 20px;
+  height: 25px;
   justify-content: center;
   align-items: center;
+  margin-left: 9px;
 `;
 const DuplicationCheckTitle = styled.Text`
   color: white;
@@ -57,21 +64,29 @@ const EmailVerifyDetailTitle = styled.Text`
   right: 85px;
 `;
 
-const VerifyForm = styled.TextInput`
+const PasswordForm = styled.TextInput`
   font-size: 22px;
   padding: 5.5px 0px;
+  width: 80%;
+`;
+
+const PasswordFormView = styled.TouchableOpacity`
   width: 90%;
   border-color: #ced4da;
   border-bottom-width: 1px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 `;
 
 const VerifyBtn = styled.TouchableOpacity`
   border-radius: 30px;
   background-color: ${MAIN_COLOR};
   width: 60px;
-  height: 20px;
+  height: 25px;
   justify-content: center;
   align-items: center;
+  margin-left: 9px;
 `;
 const VerifyTitle = styled.Text`
   color: white;
@@ -86,8 +101,8 @@ const RegisterCompleteBtn = styled.TouchableOpacity`
   width: 90%;
   height: 6%;
   border-radius: 30px;
-  position: fixed;
-  top: 250px;
+  position: absolute;
+  top: 670px;
 `;
 
 const RegisterCompleteTitle = styled.Text`
@@ -97,47 +112,55 @@ const RegisterCompleteTitle = styled.Text`
 
 const Register = () => {
   const [EmailisPress, setEmailIsPress] = useState(false);
-  const [VerifyisPress, setVerifyIsPress] = useState(false);
+  const [PasswordisPress, setPasswordIsPress] = useState(false);
+
   return (
     <Wrapper>
       <Logo source={waitherLogo} />
       <RegisterTitle>회원가입</RegisterTitle>
-      <EmailTextForm
-        placeholder="이메일"
-        placeholderTextColor="#ced4da"
-        onFocus={() => {
-          setEmailIsPress(true);
-        }}
+      <EmailFormView
         style={{
           borderBottomColor: EmailisPress ? `${MAIN_COLOR}` : '#ced4da',
         }}
-        onBlur={() => {
-          setEmailIsPress(false);
-        }}
-      ></EmailTextForm>
-      <DuplicationCheckBtn>
-        <DuplicationCheckTitle>중복확인</DuplicationCheckTitle>
-      </DuplicationCheckBtn>
+      >
+        <EmailForm
+          placeholder="이메일"
+          placeholderTextColor="#ced4da"
+          onFocus={() => {
+            setEmailIsPress(true);
+          }}
+          onBlur={() => {
+            setEmailIsPress(false);
+          }}
+        ></EmailForm>
+        <DuplicationCheckBtn>
+          <DuplicationCheckTitle>중복확인</DuplicationCheckTitle>
+        </DuplicationCheckBtn>
+      </EmailFormView>
+
       <EmailVerifyTitle>이메일 인증하기</EmailVerifyTitle>
       <EmailVerifyDetailTitle>
         입려하신 이메일로 발송된 인증번호를 입력해주세요.
       </EmailVerifyDetailTitle>
-      <VerifyForm
-        placeholder="비밀번호"
-        placeholderTextColor="#ced4da"
-        onFocus={() => {
-          setVerifyIsPress(true);
-        }}
+      <PasswordFormView
         style={{
-          borderBottomColor: VerifyisPress ? `${MAIN_COLOR}` : '#ced4da',
+          borderBottomColor: PasswordisPress ? `${MAIN_COLOR}` : '#ced4da',
         }}
-        onBlur={() => {
-          setVerifyIsPress(false);
-        }}
-      ></VerifyForm>
-      <VerifyBtn>
-        <VerifyTitle>인증하기</VerifyTitle>
-      </VerifyBtn>
+      >
+        <PasswordForm
+          placeholder="비밀번호"
+          placeholderTextColor="#ced4da"
+          onFocus={() => {
+            setPasswordIsPress(true);
+          }}
+          onBlur={() => {
+            setPasswordIsPress(false);
+          }}
+        ></PasswordForm>
+        <VerifyBtn>
+          <VerifyTitle>인증하기</VerifyTitle>
+        </VerifyBtn>
+      </PasswordFormView>
 
       <RegisterCompleteBtn>
         <RegisterCompleteTitle>인증하기</RegisterCompleteTitle>
