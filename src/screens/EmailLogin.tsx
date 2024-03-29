@@ -3,8 +3,11 @@ import styled from 'styled-components/native';
 import { ERROR_COLOR, GREY_COLOR, MAIN_COLOR } from '../styles/color';
 import waitherLogo from '../assets/images/waither-logo.png';
 import ForgotIcon from '../assets/images/ic-login-forgot.svg';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Error from '../assets/images/Error.png';
 import notError from '../assets/images/notError.png';
+import { useTogglePasswordVisibility } from '../utils/useTogglePasswordVisibility';
+import { Pressable } from 'react-native';
 
 const LogoWrapper = styled.View`
   flex: 0.3;
@@ -72,6 +75,8 @@ const ErrorImage = styled.Image`
 `;
 
 const PasswordInputView = styled.View`
+  flex-direction: row;
+  align-items: center;
   margin-top: 10px;
   width: 90%;
   border-color: #ced4da;
@@ -131,6 +136,9 @@ const EmailLogin = () => {
   const [passwordMessage, setPasswordMessage] = useState('');
   const [isPassword, setIsPassword] = useState(false);
 
+  const { passwordVisibility, rightIcon, handlePasswordVisibility } =
+    useTogglePasswordVisibility();
+
   const onChangeEmail = (text) => {
     setEmail(text);
     const emailRegExp =
@@ -167,12 +175,11 @@ const EmailLogin = () => {
       <FormWrapper behavior="padding">
         <EmailInputView
           style={{
-            borderBottomColor:
-              EmailisPress && isEmail
-                ? `${MAIN_COLOR}`
-                : (EmailisPress || isEmail) && email.length >= 1
-                  ? `${ERROR_COLOR}`
-                  : `${GREY_COLOR}`,
+            borderBottomColor: isEmail
+              ? `${MAIN_COLOR}`
+              : (EmailisPress || isEmail) && email.length >= 1
+                ? `${ERROR_COLOR}`
+                : `${GREY_COLOR}`,
           }}
         >
           <EmailInput
@@ -207,15 +214,15 @@ const EmailLogin = () => {
         </MessageView>
         <PasswordInputView
           style={{
-            borderBottomColor:
-              PasswordisPress && isPassword
-                ? `${MAIN_COLOR}`
-                : (PasswordisPress || isPassword) && password.length >= 1
-                  ? `${ERROR_COLOR}`
-                  : `${GREY_COLOR}`,
+            borderBottomColor: isPassword
+              ? `${MAIN_COLOR}`
+              : (PasswordisPress || isPassword) && password.length >= 1
+                ? `${ERROR_COLOR}`
+                : `${GREY_COLOR}`,
           }}
         >
           <PasswordInput
+            secureTextEntry={passwordVisibility}
             autoCorrect={false}
             autoCapitalize="none"
             returnKeyType="next"
@@ -231,6 +238,13 @@ const EmailLogin = () => {
               setPasswordIsPress(false);
             }}
           ></PasswordInput>
+          <Pressable onPress={handlePasswordVisibility}>
+            <MaterialCommunityIcons
+              name={rightIcon}
+              size={22}
+              color="#232323"
+            />
+          </Pressable>
         </PasswordInputView>
         <MessageView>
           {isPassword ? <ErrorImage source={notError} /> : null}
