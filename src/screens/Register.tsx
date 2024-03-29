@@ -7,6 +7,7 @@ import { Animated } from 'react-native';
 import { useRef } from 'react';
 import Error from '../assets/images/Error.png';
 import notError from '../assets/images/notError.png';
+import { NavigationHelpersContext } from '@react-navigation/native';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -133,6 +134,8 @@ const RegisterCompleteTitle = styled.Text`
   font-size: 17px;
 `;
 
+const TestEmail = 'abcde@naver.com';
+
 const Register = () => {
   const [EmailisPress, setEmailIsPress] = useState(false);
   const [PasswordisPress, setPasswordIsPress] = useState(false);
@@ -154,6 +157,14 @@ const Register = () => {
       setIsEmail(true);
     }
   };
+
+  const CheckEmail = () => {
+    if (email == TestEmail) {
+      setEmailMessage('이미 사용하고 있는 이메일이에요.');
+    }
+  };
+  console.log(email);
+  console.log(emailMessage);
 
   return (
     <Wrapper>
@@ -181,7 +192,7 @@ const Register = () => {
             setEmailIsPress(false);
           }}
         ></EmailInput>
-        <DuplicationCheckBtn>
+        <DuplicationCheckBtn onPress={CheckEmail}>
           <DuplicationCheckTitle>중복확인</DuplicationCheckTitle>
         </DuplicationCheckBtn>
       </EmailInputView>
