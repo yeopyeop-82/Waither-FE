@@ -1,4 +1,4 @@
-import React, { useState, useTransition } from 'react';
+import React, { useEffect, useState, useTransition } from 'react';
 import styled from 'styled-components/native';
 import waitherLogo from '../assets/images/waither-logo.png';
 import { ERROR_COLOR, GREY_COLOR, MAIN_COLOR } from '../styles/color';
@@ -101,12 +101,13 @@ const VerifyInputView = styled.TouchableOpacity`
 
 const VerifyBtn = styled.TouchableOpacity`
   border-radius: 30px;
-  background-color: ${MAIN_COLOR};
+  background-color: ${GREY_COLOR};
   width: 60px;
   height: 25px;
   justify-content: center;
   align-items: center;
-  margin-left: 9px;
+  right: 0px;
+  position: absolute;
 `;
 const VerifyTitle = styled.Text`
   color: white;
@@ -130,13 +131,67 @@ const RegisterCompleteTitle = styled.Text`
   font-size: 17px;
 `;
 
-const Register = () => {
-  const [EmailisPress, setEmailIsPress] = useState(false);
-  const [PasswordisPress, setPasswordIsPress] = useState(false);
+const Timer = styled.Text`
+  color: ${MAIN_COLOR};
+  margin-top: 4px;
+  right: 25px;
+`;
 
+const TestEmail = 'abcde@naver.com';
+const TestNum = '0000';
+
+const Register = () => {
+  //text input이 눌렸는지
+  const [EmailisPress, setEmailIsPress] = useState(false);
+  //입력값 저장
   const [email, setEmail] = useState('');
+  //상태에 따른 메시지
   const [emailMessage, setEmailMessage] = useState('');
+  //이메일 validation 검증
   const [isEmail, setIsEmail] = useState(false);
+  //이메일 중복 여부 검증
+  const [isDuplication, setIsDuplication] = useState(false);
+  //이메일 input editable false를 위한 state
+  const [finalEmailCheck, setFinalEmailCheck] = useState(false);
+
+  //text input이 눌렸는지
+  const [verifyIsPress, setVerifyIsPress] = useState(false);
+  //입력값 저장
+  const [verifyNum, setVerifyNum] = useState('');
+  //상태에 따른 메시지
+  const [verifyMessage, setVerifyMessage] = useState('');
+  //이메일 중복 여부 완료 시 인증번호 입력 칸을 뛰게하기 위함
+  const [isEmailVerifyReady, setIsEmailVerifyReady] = useState(false);
+  //인증번호 인증 여부
+  const [isVerfiyCheck, setIsVerfityCheck] = useState(false);
+  //인증버튼이 눌려야 인풋 뷰의 색깔이 바뀌도록
+  const [isVerifyBtn, setIsVerifyBtn] = useState(false);
+
+  const [timer, setTimer] = useState(299);
+  //타이머 함수
+  const formatTime = () => {
+    const minutes = Math.floor(timer / 60);
+    const seconds = timer % 60;
+    return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
+  };
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (finalEmailCheck) {
+      interval = setInterval(() => {
+        setTimer((prevTimer) => {
+          if (prevTimer <= 1) {
+            clearInterval(interval);
+
+            return 0;
+          }
+          return prevTimer - 1;
+        });
+      }, 1000);
+    }
+
+    return () => clearInterval(interval);
+  }, [finalEmailCheck]);
 
   const onChangeEmail = (text) => {
     setEmail(text);
@@ -147,8 +202,35 @@ const Register = () => {
       setEmailMessage('올바른 이메일 형식을 입력해주세요.');
       setIsEmail(false);
     } else {
-      setEmailMessage('사용할 수 있는 이메일이에요.');
+      setEmailMessage('이메일 형식이 맞습니다');
       setIsEmail(true);
+    }
+  };
+
+  const CheckEmail = () => {
+    if (email == TestEmail) {
+      setEmailMessage('이미 사용하고 있는 이메일이에요.');
+      setIsDuplication(true);
+    } else {
+      setEmailMessage('사용할 수 있는 이메일이에요.');
+      setIsDuplication(false);
+      setIsEmailVerifyReady(true);
+      setFinalEmailCheck(true);
+    }
+  };
+
+  const onChangeVerifyNum = (text) => {
+    setVerifyNum(text);
+  };
+
+  const CheckVerifynum = () => {
+    setIsVerifyBtn(true);
+    if (TestNum == verifyNum) {
+      setVerifyMessage('인증이 완료되었어요.');
+      setIsVerfityCheck(true);
+    } else {
+      setVerifyMessage('인증번호가 일치하지 않아요. 다시 한 번 확인해주세요.');
+      setIsVerfityCheck(false);
     }
   };
 
@@ -159,14 +241,16 @@ const Register = () => {
       <EmailInputView
         style={{
           borderBottomColor:
-            EmailisPress && isEmail
+            (EmailisPress && isEmail) || finalEmailCheck
               ? `${MAIN_COLOR}`
-              : (EmailisPress || isEmail) && email.length >= 1
+              : (!isEmail || EmailisPress) && email.length >= 1
                 ? `${ERROR_COLOR}`
                 : `${GREY_COLOR}`,
         }}
       >
         <EmailInput
+          autoCorrect={false}
+          spellCheck={false}
           autoCapitalize="none"
           autoFocus
           returnKeyType="next"
@@ -181,53 +265,98 @@ const Register = () => {
           onBlur={() => {
             setEmailIsPress(false);
           }}
+          editable={finalEmailCheck ? false : true}
         ></EmailInput>
-        <DuplicationCheckBtn>
+
+        <DuplicationCheckBtn
+          onPress={CheckEmail}
+          style={{
+            backgroundColor:
+              isEmail && !finalEmailCheck ? `${MAIN_COLOR}` : `${GREY_COLOR}`,
+          }}
+        >
           <DuplicationCheckTitle>중복확인</DuplicationCheckTitle>
         </DuplicationCheckBtn>
       </EmailInputView>
       <MessageView>
-        {isEmail ? <ErrorImage source={notError} /> : null}
-        {EmailisPress && !isEmail && email.length >= 1 ? (
+        {isEmail && !isDuplication ? <ErrorImage source={notError} /> : null}
+        {isDuplication || (EmailisPress && !isEmail && email.length >= 1) ? (
           <ErrorImage source={Error} />
         ) : null}
 
         <Message
-          style={{ color: isEmail ? `${MAIN_COLOR}` : `${ERROR_COLOR}` }}
+          style={{
+            color:
+              isEmail && !isDuplication ? `${MAIN_COLOR}` : `${ERROR_COLOR}`,
+          }}
         >
           {email.length >= 1 ? emailMessage : null}
         </Message>
       </MessageView>
+      {isEmailVerifyReady && (
+        <>
+          <EmailVerifyTitle>이메일 인증하기</EmailVerifyTitle>
+          <EmailVerifyDetailTitle>
+            입려하신 이메일로 발송된 인증번호를 입력해주세요.
+          </EmailVerifyDetailTitle>
+          <VerifyInputView
+            style={{
+              borderBottomColor: isVerfiyCheck
+                ? `${MAIN_COLOR}`
+                : (isEmail || EmailisPress) && email.length >= 1
+                  ? `${ERROR_COLOR}`
+                  : `${GREY_COLOR}`,
+            }}
+          >
+            <VerifyInput
+              placeholder="인증번호 입력"
+              placeholderTextColor="#ced4da"
+              autoCorrect={false}
+              spellCheck={false}
+              value={verifyNum}
+              editable={isVerfiyCheck ? false : true}
+              onChangeText={onChangeVerifyNum}
+              onFocus={() => {
+                setVerifyIsPress(true);
+              }}
+              onBlur={() => {
+                setVerifyIsPress(false);
+              }}
+            ></VerifyInput>
+            {finalEmailCheck && !isVerfiyCheck ? (
+              <Timer>{formatTime()}</Timer>
+            ) : null}
+            <VerifyBtn
+              onPress={CheckVerifynum}
+              style={{
+                backgroundColor: verifyIsPress
+                  ? `${MAIN_COLOR}`
+                  : `${GREY_COLOR}`,
+              }}
+            >
+              <VerifyTitle>인증하기</VerifyTitle>
+            </VerifyBtn>
+          </VerifyInputView>
+          <MessageView>
+            {isVerfiyCheck ? <ErrorImage source={notError} /> : null}
+            {!isVerfiyCheck && isVerifyBtn && verifyNum.length >= 1 ? (
+              <ErrorImage source={Error} />
+            ) : null}
 
-      <EmailVerifyTitle>이메일 인증하기</EmailVerifyTitle>
-      <EmailVerifyDetailTitle>
-        입려하신 이메일로 발송된 인증번호를 입력해주세요.
-      </EmailVerifyDetailTitle>
-      <VerifyInputView
-        style={{
-          borderBottomColor: PasswordisPress ? `${MAIN_COLOR}` : '#ced4da',
-        }}
-      >
-        <VerifyInput
-          inputMode="numeric"
-          returnKeyType="send"
-          placeholder="인증번호 입력"
-          placeholderTextColor="#ced4da"
-          onFocus={() => {
-            setPasswordIsPress(true);
-          }}
-          onBlur={() => {
-            setPasswordIsPress(false);
-          }}
-        ></VerifyInput>
-        <VerifyBtn>
-          <VerifyTitle>인증하기</VerifyTitle>
-        </VerifyBtn>
-      </VerifyInputView>
+            <Message
+              style={{
+                color: isVerfiyCheck ? `${MAIN_COLOR}` : `${ERROR_COLOR}`,
+              }}
+            >
+              {email.length >= 1 ? verifyMessage : null}
+            </Message>
+          </MessageView>
 
-      <RegisterCompleteBtn>
-        <RegisterCompleteTitle>회원가입 완료</RegisterCompleteTitle>
-      </RegisterCompleteBtn>
+          <RegisterCompleteBtn>
+            <RegisterCompleteTitle>회원가입 완료</RegisterCompleteTitle>
+          </RegisterCompleteBtn>
+        </>
+      )}
     </Wrapper>
   );
 };
