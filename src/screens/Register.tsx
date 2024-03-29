@@ -2,9 +2,6 @@ import React, { useEffect, useState, useTransition } from 'react';
 import styled from 'styled-components/native';
 import waitherLogo from '../assets/images/waither-logo.png';
 import { ERROR_COLOR, GREY_COLOR, MAIN_COLOR } from '../styles/color';
-import { useForm, SubmitHandler } from 'react-hook-form';
-import { Animated } from 'react-native';
-import { useRef } from 'react';
 import Error from '../assets/images/Error.png';
 import notError from '../assets/images/notError.png';
 
@@ -254,6 +251,10 @@ const Register = () => {
         <EmailInput
           autoCorrect={false}
           spellCheck={false}
+          autoCapitalize="none"
+          autoFocus
+          returnKeyType="next"
+          inputMode="email"
           placeholder="이메일@naver.com"
           placeholderTextColor="#ced4da"
           value={email}
@@ -325,7 +326,6 @@ const Register = () => {
             {finalEmailCheck && !isVerfiyCheck ? (
               <Timer>{formatTime()}</Timer>
             ) : null}
-
             <VerifyBtn
               onPress={CheckVerifynum}
               style={{
