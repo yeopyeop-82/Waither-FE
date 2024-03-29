@@ -41,7 +41,7 @@ const Wrapper = styled.View`
   background-color: white;
 `;
 
-const EmailInputView = styled.TouchableOpacity`
+const EmailInputView = styled.View`
   width: 90%;
   border-color: #ced4da;
   border-bottom-width: 1px;
@@ -77,6 +77,7 @@ const ErrorImage = styled.Image`
 const PasswordInputView = styled.View`
   flex-direction: row;
   align-items: center;
+  justify-content: space-between;
   margin-top: 10px;
   width: 90%;
   border-color: #ced4da;
@@ -87,6 +88,10 @@ const PasswordInput = styled.TextInput`
   font-size: 22px;
   padding: 5.5px 0px;
   width: 80%;
+`;
+
+const ShowPassword = styled.Pressable`
+  margin-right: 10px;
 `;
 
 const ForgotPassword = styled.TouchableOpacity`
@@ -115,7 +120,7 @@ const LoginButton = styled.TouchableOpacity`
   justify-content: center;
   align-items: center;
   position: absolute;
-  top: 670px;
+  bottom: 50px;
 `;
 
 const LoginButtonText = styled.Text`
@@ -188,7 +193,7 @@ const EmailLogin = () => {
             autoFocus
             returnKeyType="next"
             inputMode="email"
-            placeholder="이메일@naver.com"
+            placeholder="이메일@example.com"
             placeholderTextColor="#ced4da"
             value={email}
             onChangeText={onChangeEmail}
@@ -238,13 +243,13 @@ const EmailLogin = () => {
               setPasswordIsPress(false);
             }}
           ></PasswordInput>
-          <Pressable onPress={handlePasswordVisibility}>
+          <ShowPassword onPress={handlePasswordVisibility}>
             <MaterialCommunityIcons
               name={rightIcon}
-              size={22}
-              color="#232323"
+              size={30}
+              color="#5189F6"
             />
-          </Pressable>
+          </ShowPassword>
         </PasswordInputView>
         <MessageView>
           {isPassword ? <ErrorImage source={notError} /> : null}
@@ -265,7 +270,12 @@ const EmailLogin = () => {
           </ForgotPasswordWrapper>
         </ForgotPassword>
       </FormWrapper>
-      <LoginButton>
+      <LoginButton
+        style={{
+          backgroundColor: isEmail && isPassword ? MAIN_COLOR : GREY_COLOR,
+        }}
+        disabled={!isEmail || !isPassword}
+      >
         <LoginButtonText>로그인하기</LoginButtonText>
       </LoginButton>
     </Wrapper>
