@@ -3,6 +3,7 @@ import styled from 'styled-components/native';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { MAIN_COLOR } from '../styles/color';
 import waitherLogo from '../assets/images/waither-logo.png';
+import ForgotIcon from '../assets/images/ic-login-forgot.svg';
 
 interface IEmailLogin {
   email: string;
@@ -103,6 +104,7 @@ const EmailLogin = () => {
         <Logo source={waitherLogo} />
         <LoginTitle>로그인</LoginTitle>
       </LogoWrapper>
+      <ForgotIcon width={20} height={22} />
       <FormWrapper>
         <EmailTextForm
           placeholder="이메일"
