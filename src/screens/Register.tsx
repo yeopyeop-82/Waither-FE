@@ -135,16 +135,22 @@ const RegisterCompleteTitle = styled.Text`
 `;
 
 const TestEmail = 'abcde@naver.com';
+const TestNum = '0000';
 
 const Register = () => {
   const [EmailisPress, setEmailIsPress] = useState(false);
-  const [PasswordisPress, setPasswordIsPress] = useState(false);
-
   const [email, setEmail] = useState('');
   const [emailMessage, setEmailMessage] = useState('');
   const [isEmail, setIsEmail] = useState(false);
   const [isDuplication, setIsDuplication] = useState(false);
+  const [finalEmailCheck, setFinalEmailCheck] = useState(false);
+
+  const [verifyIsPress, setVerifyIsPress] = useState(false);
+  const [verifyNum, setVerifyNum] = useState('');
+  const [verifyMessage, setVerifyMessage] = useState('');
   const [isEmailVerifyReady, setIsEmailVerifyReady] = useState(false);
+  const [isVerfiyCheck, setIsVerfityCheck] = useState(false);
+  const [isVerifyBtn, setIsVerifyBtn] = useState(false);
 
   const onChangeEmail = (text) => {
     setEmail(text);
@@ -168,11 +174,27 @@ const Register = () => {
       setEmailMessage('사용할 수 있는 이메일이에요.');
       setIsDuplication(false);
       setIsEmailVerifyReady(true);
+      setFinalEmailCheck(true);
     }
   };
-  console.log(email);
-  console.log(isDuplication);
 
+  const onChangeVerifyNum = (text) => {
+    setVerifyNum(text);
+  };
+
+  const CheckVerifynum = () => {
+    setIsVerifyBtn(true);
+    if (TestNum == verifyNum) {
+      setVerifyMessage('인증이 완료되었어요.');
+      setIsVerfityCheck(true);
+    } else {
+      setVerifyMessage('인증번호가 일치하지 않아요. 다시 한 번 확인해주세요.');
+      setIsVerfityCheck(false);
+    }
+  };
+
+  console.log(verifyNum);
+  console.log(isVerfiyCheck);
   return (
     <Wrapper>
       <Logo source={waitherLogo} />
@@ -200,6 +222,7 @@ const Register = () => {
           onBlur={() => {
             setEmailIsPress(false);
           }}
+          editable={finalEmailCheck ? false : true}
         ></EmailInput>
         <DuplicationCheckBtn onPress={CheckEmail}>
           <DuplicationCheckTitle>중복확인</DuplicationCheckTitle>
@@ -228,22 +251,32 @@ const Register = () => {
           </EmailVerifyDetailTitle>
           <VerifyInputView
             style={{
-              borderBottomColor: PasswordisPress ? `${MAIN_COLOR}` : '#ced4da',
+              borderBottomColor:
+                verifyIsPress && isVerfiyCheck
+                  ? `${MAIN_COLOR}`
+                  : (isEmail || EmailisPress) && email.length >= 1
+                    ? `${ERROR_COLOR}`
+                    : `${GREY_COLOR}`,
             }}
           >
             <VerifyInput
               placeholder="인증번호 입력"
               placeholderTextColor="#ced4da"
+              autoCorrect={false}
+              spellCheck={false}
+              value={verifyNum}
+              onChangeText={onChangeVerifyNum}
               onFocus={() => {
-                setPasswordIsPress(true);
+                setVerifyIsPress(true);
               }}
               onBlur={() => {
-                setPasswordIsPress(false);
+                setVerifyIsPress(false);
               }}
             ></VerifyInput>
             <VerifyBtn
+              onPress={CheckVerifynum}
               style={{
-                backgroundColor: PasswordisPress
+                backgroundColor: verifyIsPress
                   ? `${MAIN_COLOR}`
                   : `${GREY_COLOR}`,
               }}
@@ -251,6 +284,20 @@ const Register = () => {
               <VerifyTitle>인증하기</VerifyTitle>
             </VerifyBtn>
           </VerifyInputView>
+          <MessageView>
+            {isVerfiyCheck ? <ErrorImage source={notError} /> : null}
+            {!isVerfiyCheck && isVerifyBtn && verifyNum.length >= 1 ? (
+              <ErrorImage source={Error} />
+            ) : null}
+
+            <Message
+              style={{
+                color: isVerfiyCheck ? `${MAIN_COLOR}` : `${ERROR_COLOR}`,
+              }}
+            >
+              {email.length >= 1 ? verifyMessage : null}
+            </Message>
+          </MessageView>
 
           <RegisterCompleteBtn>
             <RegisterCompleteTitle>회원가입 완료</RegisterCompleteTitle>
