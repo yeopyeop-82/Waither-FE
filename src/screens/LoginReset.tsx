@@ -18,7 +18,7 @@ const ResetHeader = styled.View`
 
 const ResetMessageWrapper = styled.View`
   margin-top: 5px;
-  margin-left: 15px;
+  margin-left: 17px;
 `;
 
 const ResetMessageTitle = styled.Text`
@@ -109,8 +109,15 @@ const LoginReset = () => {
       setEmailMessage('올바른 이메일 형식을 입력해주세요.');
       setIsEmail(false);
     } else {
-      setEmailMessage('사용할 수 있는 이메일이에요.');
+      setEmailMessage('올바른 이메일 형식입니다.');
       setIsEmail(true);
+    }
+  };
+
+  const handleSubmit = () => {
+    if (email !== 'waither@example.com') {
+      setEmailMessage('등록된 이메일이 없습니다. 이메일을 다시 확인해주세요.');
+      setIsEmail(false);
     }
   };
 
@@ -170,6 +177,7 @@ const LoginReset = () => {
       </FormWrapper>
       <SubmitButtonWrapper>
         <SubmitButton
+          onPress={handleSubmit}
           style={{
             backgroundColor: isEmail ? MAIN_COLOR : GREY_COLOR,
           }}
