@@ -2,9 +2,6 @@ import React, { useState, useTransition } from 'react';
 import styled from 'styled-components/native';
 import waitherLogo from '../assets/images/waither-logo.png';
 import { ERROR_COLOR, GREY_COLOR, MAIN_COLOR } from '../styles/color';
-import { useForm, SubmitHandler } from 'react-hook-form';
-import { Animated, TextInput } from 'react-native';
-import { useRef } from 'react';
 import Error from '../assets/images/Error.png';
 import notError from '../assets/images/notError.png';
 
