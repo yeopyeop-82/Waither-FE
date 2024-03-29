@@ -105,7 +105,7 @@ const VerifyInputView = styled.TouchableOpacity`
 
 const VerifyBtn = styled.TouchableOpacity`
   border-radius: 30px;
-  background-color: ${MAIN_COLOR};
+  background-color: ${GREY_COLOR};
   width: 60px;
   height: 25px;
   justify-content: center;
@@ -143,6 +143,7 @@ const Register = () => {
   const [email, setEmail] = useState('');
   const [emailMessage, setEmailMessage] = useState('');
   const [isEmail, setIsEmail] = useState(false);
+  const [isDuplication, setIsDuplication] = useState(false);
 
   const onChangeEmail = (text) => {
     setEmail(text);
@@ -153,7 +154,7 @@ const Register = () => {
       setEmailMessage('올바른 이메일 형식을 입력해주세요.');
       setIsEmail(false);
     } else {
-      setEmailMessage('사용할 수 있는 이메일이에요.');
+      setEmailMessage('이메일 형식이 맞습니다');
       setIsEmail(true);
     }
   };
@@ -161,10 +162,14 @@ const Register = () => {
   const CheckEmail = () => {
     if (email == TestEmail) {
       setEmailMessage('이미 사용하고 있는 이메일이에요.');
+      setIsDuplication(true);
+    } else {
+      setEmailMessage('사용할 수 있는 이메일이에요.');
+      setIsDuplication(false);
     }
   };
   console.log(email);
-  console.log(emailMessage);
+  console.log(isDuplication);
 
   return (
     <Wrapper>
@@ -175,12 +180,14 @@ const Register = () => {
           borderBottomColor:
             EmailisPress && isEmail
               ? `${MAIN_COLOR}`
-              : (EmailisPress || isEmail) && email.length >= 1
+              : (isEmail || EmailisPress) && email.length >= 1
                 ? `${ERROR_COLOR}`
                 : `${GREY_COLOR}`,
         }}
       >
         <EmailInput
+          autoCorrect={false}
+          spellCheck={false}
           placeholder="이메일@naver.com"
           placeholderTextColor="#ced4da"
           value={email}
@@ -197,13 +204,16 @@ const Register = () => {
         </DuplicationCheckBtn>
       </EmailInputView>
       <MessageView>
-        {isEmail ? <ErrorImage source={notError} /> : null}
-        {EmailisPress && !isEmail && email.length >= 1 ? (
+        {isEmail && !isDuplication ? <ErrorImage source={notError} /> : null}
+        {isDuplication || (EmailisPress && !isEmail && email.length >= 1) ? (
           <ErrorImage source={Error} />
         ) : null}
 
         <Message
-          style={{ color: isEmail ? `${MAIN_COLOR}` : `${ERROR_COLOR}` }}
+          style={{
+            color:
+              isEmail && !isDuplication ? `${MAIN_COLOR}` : `${ERROR_COLOR}`,
+          }}
         >
           {email.length >= 1 ? emailMessage : null}
         </Message>
@@ -228,7 +238,13 @@ const Register = () => {
             setPasswordIsPress(false);
           }}
         ></VerifyInput>
-        <VerifyBtn>
+        <VerifyBtn
+          style={{
+            backgroundColor: PasswordisPress
+              ? `${MAIN_COLOR}`
+              : `${GREY_COLOR}`,
+          }}
+        >
           <VerifyTitle>인증하기</VerifyTitle>
         </VerifyBtn>
       </VerifyInputView>
