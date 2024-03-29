@@ -1,16 +1,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components/native';
-import { SubmitHandler, useForm } from 'react-hook-form';
 import { ERROR_COLOR, GREY_COLOR, MAIN_COLOR } from '../styles/color';
 import waitherLogo from '../assets/images/waither-logo.png';
 import ForgotIcon from '../assets/images/ic-login-forgot.svg';
 import Error from '../assets/images/Error.png';
 import notError from '../assets/images/notError.png';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-
-interface IEmailLogin {
-  email: string;
-}
 
 const LogoWrapper = styled.View`
   flex: 0.3;
@@ -77,13 +71,17 @@ const ErrorImage = styled.Image`
   margin-right: 3px;
 `;
 
-const PasswordTextForm = styled.TextInput`
-  font-size: 22px;
-  padding: 5.5px 0px;
+const PasswordInputView = styled.View`
   margin-top: 10px;
   width: 90%;
   border-color: #ced4da;
   border-bottom-width: 1px;
+`;
+
+const PasswordInput = styled.TextInput`
+  font-size: 22px;
+  padding: 5.5px 0px;
+  width: 80%;
 `;
 
 const ForgotPassword = styled.TouchableOpacity`
@@ -129,7 +127,9 @@ const EmailLogin = () => {
   const [emailMessage, setEmailMessage] = useState('');
   const [isEmail, setIsEmail] = useState(false);
 
-  const [isPress, setIsPress] = useState(false);
+  const [password, setPassword] = useState('');
+  const [passwordMessage, setPasswordMessage] = useState('');
+  const [isPassword, setIsPassword] = useState(false);
 
   const onChangeEmail = (text) => {
     setEmail(text);
@@ -145,13 +145,25 @@ const EmailLogin = () => {
     }
   };
 
+  const onChangePassword = (text) => {
+    setPassword(text);
+    const passwordRegExp = /^(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&]).{8,64}$/;
+
+    if (!passwordRegExp.test(text)) {
+      setPasswordMessage('올바른 비밀번호 형식을 입력해주세요.');
+      setIsPassword(false);
+    } else {
+      setPasswordMessage('올바른 비밀번호 형식입니다.');
+      setIsPassword(true);
+    }
+  };
+
   return (
     <Wrapper>
       <LogoWrapper>
         <Logo source={waitherLogo} />
         <LoginTitle>로그인</LoginTitle>
       </LogoWrapper>
-
       <FormWrapper behavior="padding">
         <EmailInputView
           style={{
@@ -193,19 +205,45 @@ const EmailLogin = () => {
             {email.length >= 1 ? emailMessage : null}
           </Message>
         </MessageView>
-        <PasswordTextForm
-          autoCorrect={false}
-          placeholder="비밀번호"
-          placeholderTextColor="#ced4da"
-          onFocus={() => {
-            setIsPress(true);
+        <PasswordInputView
+          style={{
+            borderBottomColor:
+              PasswordisPress && isPassword
+                ? `${MAIN_COLOR}`
+                : (PasswordisPress || isPassword) && password.length >= 1
+                  ? `${ERROR_COLOR}`
+                  : `${GREY_COLOR}`,
           }}
-          style={{ borderBottomColor: isPress ? `${MAIN_COLOR}` : '#ced4da' }}
-          onBlur={() => {
-            setIsPress(false);
-          }}
-        ></PasswordTextForm>
+        >
+          <PasswordInput
+            autoCorrect={false}
+            autoCapitalize="none"
+            returnKeyType="next"
+            inputMode="email"
+            placeholder="비밀번호"
+            placeholderTextColor="#ced4da"
+            value={password}
+            onChangeText={onChangePassword}
+            onFocus={() => {
+              setPasswordIsPress(true);
+            }}
+            onBlur={() => {
+              setPasswordIsPress(false);
+            }}
+          ></PasswordInput>
+        </PasswordInputView>
+        <MessageView>
+          {isPassword ? <ErrorImage source={notError} /> : null}
+          {PasswordisPress && !isPassword && password.length >= 1 ? (
+            <ErrorImage source={Error} />
+          ) : null}
 
+          <Message
+            style={{ color: isPassword ? `${MAIN_COLOR}` : `${ERROR_COLOR}` }}
+          >
+            {password.length >= 1 ? passwordMessage : null}
+          </Message>
+        </MessageView>
         <ForgotPassword>
           <ForgotPasswordWrapper>
             <ForgotIcon width={15} height={15} />
