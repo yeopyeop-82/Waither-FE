@@ -129,9 +129,22 @@ const LoginButtonText = styled.Text`
   font-weight: 800;
 `;
 
+const ErrorMessageView = styled.View`
+  margin-top: 10px;
+  align-items: center;
+`;
+
+const ErrorMessage = styled.Text`
+  color: ${ERROR_COLOR};
+  font-size: 14px;
+  margin-top: 6px;
+`;
+
 const EmailLogin = () => {
   const [EmailisPress, setEmailIsPress] = useState(false);
   const [PasswordisPress, setPasswordIsPress] = useState(false);
+  const [showPasswordErrorMessage, setShowPasswordErrorMessage] =
+    useState(false);
 
   const [email, setEmail] = useState('');
   const [emailMessage, setEmailMessage] = useState('');
@@ -171,6 +184,14 @@ const EmailLogin = () => {
     }
   };
 
+  const handleLogin = () => {
+    if (email !== 'waither@example.com' || password !== 'qwer1234!') {
+      setShowPasswordErrorMessage(true);
+    } else {
+      setShowPasswordErrorMessage(false);
+    }
+  };
+
   return (
     <Wrapper>
       <LogoWrapper>
@@ -203,7 +224,7 @@ const EmailLogin = () => {
             onBlur={() => {
               setEmailIsPress(false);
             }}
-          ></EmailInput>
+          />
         </EmailInputView>
         <MessageView>
           {isEmail ? <ErrorImage source={notError} /> : null}
@@ -242,7 +263,7 @@ const EmailLogin = () => {
             onBlur={() => {
               setPasswordIsPress(false);
             }}
-          ></PasswordInput>
+          />
           <ShowPassword onPress={handlePasswordVisibility}>
             <MaterialCommunityIcons
               name={rightIcon}
@@ -263,14 +284,24 @@ const EmailLogin = () => {
             {password.length >= 1 ? passwordMessage : null}
           </Message>
         </MessageView>
+
         <ForgotPassword>
           <ForgotPasswordWrapper>
             <ForgotIcon width={15} height={15} />
-            <ForgotPasswordText>비밀번호를 잊으셨다면 ?</ForgotPasswordText>
+            <ForgotPasswordText>비밀번호를 잊으셨나요?</ForgotPasswordText>
           </ForgotPasswordWrapper>
         </ForgotPassword>
+        {showPasswordErrorMessage && (
+          <ErrorMessageView>
+            <ErrorMessage>
+              아이디 또는 비밀번호를 잘못 입력하셨습니다.
+            </ErrorMessage>
+            <ErrorMessage>입력하신 내용을 확인해주세요.</ErrorMessage>
+          </ErrorMessageView>
+        )}
       </FormWrapper>
       <LoginButton
+        onPress={handleLogin}
         style={{
           backgroundColor: isEmail && isPassword ? MAIN_COLOR : GREY_COLOR,
         }}
