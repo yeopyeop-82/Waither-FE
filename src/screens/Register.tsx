@@ -1,4 +1,4 @@
-import React, { useState, useTransition } from 'react';
+import React, { useEffect, useState, useTransition } from 'react';
 import styled from 'styled-components/native';
 import waitherLogo from '../assets/images/waither-logo.png';
 import { ERROR_COLOR, GREY_COLOR, MAIN_COLOR } from '../styles/color';
@@ -7,7 +7,6 @@ import { Animated } from 'react-native';
 import { useRef } from 'react';
 import Error from '../assets/images/Error.png';
 import notError from '../assets/images/notError.png';
-import { NavigationHelpersContext } from '@react-navigation/native';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -110,7 +109,8 @@ const VerifyBtn = styled.TouchableOpacity`
   height: 25px;
   justify-content: center;
   align-items: center;
-  margin-left: 9px;
+  right: 0px;
+  position: absolute;
 `;
 const VerifyTitle = styled.Text`
   color: white;
@@ -134,23 +134,67 @@ const RegisterCompleteTitle = styled.Text`
   font-size: 17px;
 `;
 
+const Timer = styled.Text`
+  color: ${MAIN_COLOR};
+  margin-top: 4px;
+  right: 25px;
+`;
+
 const TestEmail = 'abcde@naver.com';
 const TestNum = '0000';
 
 const Register = () => {
+  //text input이 눌렸는지
   const [EmailisPress, setEmailIsPress] = useState(false);
+  //입력값 저장
   const [email, setEmail] = useState('');
+  //상태에 따른 메시지
   const [emailMessage, setEmailMessage] = useState('');
+  //이메일 validation 검증
   const [isEmail, setIsEmail] = useState(false);
+  //이메일 중복 여부 검증
   const [isDuplication, setIsDuplication] = useState(false);
+  //이메일 input editable false를 위한 state
   const [finalEmailCheck, setFinalEmailCheck] = useState(false);
 
+  //text input이 눌렸는지
   const [verifyIsPress, setVerifyIsPress] = useState(false);
+  //입력값 저장
   const [verifyNum, setVerifyNum] = useState('');
+  //상태에 따른 메시지
   const [verifyMessage, setVerifyMessage] = useState('');
+  //이메일 중복 여부 완료 시 인증번호 입력 칸을 뛰게하기 위함
   const [isEmailVerifyReady, setIsEmailVerifyReady] = useState(false);
+  //인증번호 인증 여부
   const [isVerfiyCheck, setIsVerfityCheck] = useState(false);
+  //인증버튼이 눌려야 인풋 뷰의 색깔이 바뀌도록
   const [isVerifyBtn, setIsVerifyBtn] = useState(false);
+
+  const [timer, setTimer] = useState(299);
+  //타이머 함수
+  const formatTime = () => {
+    const minutes = Math.floor(timer / 60);
+    const seconds = timer % 60;
+    return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
+  };
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (finalEmailCheck) {
+      interval = setInterval(() => {
+        setTimer((prevTimer) => {
+          if (prevTimer <= 1) {
+            clearInterval(interval);
+
+            return 0;
+          }
+          return prevTimer - 1;
+        });
+      }, 1000);
+    }
+
+    return () => clearInterval(interval);
+  }, [finalEmailCheck]);
 
   const onChangeEmail = (text) => {
     setEmail(text);
@@ -193,8 +237,6 @@ const Register = () => {
     }
   };
 
-  console.log(verifyNum);
-  console.log(isVerfiyCheck);
   return (
     <Wrapper>
       <Logo source={waitherLogo} />
@@ -202,9 +244,9 @@ const Register = () => {
       <EmailInputView
         style={{
           borderBottomColor:
-            EmailisPress && isEmail
+            (EmailisPress && isEmail) || finalEmailCheck
               ? `${MAIN_COLOR}`
-              : (isEmail || EmailisPress) && email.length >= 1
+              : (!isEmail || EmailisPress) && email.length >= 1
                 ? `${ERROR_COLOR}`
                 : `${GREY_COLOR}`,
         }}
@@ -224,7 +266,14 @@ const Register = () => {
           }}
           editable={finalEmailCheck ? false : true}
         ></EmailInput>
-        <DuplicationCheckBtn onPress={CheckEmail}>
+
+        <DuplicationCheckBtn
+          onPress={CheckEmail}
+          style={{
+            backgroundColor:
+              isEmail && !finalEmailCheck ? `${MAIN_COLOR}` : `${GREY_COLOR}`,
+          }}
+        >
           <DuplicationCheckTitle>중복확인</DuplicationCheckTitle>
         </DuplicationCheckBtn>
       </EmailInputView>
@@ -251,12 +300,11 @@ const Register = () => {
           </EmailVerifyDetailTitle>
           <VerifyInputView
             style={{
-              borderBottomColor:
-                verifyIsPress && isVerfiyCheck
-                  ? `${MAIN_COLOR}`
-                  : (isEmail || EmailisPress) && email.length >= 1
-                    ? `${ERROR_COLOR}`
-                    : `${GREY_COLOR}`,
+              borderBottomColor: isVerfiyCheck
+                ? `${MAIN_COLOR}`
+                : (isEmail || EmailisPress) && email.length >= 1
+                  ? `${ERROR_COLOR}`
+                  : `${GREY_COLOR}`,
             }}
           >
             <VerifyInput
@@ -265,6 +313,7 @@ const Register = () => {
               autoCorrect={false}
               spellCheck={false}
               value={verifyNum}
+              editable={isVerfiyCheck ? false : true}
               onChangeText={onChangeVerifyNum}
               onFocus={() => {
                 setVerifyIsPress(true);
@@ -273,6 +322,10 @@ const Register = () => {
                 setVerifyIsPress(false);
               }}
             ></VerifyInput>
+            {finalEmailCheck && !isVerfiyCheck ? (
+              <Timer>{formatTime()}</Timer>
+            ) : null}
+
             <VerifyBtn
               onPress={CheckVerifynum}
               style={{
