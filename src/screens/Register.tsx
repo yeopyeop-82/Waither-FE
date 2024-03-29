@@ -144,6 +144,7 @@ const Register = () => {
   const [emailMessage, setEmailMessage] = useState('');
   const [isEmail, setIsEmail] = useState(false);
   const [isDuplication, setIsDuplication] = useState(false);
+  const [isEmailVerifyReady, setIsEmailVerifyReady] = useState(false);
 
   const onChangeEmail = (text) => {
     setEmail(text);
@@ -166,6 +167,7 @@ const Register = () => {
     } else {
       setEmailMessage('사용할 수 있는 이메일이에요.');
       setIsDuplication(false);
+      setIsEmailVerifyReady(true);
     }
   };
   console.log(email);
@@ -218,40 +220,43 @@ const Register = () => {
           {email.length >= 1 ? emailMessage : null}
         </Message>
       </MessageView>
+      {isEmailVerifyReady && (
+        <>
+          <EmailVerifyTitle>이메일 인증하기</EmailVerifyTitle>
+          <EmailVerifyDetailTitle>
+            입려하신 이메일로 발송된 인증번호를 입력해주세요.
+          </EmailVerifyDetailTitle>
+          <VerifyInputView
+            style={{
+              borderBottomColor: PasswordisPress ? `${MAIN_COLOR}` : '#ced4da',
+            }}
+          >
+            <VerifyInput
+              placeholder="인증번호 입력"
+              placeholderTextColor="#ced4da"
+              onFocus={() => {
+                setPasswordIsPress(true);
+              }}
+              onBlur={() => {
+                setPasswordIsPress(false);
+              }}
+            ></VerifyInput>
+            <VerifyBtn
+              style={{
+                backgroundColor: PasswordisPress
+                  ? `${MAIN_COLOR}`
+                  : `${GREY_COLOR}`,
+              }}
+            >
+              <VerifyTitle>인증하기</VerifyTitle>
+            </VerifyBtn>
+          </VerifyInputView>
 
-      <EmailVerifyTitle>이메일 인증하기</EmailVerifyTitle>
-      <EmailVerifyDetailTitle>
-        입려하신 이메일로 발송된 인증번호를 입력해주세요.
-      </EmailVerifyDetailTitle>
-      <VerifyInputView
-        style={{
-          borderBottomColor: PasswordisPress ? `${MAIN_COLOR}` : '#ced4da',
-        }}
-      >
-        <VerifyInput
-          placeholder="인증번호 입력"
-          placeholderTextColor="#ced4da"
-          onFocus={() => {
-            setPasswordIsPress(true);
-          }}
-          onBlur={() => {
-            setPasswordIsPress(false);
-          }}
-        ></VerifyInput>
-        <VerifyBtn
-          style={{
-            backgroundColor: PasswordisPress
-              ? `${MAIN_COLOR}`
-              : `${GREY_COLOR}`,
-          }}
-        >
-          <VerifyTitle>인증하기</VerifyTitle>
-        </VerifyBtn>
-      </VerifyInputView>
-
-      <RegisterCompleteBtn>
-        <RegisterCompleteTitle>회원가입 완료</RegisterCompleteTitle>
-      </RegisterCompleteBtn>
+          <RegisterCompleteBtn>
+            <RegisterCompleteTitle>회원가입 완료</RegisterCompleteTitle>
+          </RegisterCompleteBtn>
+        </>
+      )}
     </Wrapper>
   );
 };
