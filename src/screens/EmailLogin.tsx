@@ -7,7 +7,6 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Error from '../assets/images/Error.png';
 import notError from '../assets/images/notError.png';
 import { useTogglePasswordVisibility } from '../utils/useTogglePasswordVisibility';
-import { Pressable } from 'react-native';
 
 const LogoWrapper = styled.View`
   flex: 0.3;
@@ -140,7 +139,8 @@ const ErrorMessage = styled.Text`
   margin-top: 6px;
 `;
 
-const EmailLogin = () => {
+// eslint-disable-next-line react/prop-types
+const EmailLogin = ({ navigation }) => {
   const [EmailisPress, setEmailIsPress] = useState(false);
   const [PasswordisPress, setPasswordIsPress] = useState(false);
   const [showPasswordErrorMessage, setShowPasswordErrorMessage] =
@@ -285,7 +285,7 @@ const EmailLogin = () => {
           </Message>
         </MessageView>
 
-        <ForgotPassword>
+        <ForgotPassword onPress={() => navigation.navigate('LoginReset')}>
           <ForgotPasswordWrapper>
             <ForgotIcon width={15} height={15} />
             <ForgotPasswordText>비밀번호를 잊으셨나요?</ForgotPasswordText>

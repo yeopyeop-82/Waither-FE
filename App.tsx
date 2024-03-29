@@ -5,6 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import Login from './src/screens/Login';
 import Register from './src/screens/Register';
 import EmailLogin from './src/screens/EmailLogin';
+import LoginReset from './src/screens/LoginReset';
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -25,6 +26,7 @@ export default function App() {
 
         <Stack.Screen name="EmailLogin" component={EmailLogin} />
         <Stack.Screen name="Register" component={Register} />
+        <Stack.Screen name="LoginReset" component={LoginReset} />
       </Stack.Navigator>
     </NavigationContainer>
   );
