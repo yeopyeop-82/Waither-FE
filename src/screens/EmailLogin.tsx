@@ -7,7 +7,6 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Error from '../assets/images/Error.png';
 import notError from '../assets/images/notError.png';
 import { useTogglePasswordVisibility } from '../utils/useTogglePasswordVisibility';
-import { Pressable } from 'react-native';
 
 const LogoWrapper = styled.View`
   flex: 0.3;
