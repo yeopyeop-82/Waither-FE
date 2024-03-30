@@ -304,7 +304,7 @@ const Register = () => {
 
   const onChangeCheckPassword = (test) => {
     setCheckPassword(test);
-    if (checkPassword == password) {
+    if (test === password) {
       setCheckPasswordMessage('비밀번호가 일치해요.');
       setisPasswordChecked(true);
     } else {
