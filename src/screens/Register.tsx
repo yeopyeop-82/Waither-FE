@@ -4,6 +4,8 @@ import waitherLogo from '../assets/images/waither-logo.png';
 import { ERROR_COLOR, GREY_COLOR, MAIN_COLOR } from '../styles/color';
 import Error from '../assets/images/Error.png';
 import notError from '../assets/images/notError.png';
+import { useTogglePasswordVisibility } from '../utils/useTogglePasswordVisibility';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -137,6 +139,42 @@ const Timer = styled.Text`
   right: 25px;
 `;
 
+const ShowPassword = styled.Pressable`
+  margin-right: 10px;
+`;
+
+const PasswordInputView = styled.View`
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 30px;
+  width: 90%;
+  border-color: #ced4da;
+  border-bottom-width: 1px;
+`;
+
+const PasswordInput = styled.TextInput`
+  font-size: 22px;
+  padding: 5.5px 0px;
+  width: 80%;
+`;
+
+const CheckPasswordInputView = styled.View`
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 30px;
+  width: 90%;
+  border-color: #ced4da;
+  border-bottom-width: 1px;
+`;
+
+const CheckPasswordInput = styled.TextInput`
+  font-size: 22px;
+  padding: 5.5px 0px;
+  width: 80%;
+`;
+
 const TestEmail = 'abcde@naver.com';
 const TestNum = '0000';
 
@@ -166,6 +204,23 @@ const Register = () => {
   const [isVerfiyCheck, setIsVerfityCheck] = useState(false);
   //인증버튼이 눌려야 인풋 뷰의 색깔이 바뀌도록
   const [isVerifyBtn, setIsVerifyBtn] = useState(false);
+
+  const [PasswordisPress, setPasswordIsPress] = useState(false);
+
+  const [showPasswordErrorMessage, setShowPasswordErrorMessage] =
+    useState(false);
+  const [password, setPassword] = useState('');
+  const [passwordMessage, setPasswordMessage] = useState('');
+
+  const [checkPasswordMessage, setCheckPasswordMessage] = useState('');
+  const [isPassword, setIsPassword] = useState(false);
+
+  const [checkPasswordIsPress, setCheckPasswordIsPress] = useState(false);
+  const [isPasswordChecked, setisPasswordChecked] = useState(false);
+  const [checkPassword, setCheckPassword] = useState('');
+
+  const { passwordVisibility, rightIcon, handlePasswordVisibility } =
+    useTogglePasswordVisibility();
 
   const [timer, setTimer] = useState(299);
   //타이머 함수
@@ -233,6 +288,36 @@ const Register = () => {
       setIsVerfityCheck(false);
     }
   };
+
+  const onChangePassword = (text) => {
+    setPassword(text);
+    const passwordRegExp = /^(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&]).{8,64}$/;
+
+    if (!passwordRegExp.test(text)) {
+      setPasswordMessage('비밀번호는 최소 8자리 이상이어야 합니다.');
+      setIsPassword(false);
+    } else {
+      setPasswordMessage('사용할 수 있는 비밀번호에요.');
+      setIsPassword(true);
+    }
+  };
+
+  const onChangeCheckPassword = (test) => {
+    setCheckPassword(test);
+    if (checkPassword == password) {
+      setCheckPasswordMessage('비밀번호가 일치해요.');
+      setisPasswordChecked(true);
+    } else {
+      setCheckPasswordMessage('비밀번호가 일치하지 않아요.');
+      setisPasswordChecked(false);
+    }
+  };
+
+  const CheckPassword = () => {};
+  console.log(password);
+  console.log(checkPassword);
+  console.log(isPasswordChecked);
+  console.log(checkPasswordMessage);
 
   return (
     <Wrapper>
@@ -355,6 +440,107 @@ const Register = () => {
           <RegisterCompleteBtn>
             <RegisterCompleteTitle>회원가입 완료</RegisterCompleteTitle>
           </RegisterCompleteBtn>
+        </>
+      )}
+      {isVerfiyCheck && (
+        <>
+          <PasswordInputView
+            style={{
+              borderBottomColor: isPassword
+                ? `${MAIN_COLOR}`
+                : (PasswordisPress || isPassword) && password.length >= 1
+                  ? `${ERROR_COLOR}`
+                  : `${GREY_COLOR}`,
+            }}
+          >
+            <PasswordInput
+              secureTextEntry={passwordVisibility}
+              autoCorrect={false}
+              autoCapitalize="none"
+              returnKeyType="next"
+              inputMode="email"
+              placeholder="비밀번호"
+              placeholderTextColor="#ced4da"
+              value={password}
+              onChangeText={onChangePassword}
+              onFocus={() => {
+                setPasswordIsPress(true);
+              }}
+              onBlur={() => {
+                setPasswordIsPress(false);
+              }}
+            />
+            <ShowPassword onPress={handlePasswordVisibility}>
+              <MaterialCommunityIcons
+                name={rightIcon}
+                size={30}
+                color="#5189F6"
+              />
+            </ShowPassword>
+          </PasswordInputView>
+          <MessageView>
+            {isPassword ? <ErrorImage source={notError} /> : null}
+            {PasswordisPress && !isPassword && password.length >= 1 ? (
+              <ErrorImage source={Error} />
+            ) : null}
+
+            <Message
+              style={{ color: isPassword ? `${MAIN_COLOR}` : `${ERROR_COLOR}` }}
+            >
+              {password.length >= 1 ? passwordMessage : null}
+            </Message>
+          </MessageView>
+          <CheckPasswordInputView
+            style={{
+              borderBottomColor: isPasswordChecked
+                ? `${MAIN_COLOR}`
+                : (checkPasswordIsPress || checkPassword) &&
+                    checkPassword.length >= 1
+                  ? `${ERROR_COLOR}`
+                  : `${GREY_COLOR}`,
+            }}
+          >
+            <CheckPasswordInput
+              secureTextEntry={passwordVisibility}
+              autoCorrect={false}
+              // autoCapitalize="none"
+              // returnKeyType="next"
+              // inputMode="email"
+              placeholder="비밀번호"
+              placeholderTextColor="#ced4da"
+              value={checkPassword}
+              onChangeText={onChangeCheckPassword}
+              onFocus={() => {
+                setCheckPasswordIsPress(true);
+              }}
+              onBlur={() => {
+                setCheckPasswordIsPress(false);
+              }}
+            />
+            <ShowPassword onPress={handlePasswordVisibility}>
+              <MaterialCommunityIcons
+                name={rightIcon}
+                size={30}
+                color="#5189F6"
+              />
+            </ShowPassword>
+          </CheckPasswordInputView>
+          <MessageView>
+            {isPasswordChecked ? <ErrorImage source={notError} /> : null}
+            {checkPasswordIsPress &&
+            !isPasswordChecked &&
+            checkPassword.length >= 1 ? (
+              <ErrorImage source={Error} />
+            ) : null}
+
+            <Message
+              style={{
+                color: isPasswordChecked ? `${MAIN_COLOR}` : `${ERROR_COLOR}`,
+              }}
+            >
+              {password.length >= 1 ? checkPasswordMessage : null}
+            </Message>
+          </MessageView>
         </>
       )}
     </Wrapper>
