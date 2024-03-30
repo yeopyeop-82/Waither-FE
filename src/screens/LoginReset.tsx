@@ -4,6 +4,9 @@ import styled from 'styled-components/native';
 import { ERROR_COLOR, GREY_COLOR, MAIN_COLOR } from '../styles/color';
 import Error from '../assets/images/Error.png';
 import notError from '../assets/images/notError.png';
+import Toast from 'react-native-toast-message';
+import { showToast } from '../utils/showToast';
+import { useNavigation } from '@react-navigation/native';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -95,6 +98,7 @@ const SubmitButtonText = styled.Text`
 `;
 
 const LoginReset = () => {
+  const navigation = useNavigation();
   const [EmailisPress, setEmailIsPress] = useState(false);
   const [email, setEmail] = useState('');
   const [emailMessage, setEmailMessage] = useState('');
@@ -118,6 +122,12 @@ const LoginReset = () => {
     if (email !== 'waither@example.com') {
       setEmailMessage('등록된 이메일이 없습니다. 이메일을 다시 확인해주세요.');
       setIsEmail(false);
+    } else {
+      showToast(
+        '가입된 이메일로 임시 비밀번호를 전송했어요',
+        '메일함을 확인해주세요',
+      );
+      navigation.navigate('EmailLogin');
     }
   };
 
