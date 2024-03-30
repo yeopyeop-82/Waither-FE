@@ -1,12 +1,10 @@
 import React from 'react';
-import { View, Text } from 'react-native';
 import { USER_WIDTH } from '../styles/dimension';
 import { MAIN_COLOR } from '../styles/color';
 import styled from 'styled-components/native';
 import ToastIcon from '../assets/images/ic-email.svg';
 
 const WaitherToast = styled.View`
-  top: 20px;
   color: white;
   flex-direction: row;
   align-items: center;
@@ -17,27 +15,30 @@ const WaitherToast = styled.View`
 `;
 
 const WaitherToastTextWrapper = styled.View`
+  position: relative;
   justify-content: center;
   align-items: flex-start;
 `;
 
 const WaitherToastText = styled.Text`
   color: white;
+  font-size: 15px;
+  font-weight: 500;
 `;
 
 const ToastIconWrapper = styled.View`
-  width: 50px;
-  height: 50px;
+  margin-left: 10px;
+  margin-right: 5px;
 `;
 
 export const toastConfig = {
   waitherToast: ({ text1, text2 }) => (
     <WaitherToast>
       <ToastIconWrapper>
-        <ToastIcon width={30} height={30} />
+        <ToastIcon width={50} height={50} />
       </ToastIconWrapper>
       <WaitherToastTextWrapper>
-        <WaitherToastText>{text1}</WaitherToastText>
+        <WaitherToastText style={{ marginBottom: 3 }}>{text1}</WaitherToastText>
         <WaitherToastText>{text2}</WaitherToastText>
       </WaitherToastTextWrapper>
     </WaitherToast>
