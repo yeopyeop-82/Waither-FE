@@ -7,6 +7,9 @@ import Register from './src/screens/Register';
 import EmailLogin from './src/screens/EmailLogin';
 import LoginReset from './src/screens/LoginReset';
 
+import Toast from 'react-native-toast-message';
+import { toastConfig } from './src/utils/toastConfig';
+
 export default function App() {
   const Stack = createNativeStackNavigator();
   useEffect(() => {
@@ -16,18 +19,21 @@ export default function App() {
   }, []);
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
-        <Stack.Screen
-          name="Login"
-          component={Login}
-          options={{ headerShown: false }}
-        />
+    <>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Login">
+          <Stack.Screen
+            name="Login"
+            component={Login}
+            options={{ headerShown: false }}
+          />
 
-        <Stack.Screen name="EmailLogin" component={EmailLogin} />
-        <Stack.Screen name="Register" component={Register} />
-        <Stack.Screen name="LoginReset" component={LoginReset} />
-      </Stack.Navigator>
-    </NavigationContainer>
+          <Stack.Screen name="EmailLogin" component={EmailLogin} />
+          <Stack.Screen name="Register" component={Register} />
+          <Stack.Screen name="LoginReset" component={LoginReset} />
+        </Stack.Navigator>
+      </NavigationContainer>
+      <Toast config={toastConfig} />
+    </>
   );
 }
