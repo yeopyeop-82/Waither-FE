@@ -8,6 +8,6 @@ export const showToast = (text1: string, text2: string) => {
     text2: text2,
     position: 'top',
     topOffset: 60,
-    visibilityTime: 3000,
+    visibilityTime: 4000,
   });
 };

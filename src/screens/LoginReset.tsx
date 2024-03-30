@@ -6,6 +6,7 @@ import Error from '../assets/images/Error.png';
 import notError from '../assets/images/notError.png';
 import Toast from 'react-native-toast-message';
 import { showToast } from '../utils/showToast';
+import { useNavigation } from '@react-navigation/native';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -97,6 +98,7 @@ const SubmitButtonText = styled.Text`
 `;
 
 const LoginReset = () => {
+  const navigation = useNavigation();
   const [EmailisPress, setEmailIsPress] = useState(false);
   const [email, setEmail] = useState('');
   const [emailMessage, setEmailMessage] = useState('');
@@ -125,6 +127,7 @@ const LoginReset = () => {
         '가입된 이메일로 임시 비밀번호를 전송했어요',
         '메일함을 확인해주세요',
       );
+      navigation.navigate('EmailLogin');
     }
   };
 
