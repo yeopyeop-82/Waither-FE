@@ -9,6 +9,7 @@ import {
   MAIN_COLOR,
 } from '../styles/color.js';
 import Modal from 'react-native-modal';
+import PasswordReset from './PasswordReset';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -224,7 +225,8 @@ export default function Login({ navigation }) {
         </NotLoginBtn>
       </Wrapper2>
       <NotUser>아직 회원이 아니시라면</NotUser>
-      <EmailRegister onPress={() => navigation.navigate('Register')}>
+      {/* 화면 구성을 위한 변경 Register -> PasswordReset */}
+      <EmailRegister onPress={() => navigation.navigate('PasswordReset')}>
         <EmailRegisterText>이메일로 회원가입</EmailRegisterText>
       </EmailRegister>
     </Wrapper>
