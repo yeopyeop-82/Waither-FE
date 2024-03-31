@@ -9,6 +9,7 @@ import LoginReset from './src/screens/LoginReset';
 
 import Toast from 'react-native-toast-message';
 import { toastConfig } from './src/utils/toastConfig';
+import PasswordReset from './src/screens/PasswordReset';
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -31,6 +32,7 @@ export default function App() {
           <Stack.Screen name="EmailLogin" component={EmailLogin} />
           <Stack.Screen name="Register" component={Register} />
           <Stack.Screen name="LoginReset" component={LoginReset} />
+          <Stack.Screen name="PasswordReset" component={PasswordReset} />
         </Stack.Navigator>
       </NavigationContainer>
       <Toast config={toastConfig} />

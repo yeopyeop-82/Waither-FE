@@ -6,7 +6,7 @@ import Error from '../assets/images/Error.png';
 import notError from '../assets/images/notError.png';
 import { useTogglePasswordVisibility } from '../utils/useTogglePasswordVisibility';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { mainModule } from 'process';
+import { useNavigation } from '@react-navigation/native';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -193,6 +193,8 @@ const TestEmail = 'abcde@naver.com';
 const TestNum = '0000';
 
 const Register = () => {
+  const navigation = useNavigation();
+
   //text input이 눌렸는지
   const [EmailisPress, setEmailIsPress] = useState(false);
   //입력값 저장
@@ -230,7 +232,7 @@ const Register = () => {
   //password 확인 text input이 눌렸는지
   const [checkPasswordIsPress, setCheckPasswordIsPress] = useState(false);
   //기존 입력한 비밀번호와 동일한지
-  const [isPasswordChecked, setisPasswordChecked] = useState(false);
+  const [isPasswordChecked, setIsPasswordChecked] = useState(false);
   //비밀번호 동일 여부에 따른 메세지
   const [checkPasswordMessage, setCheckPasswordMessage] = useState('');
   //확인 password 입력값 저장
@@ -319,14 +321,14 @@ const Register = () => {
     }
   };
 
-  const onChangeCheckPassword = (test) => {
-    setCheckPassword(test);
-    if (test === password) {
+  const onChangeCheckPassword = (text) => {
+    setCheckPassword(text);
+    if (text === password) {
       setCheckPasswordMessage('비밀번호가 일치해요.');
-      setisPasswordChecked(true);
+      setIsPasswordChecked(true);
     } else {
       setCheckPasswordMessage('비밀번호가 일치하지 않아요.');
-      setisPasswordChecked(false);
+      setIsPasswordChecked(false);
     }
   };
 
@@ -460,6 +462,7 @@ const Register = () => {
             </>
           ) : null}
           <RegisterCompleteBtn
+            disabled={!isPasswordChecked}
             style={{
               backgroundColor: isPasswordChecked
                 ? `${MAIN_COLOR}`
@@ -531,9 +534,9 @@ const Register = () => {
             <CheckPasswordInput
               secureTextEntry={passwordVisibility}
               autoCorrect={false}
-              // autoCapitalize="none"
-              // returnKeyType="next"
-              // inputMode="email"
+              autoCapitalize="none"
+              returnKeyType="next"
+              inputMode="email"
               placeholder="비밀번호"
               placeholderTextColor="#ced4da"
               value={checkPassword}
