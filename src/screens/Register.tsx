@@ -232,7 +232,7 @@ const Register = () => {
   //password 확인 text input이 눌렸는지
   const [checkPasswordIsPress, setCheckPasswordIsPress] = useState(false);
   //기존 입력한 비밀번호와 동일한지
-  const [isPasswordChecked, setisPasswordChecked] = useState(false);
+  const [isPasswordChecked, setIsPasswordChecked] = useState(false);
   //비밀번호 동일 여부에 따른 메세지
   const [checkPasswordMessage, setCheckPasswordMessage] = useState('');
   //확인 password 입력값 저장
@@ -325,10 +325,10 @@ const Register = () => {
     setCheckPassword(text);
     if (text === password) {
       setCheckPasswordMessage('비밀번호가 일치해요.');
-      setisPasswordChecked(true);
+      setIsPasswordChecked(true);
     } else {
       setCheckPasswordMessage('비밀번호가 일치하지 않아요.');
-      setisPasswordChecked(false);
+      setIsPasswordChecked(false);
     }
   };
 
@@ -534,9 +534,9 @@ const Register = () => {
             <CheckPasswordInput
               secureTextEntry={passwordVisibility}
               autoCorrect={false}
-              // autoCapitalize="none"
-              // returnKeyType="next"
-              // inputMode="email"
+              autoCapitalize="none"
+              returnKeyType="next"
+              inputMode="email"
               placeholder="비밀번호"
               placeholderTextColor="#ced4da"
               value={checkPassword}
