@@ -329,6 +329,7 @@ const PasswordReset = () => {
               placeholderTextColor="#ced4da"
               onChangeText={onChangeCheckPassword}
               value={checkPassword}
+              editable={isNewPasswordChecked ? true : false}
               onFocus={() => {
                 setCheckPasswordIsPress(true);
               }}
