@@ -32,7 +32,7 @@ const EmailInput = styled.TextInput`
   width: 80%;
 `;
 
-const EmailInputView = styled.TouchableOpacity`
+const EmailInputView = styled.View`
   width: 90%;
   border-color: #ced4da;
   border-bottom-width: 1px;
@@ -106,7 +106,7 @@ const VerifyInput = styled.TextInput`
   width: 80%;
 `;
 
-const VerifyInputView = styled.TouchableOpacity`
+const VerifyInputView = styled.View`
   width: 90%;
   border-color: #ced4da;
   border-bottom-width: 1px;
@@ -372,6 +372,7 @@ const Register = () => {
             backgroundColor:
               isEmail && !finalEmailCheck ? `${MAIN_COLOR}` : `${GREY_COLOR}`,
           }}
+          disabled={isEmail && !finalEmailCheck ? false : true}
         >
           <DuplicationCheckTitle>중복확인</DuplicationCheckTitle>
         </DuplicationCheckBtn>
@@ -411,7 +412,7 @@ const Register = () => {
                 style={{
                   borderBottomColor: isVerfiyCheck
                     ? `${MAIN_COLOR}`
-                    : (isEmail || EmailisPress) && email.length >= 1
+                    : !isVerfiyCheck && verifyNum.length >= 0 && isVerifyBtn
                       ? `${ERROR_COLOR}`
                       : `${GREY_COLOR}`,
                 }}
@@ -436,10 +437,13 @@ const Register = () => {
                 ) : null}
                 <VerifyBtn
                   onPress={CheckVerifynum}
+                  disabled={verifyNum.length === 4 ? false : true}
                   style={{
-                    backgroundColor: verifyIsPress
-                      ? `${MAIN_COLOR}`
-                      : `${GREY_COLOR}`,
+                    backgroundColor:
+                      // 인증번호 길이는 임시로 4로 지정
+                      verifyIsPress && verifyNum.length === 4
+                        ? `${MAIN_COLOR}`
+                        : `${GREY_COLOR}`,
                   }}
                 >
                   <VerifyTitle>인증하기</VerifyTitle>
@@ -447,7 +451,7 @@ const Register = () => {
               </VerifyInputView>
               <MessageView>
                 {isVerfiyCheck ? <ErrorImage source={notError} /> : null}
-                {!isVerfiyCheck && isVerifyBtn && verifyNum.length >= 1 ? (
+                {!isVerfiyCheck && isVerifyBtn && verifyNum.length >= 0 ? (
                   <ErrorImage source={Error} />
                 ) : null}
 
