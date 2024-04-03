@@ -238,6 +238,8 @@ const Register = () => {
   //확인 password 입력값 저장
   const [checkPassword, setCheckPassword] = useState('');
 
+  //이메일 변경 상태 확인 useEffect
+
   const { passwordVisibility, rightIcon, handlePasswordVisibility } =
     useTogglePasswordVisibility();
 
@@ -266,6 +268,10 @@ const Register = () => {
 
     return () => clearInterval(interval);
   }, [finalEmailCheck]);
+
+  useEffect(() => {
+    setIsDuplication(false);
+  }, [email]);
 
   const onChangeEmail = (text) => {
     setEmail(text);
@@ -339,7 +345,7 @@ const Register = () => {
       <EmailInputView
         style={{
           borderBottomColor:
-            (EmailisPress && isEmail) || finalEmailCheck
+            EmailisPress && isEmail && !isDuplication
               ? `${MAIN_COLOR}`
               : (!isEmail || EmailisPress) && email.length >= 1
                 ? `${ERROR_COLOR}`
@@ -379,6 +385,8 @@ const Register = () => {
       </EmailInputView>
       <MessageView>
         {isEmail && !isDuplication ? <ErrorImage source={notError} /> : null}
+        {/* 여기부분!! */}
+        {/* email.length == 0 일때 isDuplication(false) */}
         {isDuplication || (EmailisPress && !isEmail && email.length >= 1) ? (
           <ErrorImage source={Error} />
         ) : null}
