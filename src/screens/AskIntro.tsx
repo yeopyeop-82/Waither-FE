@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useRecoilValue } from 'recoil';
 import { userNameState } from '../recoil/userNameRecoil';
 import styled from 'styled-components/native';
 import AskDataboxLogo from '../assets/images/img-ask1-databox.svg';
 import AskDataboxPng from '../assets/images/img-ask1-databox.png';
 import { MAIN_COLOR } from '../styles/color';
+import { useNavigation } from '@react-navigation/native';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -37,6 +38,16 @@ const Bold = styled.Text`
 
 const AskIntro = () => {
   const name = useRecoilValue(userNameState);
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.navigate('AskWeather');
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [navigation]);
+
   return (
     <Wrapper>
       <Logo resizeMode="contain" source={AskDataboxPng} />
