@@ -53,7 +53,11 @@ export default function App() {
             name="AskNotificationTime"
             component={AskNotificationTime}
           />
-          <Stack.Screen name="AskOutro" component={AskOutro} />
+          <Stack.Screen
+            options={{ headerShown: true }}
+            name="AskOutro"
+            component={AskOutro}
+          />
         </Stack.Navigator>
       </NavigationContainer>
       <Toast config={toastConfig} />

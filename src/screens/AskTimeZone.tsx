@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { useRecoilValue } from 'recoil';
+import React, { useEffect, useState } from 'react';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import styled from 'styled-components/native';
 import { userWeatherState } from '../recoil/userWeather';
 import { Picker } from '@react-native-picker/picker';
 import { MAIN_COLOR } from '../styles/color';
 import { useNavigation } from '@react-navigation/native';
+import { userFeelingTimeZoneState } from '../recoil/userInitInfoRecoil';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -106,6 +107,9 @@ const AskTimeZone = () => {
   const weather = useRecoilValue(userWeatherState);
   const [selectedAmPm, setSelectedAmPm] = useState('AM');
   const [selectedTime, setSelectedTime] = useState('1');
+  const [userTimeZone, setUserTimeZone] = useRecoilState(
+    userFeelingTimeZoneState,
+  );
 
   const AmPmOptions = [
     { label: '오전', value: 'AM' },
@@ -117,7 +121,18 @@ const AskTimeZone = () => {
     value: `${index + 1}`,
   }));
 
+  useEffect(() => {
+    const userTimeZone1 =
+      (selectedAmPm === 'AM' ? 0 : 12) + Number(selectedTime);
+    setUserTimeZone(userTimeZone1);
+  }, [selectedAmPm, selectedTime, setUserTimeZone]);
+
   const handleSubmit = () => {
+    setUserTimeZone(0);
+    const userTimeZone1 =
+      (selectedAmPm === 'AM' ? 0 : 12) + Number(selectedTime);
+    setUserTimeZone(userTimeZone1);
+    console.log(userTimeZone);
     navigation.navigate('AskNotificationTime');
   };
 
