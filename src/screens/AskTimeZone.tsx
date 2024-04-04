@@ -25,7 +25,6 @@ const AskTitle = styled.Text`
 const AskAmPmButton = styled.TouchableOpacity`
   align-items: center;
   justify-content: center;
-  width: 65%;
   height: 40px;
   border-radius: 30px;
   margin-bottom: 5px;
@@ -66,7 +65,8 @@ const TimeText = styled.Text`
 `;
 
 const AmPmSelectButtonWrapper = styled.View`
-  width: 40%;
+  width: 25%;
+  margin-right: 20px;
 `;
 
 const TimePickerWrapper = styled.View`
