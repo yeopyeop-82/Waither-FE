@@ -7,6 +7,7 @@ import notError from '../assets/images/notError.png';
 import { useTogglePasswordVisibility } from '../utils/useTogglePasswordVisibility';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -24,6 +25,13 @@ const Logo = styled.Image`
 const RegisterTitle = styled.Text`
   margin-bottom: 60px;
   font-size: 20px;
+`;
+
+const FormWrapper = styled.View`
+  flex-direction: column;
+  align-items: center;
+  background-color: white;
+  flex: 1;
 `;
 
 const EmailInput = styled.TextInput`
@@ -340,253 +348,272 @@ const Register = () => {
 
   return (
     <Wrapper>
-      <Logo source={waitherLogo} />
-      <RegisterTitle>회원가입</RegisterTitle>
-      <EmailInputView
-        style={{
-          borderBottomColor:
-            EmailisPress && isEmail && !isDuplication
-              ? `${MAIN_COLOR}`
-              : (!isEmail || EmailisPress) && email.length >= 1
-                ? `${ERROR_COLOR}`
-                : `${GREY_COLOR}`,
-        }}
+      <KeyboardAwareScrollView
+        scrollEnabled={isVerfiyCheck ? true : false}
+        style={{ width: '100%' }}
       >
-        <EmailInput
-          autoCorrect={false}
-          spellCheck={false}
-          autoCapitalize="none"
-          autoFocus
-          returnKeyType="next"
-          inputMode="email"
-          placeholder="이메일@naver.com"
-          placeholderTextColor="#ced4da"
-          value={email}
-          onChangeText={onChangeEmail}
-          onFocus={() => {
-            setEmailIsPress(true);
-          }}
-          onBlur={() => {
-            setEmailIsPress(false);
-          }}
-          editable={finalEmailCheck ? false : true}
-        ></EmailInput>
+        <FormWrapper>
+          <Logo source={waitherLogo} />
+          <RegisterTitle>회원가입</RegisterTitle>
+          <EmailInputView
+            style={{
+              borderBottomColor:
+                EmailisPress && isEmail && !isDuplication
+                  ? `${MAIN_COLOR}`
+                  : (!isEmail || EmailisPress) && email.length >= 1
+                    ? `${ERROR_COLOR}`
+                    : `${GREY_COLOR}`,
+            }}
+          >
+            <EmailInput
+              autoCorrect={false}
+              spellCheck={false}
+              autoCapitalize="none"
+              autoFocus
+              returnKeyType="next"
+              inputMode="email"
+              placeholder="이메일@naver.com"
+              placeholderTextColor="#ced4da"
+              value={email}
+              onChangeText={onChangeEmail}
+              onFocus={() => {
+                setEmailIsPress(true);
+              }}
+              onBlur={() => {
+                setEmailIsPress(false);
+              }}
+              editable={finalEmailCheck ? false : true}
+            ></EmailInput>
 
-        <DuplicationCheckBtn
-          onPress={CheckEmail}
-          style={{
-            backgroundColor:
-              isEmail && !finalEmailCheck ? `${MAIN_COLOR}` : `${GREY_COLOR}`,
-          }}
-          disabled={isEmail && !finalEmailCheck ? false : true}
-        >
-          <DuplicationCheckTitle>중복확인</DuplicationCheckTitle>
-        </DuplicationCheckBtn>
-      </EmailInputView>
-      <MessageView>
-        {isEmail && !isDuplication ? <ErrorImage source={notError} /> : null}
-        {/* 여기부분!! */}
-        {/* email.length == 0 일때 isDuplication(false) */}
-        {isDuplication || (EmailisPress && !isEmail && email.length >= 1) ? (
-          <ErrorImage source={Error} />
-        ) : null}
-
-        <Message
-          style={{
-            color:
-              isEmail && !isDuplication ? `${MAIN_COLOR}` : `${ERROR_COLOR}`,
-          }}
-        >
-          {email.length >= 1 ? emailMessage : null}
-        </Message>
-      </MessageView>
-      {isEmailVerifyReady && (
-        <>
-          <HiddenView>
-            <EmailVerifyTitle>이메일 인증하기</EmailVerifyTitle>
-            {isVerfiyCheck && (
-              <>
-                <HiddenCheck source={notError} />
-                <HiddenTitle>인증 완료</HiddenTitle>
-              </>
-            )}
-          </HiddenView>
-          {!isVerfiyCheck ? (
-            <>
-              <EmailVerifyDetailTitle>
-                입려하신 이메일로 발송된 인증번호를 입력해주세요.
-              </EmailVerifyDetailTitle>
-              <VerifyInputView
-                style={{
-                  borderBottomColor: isVerfiyCheck
+            <DuplicationCheckBtn
+              onPress={CheckEmail}
+              style={{
+                backgroundColor:
+                  isEmail && !finalEmailCheck
                     ? `${MAIN_COLOR}`
-                    : !isVerfiyCheck && verifyNum.length >= 0 && isVerifyBtn
-                      ? `${ERROR_COLOR}`
-                      : `${GREY_COLOR}`,
-                }}
-              >
-                <VerifyInput
-                  placeholder="인증번호 입력"
-                  placeholderTextColor="#ced4da"
-                  autoCorrect={false}
-                  spellCheck={false}
-                  value={verifyNum}
-                  editable={isVerfiyCheck ? false : true}
-                  onChangeText={onChangeVerifyNum}
-                  onFocus={() => {
-                    setVerifyIsPress(true);
-                  }}
-                  onBlur={() => {
-                    setVerifyIsPress(false);
-                  }}
-                ></VerifyInput>
-                {finalEmailCheck && !isVerfiyCheck ? (
-                  <Timer>{formatTime()}</Timer>
-                ) : null}
-                <VerifyBtn
-                  onPress={CheckVerifynum}
-                  disabled={verifyNum.length === 4 ? false : true}
-                  style={{
-                    backgroundColor:
-                      // 인증번호 길이는 임시로 4로 지정
-                      verifyIsPress && verifyNum.length === 4
-                        ? `${MAIN_COLOR}`
-                        : `${GREY_COLOR}`,
-                  }}
-                >
-                  <VerifyTitle>인증하기</VerifyTitle>
-                </VerifyBtn>
-              </VerifyInputView>
-              <MessageView>
-                {isVerfiyCheck ? <ErrorImage source={notError} /> : null}
-                {!isVerfiyCheck && isVerifyBtn && verifyNum.length >= 0 ? (
-                  <ErrorImage source={Error} />
-                ) : null}
-
-                <Message
-                  style={{
-                    color: isVerfiyCheck ? `${MAIN_COLOR}` : `${ERROR_COLOR}`,
-                  }}
-                >
-                  {email.length >= 1 ? verifyMessage : null}
-                </Message>
-              </MessageView>
-            </>
-          ) : null}
-          <RegisterCompleteBtn
-            onPress={() => navigation.navigate('Greeting')}
-            disabled={!isPasswordChecked}
-            style={{
-              backgroundColor: isPasswordChecked
-                ? `${MAIN_COLOR}`
-                : `${GREY_COLOR}`,
-            }}
-          >
-            <RegisterCompleteTitle>회원가입 완료</RegisterCompleteTitle>
-          </RegisterCompleteBtn>
-        </>
-      )}
-      {isVerfiyCheck && (
-        <>
-          <PasswordInputView
-            style={{
-              borderBottomColor: isPassword
-                ? `${MAIN_COLOR}`
-                : (PasswordisPress || isPassword) && password.length >= 1
-                  ? `${ERROR_COLOR}`
-                  : `${GREY_COLOR}`,
-            }}
-          >
-            <PasswordInput
-              secureTextEntry={passwordVisibility}
-              autoCorrect={false}
-              autoCapitalize="none"
-              returnKeyType="next"
-              inputMode="email"
-              placeholder="비밀번호"
-              placeholderTextColor="#ced4da"
-              value={password}
-              onChangeText={onChangePassword}
-              onFocus={() => {
-                setPasswordIsPress(true);
+                    : `${GREY_COLOR}`,
               }}
-              onBlur={() => {
-                setPasswordIsPress(false);
-              }}
-            />
-            <ShowPassword onPress={handlePasswordVisibility}>
-              <MaterialCommunityIcons
-                name={rightIcon}
-                size={30}
-                color="#5189F6"
-              />
-            </ShowPassword>
-          </PasswordInputView>
-          <MessageView>
-            {isPassword ? <ErrorImage source={notError} /> : null}
-            {PasswordisPress && !isPassword && password.length >= 1 ? (
-              <ErrorImage source={Error} />
-            ) : null}
-
-            <Message
-              style={{ color: isPassword ? `${MAIN_COLOR}` : `${ERROR_COLOR}` }}
+              disabled={isEmail && !finalEmailCheck ? false : true}
             >
-              {password.length >= 1 ? passwordMessage : null}
-            </Message>
-          </MessageView>
-          <CheckPasswordInputView
-            style={{
-              borderBottomColor: isPasswordChecked
-                ? `${MAIN_COLOR}`
-                : (checkPasswordIsPress || checkPassword) &&
-                    checkPassword.length >= 1
-                  ? `${ERROR_COLOR}`
-                  : `${GREY_COLOR}`,
-            }}
-          >
-            <CheckPasswordInput
-              secureTextEntry={passwordVisibility}
-              autoCorrect={false}
-              autoCapitalize="none"
-              returnKeyType="next"
-              inputMode="email"
-              placeholder="비밀번호"
-              placeholderTextColor="#ced4da"
-              value={checkPassword}
-              onChangeText={onChangeCheckPassword}
-              onFocus={() => {
-                setCheckPasswordIsPress(true);
-              }}
-              onBlur={() => {
-                setCheckPasswordIsPress(false);
-              }}
-            />
-            <ShowPassword onPress={handlePasswordVisibility}>
-              <MaterialCommunityIcons
-                name={rightIcon}
-                size={30}
-                color="#5189F6"
-              />
-            </ShowPassword>
-          </CheckPasswordInputView>
+              <DuplicationCheckTitle>중복확인</DuplicationCheckTitle>
+            </DuplicationCheckBtn>
+          </EmailInputView>
           <MessageView>
-            {isPasswordChecked ? <ErrorImage source={notError} /> : null}
-            {checkPasswordIsPress &&
-            !isPasswordChecked &&
-            checkPassword.length >= 1 ? (
+            {isEmail && !isDuplication ? (
+              <ErrorImage source={notError} />
+            ) : null}
+            {/* 여기부분!! */}
+            {/* email.length == 0 일때 isDuplication(false) */}
+            {isDuplication ||
+            (EmailisPress && !isEmail && email.length >= 1) ? (
               <ErrorImage source={Error} />
             ) : null}
 
             <Message
               style={{
-                color: isPasswordChecked ? `${MAIN_COLOR}` : `${ERROR_COLOR}`,
+                color:
+                  isEmail && !isDuplication
+                    ? `${MAIN_COLOR}`
+                    : `${ERROR_COLOR}`,
               }}
             >
-              {password.length >= 1 ? checkPasswordMessage : null}
+              {email.length >= 1 ? emailMessage : null}
             </Message>
           </MessageView>
-        </>
-      )}
+          {isEmailVerifyReady && (
+            <>
+              <HiddenView>
+                <EmailVerifyTitle>이메일 인증하기</EmailVerifyTitle>
+                {isVerfiyCheck && (
+                  <>
+                    <HiddenCheck source={notError} />
+                    <HiddenTitle>인증 완료</HiddenTitle>
+                  </>
+                )}
+              </HiddenView>
+              {!isVerfiyCheck ? (
+                <>
+                  <EmailVerifyDetailTitle>
+                    입려하신 이메일로 발송된 인증번호를 입력해주세요.
+                  </EmailVerifyDetailTitle>
+                  <VerifyInputView
+                    style={{
+                      borderBottomColor: isVerfiyCheck
+                        ? `${MAIN_COLOR}`
+                        : !isVerfiyCheck && verifyNum.length >= 0 && isVerifyBtn
+                          ? `${ERROR_COLOR}`
+                          : `${GREY_COLOR}`,
+                    }}
+                  >
+                    <VerifyInput
+                      placeholder="인증번호 입력"
+                      placeholderTextColor="#ced4da"
+                      autoCorrect={false}
+                      spellCheck={false}
+                      value={verifyNum}
+                      editable={isVerfiyCheck ? false : true}
+                      onChangeText={onChangeVerifyNum}
+                      onFocus={() => {
+                        setVerifyIsPress(true);
+                      }}
+                      onBlur={() => {
+                        setVerifyIsPress(false);
+                      }}
+                    ></VerifyInput>
+                    {finalEmailCheck && !isVerfiyCheck ? (
+                      <Timer>{formatTime()}</Timer>
+                    ) : null}
+                    <VerifyBtn
+                      onPress={CheckVerifynum}
+                      disabled={verifyNum.length === 4 ? false : true}
+                      style={{
+                        backgroundColor:
+                          // 인증번호 길이는 임시로 4로 지정
+                          verifyIsPress && verifyNum.length === 4
+                            ? `${MAIN_COLOR}`
+                            : `${GREY_COLOR}`,
+                      }}
+                    >
+                      <VerifyTitle>인증하기</VerifyTitle>
+                    </VerifyBtn>
+                  </VerifyInputView>
+                  <MessageView>
+                    {isVerfiyCheck ? <ErrorImage source={notError} /> : null}
+                    {!isVerfiyCheck && isVerifyBtn && verifyNum.length >= 0 ? (
+                      <ErrorImage source={Error} />
+                    ) : null}
+
+                    <Message
+                      style={{
+                        color: isVerfiyCheck
+                          ? `${MAIN_COLOR}`
+                          : `${ERROR_COLOR}`,
+                      }}
+                    >
+                      {email.length >= 1 ? verifyMessage : null}
+                    </Message>
+                  </MessageView>
+                </>
+              ) : null}
+            </>
+          )}
+          {isVerfiyCheck && (
+            <>
+              <PasswordInputView
+                style={{
+                  borderBottomColor: isPassword
+                    ? `${MAIN_COLOR}`
+                    : (PasswordisPress || isPassword) && password.length >= 1
+                      ? `${ERROR_COLOR}`
+                      : `${GREY_COLOR}`,
+                }}
+              >
+                <PasswordInput
+                  secureTextEntry={passwordVisibility}
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  returnKeyType="next"
+                  inputMode="email"
+                  placeholder="비밀번호"
+                  placeholderTextColor="#ced4da"
+                  value={password}
+                  onChangeText={onChangePassword}
+                  onFocus={() => {
+                    setPasswordIsPress(true);
+                  }}
+                  onBlur={() => {
+                    setPasswordIsPress(false);
+                  }}
+                />
+                <ShowPassword onPress={handlePasswordVisibility}>
+                  <MaterialCommunityIcons
+                    name={rightIcon}
+                    size={30}
+                    color="#5189F6"
+                  />
+                </ShowPassword>
+              </PasswordInputView>
+              <MessageView>
+                {isPassword ? <ErrorImage source={notError} /> : null}
+                {PasswordisPress && !isPassword && password.length >= 1 ? (
+                  <ErrorImage source={Error} />
+                ) : null}
+
+                <Message
+                  style={{
+                    color: isPassword ? `${MAIN_COLOR}` : `${ERROR_COLOR}`,
+                  }}
+                >
+                  {password.length >= 1 ? passwordMessage : null}
+                </Message>
+              </MessageView>
+              <CheckPasswordInputView
+                style={{
+                  borderBottomColor: isPasswordChecked
+                    ? `${MAIN_COLOR}`
+                    : (checkPasswordIsPress || checkPassword) &&
+                        checkPassword.length >= 1
+                      ? `${ERROR_COLOR}`
+                      : `${GREY_COLOR}`,
+                }}
+              >
+                <CheckPasswordInput
+                  secureTextEntry={passwordVisibility}
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  returnKeyType="next"
+                  inputMode="email"
+                  placeholder="비밀번호"
+                  placeholderTextColor="#ced4da"
+                  value={checkPassword}
+                  onChangeText={onChangeCheckPassword}
+                  onFocus={() => {
+                    setCheckPasswordIsPress(true);
+                  }}
+                  onBlur={() => {
+                    setCheckPasswordIsPress(false);
+                  }}
+                />
+                <ShowPassword onPress={handlePasswordVisibility}>
+                  <MaterialCommunityIcons
+                    name={rightIcon}
+                    size={30}
+                    color="#5189F6"
+                  />
+                </ShowPassword>
+              </CheckPasswordInputView>
+              <MessageView>
+                {isPasswordChecked ? <ErrorImage source={notError} /> : null}
+                {checkPasswordIsPress &&
+                !isPasswordChecked &&
+                checkPassword.length >= 1 ? (
+                  <ErrorImage source={Error} />
+                ) : null}
+
+                <Message
+                  style={{
+                    color: isPasswordChecked
+                      ? `${MAIN_COLOR}`
+                      : `${ERROR_COLOR}`,
+                  }}
+                >
+                  {checkPassword.length >= 1 ? checkPasswordMessage : null}
+                </Message>
+              </MessageView>
+            </>
+          )}
+        </FormWrapper>
+      </KeyboardAwareScrollView>
+      <RegisterCompleteBtn
+        disabled={!isPasswordChecked}
+        style={{
+          backgroundColor: isPasswordChecked
+            ? `${MAIN_COLOR}`
+            : `${GREY_COLOR}`,
+        }}
+      >
+        <RegisterCompleteTitle>회원가입 완료</RegisterCompleteTitle>
+      </RegisterCompleteBtn>
     </Wrapper>
   );
 };
