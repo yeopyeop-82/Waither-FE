@@ -92,7 +92,7 @@ const AskWeather = () => {
 
   const handleSubmit = () => {
     storeWeather(selectedValue);
-    navigation.navigate('AskIntro');
+    navigation.navigate('AskTimeZone');
   };
 
   return (

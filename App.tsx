@@ -14,6 +14,7 @@ import PasswordReset from './src/screens/PasswordReset';
 import { RecoilRoot } from 'recoil';
 import AskIntro from './src/screens/AskIntro';
 import AskWeather from './src/screens/AskWeather';
+import AskTimeZone from './src/screens/AskTimeZone';
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -45,6 +46,7 @@ export default function App() {
           <Stack.Screen name="GreetNaming" component={GreetNaming} />
           <Stack.Screen name="AskIntro" component={AskIntro} />
           <Stack.Screen name="AskWeather" component={AskWeather} />
+          <Stack.Screen name="AskTimeZone" component={AskTimeZone} />
         </Stack.Navigator>
       </NavigationContainer>
       <Toast config={toastConfig} />
