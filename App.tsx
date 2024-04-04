@@ -33,7 +33,7 @@ export default function App() {
           <Stack.Screen name="Register" component={Register} />
           <Stack.Screen name="LoginReset" component={LoginReset} />
           <Stack.Screen
-            options={{ headerShown: false }}
+            options={{ headerShown: true }}
             name="Greeting"
             component={Greeting}
           />
