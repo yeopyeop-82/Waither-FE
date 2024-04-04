@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import styled from 'styled-components/native';
+import { MAIN_COLOR } from '../styles/color';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -22,7 +23,6 @@ const Bold = styled.Text`
 `;
 
 const AskWeatherButtonWrapper = styled.View`
-  flex: 0.6;
   width: 60%;
   align-items: center;
   margin-top: 40px;
@@ -49,11 +49,7 @@ const AskWeather = () => {
         </AskTitle>
         <AskTitle>어떠셨나요?</AskTitle>
       </AskTitleWrapper>
-      <AskWeatherButtonWrapper>
-        <AskWeatherButton>
-          <AskWeatherButtonText>추웠어요</AskWeatherButtonText>
-        </AskWeatherButton>
-      </AskWeatherButtonWrapper>
+      <AskWeatherButtonWrapper></AskWeatherButtonWrapper>
     </Wrapper>
   );
 };
