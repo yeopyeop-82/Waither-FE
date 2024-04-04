@@ -3,6 +3,8 @@ import styled from 'styled-components/native';
 import { ERROR_COLOR, GREY_COLOR, MAIN_COLOR } from '../styles/color';
 import Error from '../assets/images/Error.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { userNameState } from '../recoil/recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -79,7 +81,7 @@ const SubmitButtonText = styled.Text`
 
 const GreetNaming = () => {
   const [NameisPress, setNameIsPress] = useState(false);
-  const [name, setName] = useState('');
+  const [name, setName] = useRecoilState(userNameState);
   const [nameMessage, setNameMessage] = useState('');
   const [isName, setIsName] = useState(false);
 
@@ -99,6 +101,7 @@ const GreetNaming = () => {
   const storeName = async (name) => {
     try {
       await AsyncStorage.setItem('userName', name);
+      console.log('저장됨');
     } catch (e) {
       console.log("Error storing user's name:", e);
     }
