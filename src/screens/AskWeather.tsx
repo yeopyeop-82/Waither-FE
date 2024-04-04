@@ -3,6 +3,9 @@ import styled from 'styled-components/native';
 import { MAIN_COLOR } from '../styles/color';
 import { TouchableOpacity, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRecoilState } from 'recoil';
+import { userWeatherState } from '../recoil/userWeather';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -69,7 +72,7 @@ const AskWeatherRadioButton = ({ label, selected, onSelect }) => (
 
 const AskWeather = () => {
   const navigation = useNavigation();
-  const [selectedValue, setSelectedValue] = useState('option3');
+  const [selectedValue, setSelectedValue] = useRecoilState(userWeatherState);
   const weatherOptions = [
     { label: '추웠어요', value: 'option1' },
     { label: '조금 추웠어요', value: 'option2' },
@@ -78,7 +81,17 @@ const AskWeather = () => {
     { label: '더웠어요', value: 'option5' },
   ];
 
+  const storeWeather = async (weather) => {
+    try {
+      await AsyncStorage.setItem('userWeather', weather);
+      console.log('저장됨');
+    } catch (e) {
+      console.log("Error storing user's weather:", e);
+    }
+  };
+
   const handleSubmit = () => {
+    storeWeather(selectedValue);
     navigation.navigate('AskIntro');
   };
 
