@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useRecoilValue } from 'recoil';
 import { userNameState } from '../recoil/userNameRecoil';
 import styled from 'styled-components/native';
-import AskDataboxPng from '../assets/images/img-ask1-databox.png';
+import AskDataboxPng from '../assets/images/img-ask1-databox-check.png';
 import { MAIN_COLOR } from '../styles/color';
 import { useNavigation } from '@react-navigation/native';
 
@@ -15,8 +15,8 @@ const Wrapper = styled.View`
 `;
 
 const Logo = styled.Image`
-  width: 130px;
-  height: 130px;
+  width: 150px;
+  height: 150px;
   margin-bottom: 50px;
 `;
 
@@ -42,12 +42,16 @@ const AskOutro = () => {
     <Wrapper>
       <Logo resizeMode="contain" source={AskDataboxPng} />
       <AskMessageWrapper>
-        <AskMessage>반가워요 {name} 님!</AskMessage>
+        <AskMessage>{name} 님의</AskMessage>
+        <AskMessage style={{ marginBottom: 30 }}>
+          데이터가 저장되었어요.
+        </AskMessage>
+        <AskMessage>이제 웨이더가</AskMessage>
         <AskMessage>
-          <Bold>정확한 기상예보</Bold>를 위해
+          {name} 님에게 <Bold>꼭 맞는</Bold>
         </AskMessage>
         <AskMessage>
-          {name} 님이 느낀 <Bold>어제 날씨</Bold>가 궁금해요.
+          <Bold>기상예보를 보내드릴게요.</Bold>
         </AskMessage>
       </AskMessageWrapper>
     </Wrapper>
