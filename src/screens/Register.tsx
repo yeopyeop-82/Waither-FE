@@ -474,6 +474,7 @@ const Register = () => {
             </>
           ) : null}
           <RegisterCompleteBtn
+            onPress={() => navigation.navigate('Greeting')}
             disabled={!isPasswordChecked}
             style={{
               backgroundColor: isPasswordChecked
