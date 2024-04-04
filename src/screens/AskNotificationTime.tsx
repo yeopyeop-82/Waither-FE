@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components/native';
 import { Picker } from '@react-native-picker/picker';
+import { MAIN_COLOR } from '../styles/color';
+import { useNavigation } from '@react-navigation/native';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -32,7 +34,31 @@ const PickerWrapper = styled.View`
   flex-direction: row;
 `;
 
+const SubmitButtonWrapper = styled.View`
+  width: 100%;
+  align-items: center;
+  position: absolute;
+  bottom: 50px;
+`;
+
+const SubmitButton = styled.TouchableOpacity`
+  width: 90%;
+  height: 50px;
+  border-radius: 40px;
+  background-color: ${MAIN_COLOR};
+  justify-content: center;
+  align-items: center;
+`;
+
+const SubmitButtonText = styled.Text`
+  color: white;
+  font-size: 20px;
+  font-weight: 800;
+`;
+
 const AskNotificationTime = () => {
+  const navigation = useNavigation();
+
   const [selectedAmPm, setSelectedAmPm] = useState('AM');
   const [selectedHour, setSelectedHour] = useState('1');
   const [selectedMinute, setSelectedMinute] = useState('1');
@@ -51,6 +77,10 @@ const AskNotificationTime = () => {
     label: `${index + 1}`,
     value: `${index + 1}`,
   }));
+
+  const handleSubmit = () => {
+    navigation.navigate('AskOutro');
+  };
 
   return (
     <Wrapper>
@@ -113,6 +143,11 @@ const AskNotificationTime = () => {
           ))}
         </Picker>
       </PickerWrapper>
+      <SubmitButtonWrapper>
+        <SubmitButton onPress={handleSubmit}>
+          <SubmitButtonText>완료</SubmitButtonText>
+        </SubmitButton>
+      </SubmitButtonWrapper>
     </Wrapper>
   );
 };

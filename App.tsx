@@ -16,6 +16,7 @@ import AskIntro from './src/screens/AskIntro';
 import AskWeather from './src/screens/AskWeather';
 import AskTimeZone from './src/screens/AskTimeZone';
 import AskNotificationTime from './src/screens/AskNotificationTime';
+import AskOutro from './src/screens/AskOutro';
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -52,6 +53,7 @@ export default function App() {
             name="AskNotificationTime"
             component={AskNotificationTime}
           />
+          <Stack.Screen name="AskOutro" component={AskOutro} />
         </Stack.Navigator>
       </NavigationContainer>
       <Toast config={toastConfig} />
