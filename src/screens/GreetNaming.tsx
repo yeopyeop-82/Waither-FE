@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components/native';
 import { ERROR_COLOR, GREY_COLOR, MAIN_COLOR } from '../styles/color';
 import Error from '../assets/images/Error.png';
-import notError from '../assets/images/notError.png';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -96,6 +96,20 @@ const GreetNaming = () => {
     }
   };
 
+  const storeName = async (name) => {
+    try {
+      await AsyncStorage.setItem('userName', name);
+    } catch (e) {
+      console.log("Error storing user's name:", e);
+    }
+  };
+
+  const handleSubmit = () => {
+    if (isName) {
+      storeName(name);
+    }
+  };
+
   return (
     <Wrapper>
       <GreetNamingWrapper>
@@ -143,6 +157,7 @@ const GreetNaming = () => {
             backgroundColor: isName ? MAIN_COLOR : GREY_COLOR,
           }}
           disabled={!isName}
+          onPress={handleSubmit}
         >
           <SubmitButtonText>완료</SubmitButtonText>
         </SubmitButton>
