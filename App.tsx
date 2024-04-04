@@ -15,6 +15,7 @@ import { RecoilRoot } from 'recoil';
 import AskIntro from './src/screens/AskIntro';
 import AskWeather from './src/screens/AskWeather';
 import AskTimeZone from './src/screens/AskTimeZone';
+import AskNotificationTime from './src/screens/AskNotificationTime';
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -47,6 +48,10 @@ export default function App() {
           <Stack.Screen name="AskIntro" component={AskIntro} />
           <Stack.Screen name="AskWeather" component={AskWeather} />
           <Stack.Screen name="AskTimeZone" component={AskTimeZone} />
+          <Stack.Screen
+            name="AskNotificationTime"
+            component={AskNotificationTime}
+          />
         </Stack.Navigator>
       </NavigationContainer>
       <Toast config={toastConfig} />
