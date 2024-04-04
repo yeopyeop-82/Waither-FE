@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useRecoilValue } from 'recoil';
-import { userNameState } from '../recoil/userNameRecoil';
+import { userNameState } from '../recoil/userInitInfoRecoil';
 import styled from 'styled-components/native';
 import AskDataboxPng from '../assets/images/img-ask1-databox-check.png';
 import { MAIN_COLOR } from '../styles/color';

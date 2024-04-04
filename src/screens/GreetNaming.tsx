@@ -3,7 +3,7 @@ import styled from 'styled-components/native';
 import { ERROR_COLOR, GREY_COLOR, MAIN_COLOR } from '../styles/color';
 import Error from '../assets/images/Error.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { userNameState } from '../recoil/userNameRecoil';
+import { userNameState } from '../recoil/userInitInfoRecoil';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useNavigation } from '@react-navigation/native';
 

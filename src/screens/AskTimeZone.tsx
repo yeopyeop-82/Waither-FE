@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import styled from 'styled-components/native';
-import { userWeatherState } from '../recoil/userWeather';
+import { userFeelingWeatherState } from '../recoil/userInitInfoRecoil';
 import { Picker } from '@react-native-picker/picker';
 import { MAIN_COLOR } from '../styles/color';
 import { useNavigation } from '@react-navigation/native';
@@ -104,7 +104,7 @@ const DontKnowSubmitButtonText = styled(AskAmPmButtonText)`
 
 const AskTimeZone = () => {
   const navigation = useNavigation();
-  const weather = useRecoilValue(userWeatherState);
+  const weather = useRecoilValue(userFeelingWeatherState);
   const [selectedAmPm, setSelectedAmPm] = useState('AM');
   const [selectedTime, setSelectedTime] = useState('1');
   const [userTimeZone, setUserTimeZone] = useRecoilState(

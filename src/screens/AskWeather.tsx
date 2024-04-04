@@ -4,7 +4,7 @@ import { MAIN_COLOR } from '../styles/color';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRecoilState } from 'recoil';
-import { userWeatherState } from '../recoil/userWeather';
+import { userFeelingWeatherState } from '../recoil/userInitInfoRecoil';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -71,7 +71,9 @@ const AskWeatherRadioButton = ({ label, selected, onSelect }) => (
 
 const AskWeather = () => {
   const navigation = useNavigation();
-  const [selectedValue, setSelectedValue] = useRecoilState(userWeatherState);
+  const [selectedValue, setSelectedValue] = useRecoilState(
+    userFeelingWeatherState,
+  );
   const weatherOptions = [
     { label: '추웠어요', value: 'option1' },
     { label: '조금 추웠어요', value: 'option2' },
