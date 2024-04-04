@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useRecoilValue } from 'recoil';
+import { userNameState } from '../recoil/userNameRecoil';
 import styled from 'styled-components/native';
 
 const Wrapper = styled.View`
@@ -11,9 +13,10 @@ const Wrapper = styled.View`
 const Name = styled.Text``;
 
 const AskIntro = () => {
+  const name = useRecoilValue(userNameState);
   return (
     <Wrapper>
-      <Name>Ask</Name>
+      <Name>{name}</Name>
     </Wrapper>
   );
 };
