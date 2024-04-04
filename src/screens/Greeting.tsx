@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components/native';
+import { useNavigation } from '@react-navigation/native';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -28,6 +29,16 @@ const BoldText = styled.Text`
 `;
 
 const Greeting = () => {
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.navigate('GreetNaming'); // Replace 'GreetNaming' with the actual name of your screen
+    }, 3000); // 3000 milliseconds = 3 seconds
+
+    return () => clearTimeout(timer); // Cleanup the timer on component unmount
+  }, [navigation]);
+
   return (
     <Wrapper>
       <GreetingTitle>안녕하세요.</GreetingTitle>

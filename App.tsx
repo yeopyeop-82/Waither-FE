@@ -9,6 +9,7 @@ import LoginReset from './src/screens/LoginReset';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from './src/utils/toastConfig';
 import Greeting from './src/screens/Greeting';
+import GreetNaming from './src/screens/GreetNaming';
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -36,6 +37,7 @@ export default function App() {
             name="Greeting"
             component={Greeting}
           />
+          <Stack.Screen name="GreetNaming" component={GreetNaming} />
         </Stack.Navigator>
       </NavigationContainer>
       <Toast config={toastConfig} />
