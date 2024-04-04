@@ -5,6 +5,7 @@ import Error from '../assets/images/Error.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { userNameState } from '../recoil/recoil';
 import { useRecoilState, useRecoilValue } from 'recoil';
+import { useNavigation } from '@react-navigation/native';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -80,6 +81,7 @@ const SubmitButtonText = styled.Text`
 `;
 
 const GreetNaming = () => {
+  const navigation = useNavigation();
   const [NameisPress, setNameIsPress] = useState(false);
   const [name, setName] = useRecoilState(userNameState);
   const [nameMessage, setNameMessage] = useState('');
@@ -110,6 +112,7 @@ const GreetNaming = () => {
   const handleSubmit = () => {
     if (isName) {
       storeName(name);
+      navigation.navigate('AskIntro');
     }
   };
 

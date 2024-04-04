@@ -12,6 +12,7 @@ import Greeting from './src/screens/Greeting';
 import GreetNaming from './src/screens/GreetNaming';
 import PasswordReset from './src/screens/PasswordReset';
 import { RecoilRoot } from 'recoil';
+import AskIntro from './src/screens/AskIntro';
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -41,6 +42,7 @@ export default function App() {
             component={Greeting}
           />
           <Stack.Screen name="GreetNaming" component={GreetNaming} />
+          <Stack.Screen name="AskIntro" component={AskIntro} />
         </Stack.Navigator>
       </NavigationContainer>
       <Toast config={toastConfig} />
