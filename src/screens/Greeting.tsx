@@ -33,10 +33,10 @@ const Greeting = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigation.navigate('GreetNaming'); // Replace 'GreetNaming' with the actual name of your screen
-    }, 3000); // 3000 milliseconds = 3 seconds
+      navigation.navigate('GreetNaming');
+    }, 3000);
 
-    return () => clearTimeout(timer); // Cleanup the timer on component unmount
+    return () => clearTimeout(timer);
   }, [navigation]);
 
   return (
