@@ -78,6 +78,10 @@ const AskWeather = () => {
     { label: '더웠어요', value: 'option5' },
   ];
 
+  const handleSubmit = () => {
+    navigation.navigate('AskIntro');
+  };
+
   return (
     <Wrapper>
       <AskTitleWrapper>
@@ -95,7 +99,7 @@ const AskWeather = () => {
             onSelect={() => setSelectedValue(option.value)}
           />
         ))}
-        <SubmitButton>
+        <SubmitButton onPress={handleSubmit}>
           <SubmitButtonText>확인</SubmitButtonText>
         </SubmitButton>
       </AskWeatherButtonWrapper>
