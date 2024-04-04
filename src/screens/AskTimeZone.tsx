@@ -122,16 +122,12 @@ const AskTimeZone = () => {
   }));
 
   useEffect(() => {
-    const userTimeZone1 =
+    const userTimeZone =
       (selectedAmPm === 'AM' ? 0 : 12) + Number(selectedTime);
-    setUserTimeZone(userTimeZone1);
+    setUserTimeZone(userTimeZone);
   }, [selectedAmPm, selectedTime, setUserTimeZone]);
 
   const handleSubmit = () => {
-    setUserTimeZone(0);
-    const userTimeZone1 =
-      (selectedAmPm === 'AM' ? 0 : 12) + Number(selectedTime);
-    setUserTimeZone(userTimeZone1);
     console.log(userTimeZone);
     navigation.navigate('AskNotificationTime');
   };
