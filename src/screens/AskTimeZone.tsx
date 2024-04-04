@@ -148,9 +148,10 @@ const AskTimeZone = () => {
           ))}
         </AmPmSelectButtonWrapper>
         <Picker
-          style={{ width: 100, height: 45 }}
-          itemStyle={{ height: 45 }}
-          selectionColor="rgba(81, 137, 246, 0.2)"
+          style={{ width: 100 }}
+          //   itemStyle={{ width: 100, height: 150 }}
+          selectionColor={'rgba(81, 137, 246, 0.2)'}
+          numberOfLines={2}
           selectedValue={selectedTime}
           onValueChange={(itemValue, itemIndex) => setSelectedTime(itemValue)}
         >
@@ -159,6 +160,7 @@ const AskTimeZone = () => {
               key={option.value}
               label={option.label}
               value={option.value}
+              style={{ backgroundColor: 'tomato' }}
             />
           ))}
         </Picker>

@@ -9,14 +9,35 @@ const Wrapper = styled.View`
   flex: 1;
 `;
 
-const Example = styled.Text`
+const AskTitleWrapper = styled.View`
+  align-items: center;
+`;
+
+const AskSubTitle = styled.Text`
+  font-size: 23px;
+  margin-bottom: 15px;
+`;
+
+const AskTitle = styled.Text`
   font-size: 30px;
+`;
+
+const Bold = styled.Text`
+  font-weight: 800;
 `;
 
 const AskNotificationTime = () => {
   return (
     <Wrapper>
-      <Example>안녕</Example>
+      <AskTitleWrapper>
+        <AskSubTitle>마지막 단계에요!</AskSubTitle>
+        <AskTitle>
+          <Bold>날씨 알림</Bold>을 받으실
+        </AskTitle>
+        <AskTitle>
+          <Bold>시간대</Bold>를 설정해주세요.
+        </AskTitle>
+      </AskTitleWrapper>
     </Wrapper>
   );
 };
