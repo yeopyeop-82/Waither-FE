@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components/native';
+import { Picker } from '@react-native-picker/picker';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -11,6 +12,7 @@ const Wrapper = styled.View`
 
 const AskTitleWrapper = styled.View`
   align-items: center;
+  margin-bottom: 30px;
 `;
 
 const AskSubTitle = styled.Text`
@@ -26,7 +28,30 @@ const Bold = styled.Text`
   font-weight: 800;
 `;
 
+const PickerWrapper = styled.View`
+  flex-direction: row;
+`;
+
 const AskNotificationTime = () => {
+  const [selectedAmPm, setSelectedAmPm] = useState('AM');
+  const [selectedHour, setSelectedHour] = useState('1');
+  const [selectedMinute, setSelectedMinute] = useState('1');
+
+  const AmPmOptions = [
+    { label: '오전', value: 'AM' },
+    { label: '오후', value: 'PM' },
+  ];
+
+  const hourOptions = Array.from({ length: 12 }, (_, index) => ({
+    label: `${index + 1}`,
+    value: `${index + 1}`,
+  }));
+
+  const minuteOptions = Array.from({ length: 60 }, (_, index) => ({
+    label: `${index + 1}`,
+    value: `${index + 1}`,
+  }));
+
   return (
     <Wrapper>
       <AskTitleWrapper>
@@ -38,6 +63,56 @@ const AskNotificationTime = () => {
           <Bold>시간대</Bold>를 설정해주세요.
         </AskTitle>
       </AskTitleWrapper>
+      <PickerWrapper>
+        <Picker
+          style={{ width: 100 }}
+          //   itemStyle={{ width: 100, height: 150 }}
+          selectionColor={'rgba(81, 137, 246, 0.2)'}
+          selectedValue={selectedAmPm}
+          onValueChange={(itemValue, itemIndex) => setSelectedAmPm(itemValue)}
+        >
+          {AmPmOptions.map((option) => (
+            <Picker.Item
+              key={option.value}
+              label={option.label}
+              value={option.value}
+              style={{ backgroundColor: 'tomato' }}
+            />
+          ))}
+        </Picker>
+        <Picker
+          style={{ width: 100 }}
+          //   itemStyle={{ width: 100, height: 150 }}
+          selectionColor={'rgba(81, 137, 246, 0.2)'}
+          selectedValue={selectedHour}
+          onValueChange={(itemValue, itemIndex) => setSelectedHour(itemValue)}
+        >
+          {hourOptions.map((option) => (
+            <Picker.Item
+              key={option.value}
+              label={option.label}
+              value={option.value}
+              style={{ backgroundColor: 'tomato' }}
+            />
+          ))}
+        </Picker>
+        <Picker
+          style={{ width: 100 }}
+          //   itemStyle={{ width: 100, height: 150 }}
+          selectionColor={'rgba(81, 137, 246, 0.2)'}
+          selectedValue={selectedMinute}
+          onValueChange={(itemValue, itemIndex) => setSelectedMinute(itemValue)}
+        >
+          {minuteOptions.map((option) => (
+            <Picker.Item
+              key={option.value}
+              label={option.label}
+              value={option.value}
+              style={{ backgroundColor: 'tomato' }}
+            />
+          ))}
+        </Picker>
+      </PickerWrapper>
     </Wrapper>
   );
 };
