@@ -1,8 +1,8 @@
+import { Picker } from '@react-native-picker/picker';
+import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import styled from 'styled-components/native';
-import { Picker } from '@react-native-picker/picker';
 import { MAIN_COLOR } from '../styles/color';
-import { useNavigation } from '@react-navigation/native';
 
 const Wrapper = styled.View`
   flex-direction: column;

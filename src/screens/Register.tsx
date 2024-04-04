@@ -1,13 +1,13 @@
-import React, { useEffect, useState, useTransition } from 'react';
-import styled from 'styled-components/native';
-import waitherLogo from '../assets/images/waither-logo.png';
-import { ERROR_COLOR, GREY_COLOR, MAIN_COLOR } from '../styles/color';
-import Error from '../assets/images/Error.png';
-import notError from '../assets/images/notError.png';
-import { useTogglePasswordVisibility } from '../utils/useTogglePasswordVisibility';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import styled from 'styled-components/native';
+import Error from '../assets/images/Error.png';
+import notError from '../assets/images/notError.png';
+import waitherLogo from '../assets/images/waither-logo.png';
+import { ERROR_COLOR, GREY_COLOR, MAIN_COLOR } from '../styles/color';
+import { useTogglePasswordVisibility } from '../utils/useTogglePasswordVisibility';
 
 const Wrapper = styled.View`
   flex-direction: column;

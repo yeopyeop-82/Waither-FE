@@ -1,10 +1,9 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useRecoilValue } from 'recoil';
-import { userNameState } from '../recoil/userInitInfoRecoil';
 import styled from 'styled-components/native';
 import AskDataboxPng from '../assets/images/img-ask1-databox-check.png';
+import { userNameState } from '../recoil/userInitInfoRecoil';
 import { MAIN_COLOR } from '../styles/color';
-import { useNavigation } from '@react-navigation/native';
 
 const Wrapper = styled.View`
   flex-direction: column;

@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
+import Modal from 'react-native-modal';
 import { styled } from 'styled-components/native';
-import waitherLogo from '../assets/images/waither-logo.png';
-import KakaoLogo from '../assets/images/Kakao-logo.png';
 import AppleLogo from '../assets/images/Apple-logo.png';
+import KakaoLogo from '../assets/images/Kakao-logo.png';
+import waitherLogo from '../assets/images/waither-logo.png';
 import {
   APPLE_LOGIN_COLOR,
   KAKAO_LOGIN_COLOR,
   MAIN_COLOR,
 } from '../styles/color.js';
-import Modal from 'react-native-modal';
-import PasswordReset from './PasswordReset';
 
 const Wrapper = styled.View`
   flex-direction: column;
