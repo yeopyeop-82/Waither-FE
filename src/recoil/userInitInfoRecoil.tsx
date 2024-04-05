@@ -7,7 +7,7 @@ export const userFeelingTimeZoneState = atom({
 
 export const userNotificationTimeState = atom({
   key: 'userNotificationTimeState',
-  default: 0,
+  default: '',
 });
 
 export const userFeelingWeatherState = atom({

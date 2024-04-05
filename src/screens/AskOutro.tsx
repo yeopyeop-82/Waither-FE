@@ -2,7 +2,12 @@ import React from 'react';
 import { useRecoilValue } from 'recoil';
 import styled from 'styled-components/native';
 import AskDataboxPng from '../assets/images/img-ask1-databox-check.png';
-import { userNameState } from '../recoil/userInitInfoRecoil';
+import {
+  userFeelingTimeZoneState,
+  userFeelingWeatherState,
+  userNameState,
+  userNotificationTimeState,
+} from '../recoil/userInitInfoRecoil';
 import { MAIN_COLOR } from '../styles/color';
 
 const Wrapper = styled.View`
@@ -36,6 +41,9 @@ const Bold = styled.Text`
 
 const AskOutro = () => {
   const name = useRecoilValue(userNameState);
+  const feelingWeather = useRecoilValue(userFeelingWeatherState);
+  const feelingTimeZone = useRecoilValue(userFeelingTimeZoneState);
+  const notificationTime = useRecoilValue(userNotificationTimeState);
 
   return (
     <Wrapper>
@@ -51,6 +59,13 @@ const AskOutro = () => {
         </AskMessage>
         <AskMessage>
           <Bold>기상예보를 보내드릴게요.</Bold>
+        </AskMessage>
+        <AskMessage>
+          이름 : {name} / 어제 날씨 : {feelingWeather}
+        </AskMessage>
+        <AskMessage>
+          춥/덥다고 느낀 시간 : {feelingTimeZone} / 알림시간 :{' '}
+          {notificationTime}
         </AskMessage>
       </AskMessageWrapper>
     </Wrapper>

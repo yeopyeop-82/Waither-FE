@@ -1,8 +1,10 @@
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
 import { MAIN_COLOR } from '../styles/color';
+import { useRecoilState } from 'recoil';
+import { userNotificationTimeState } from '../recoil/userInitInfoRecoil';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -63,6 +65,10 @@ const AskNotificationTime = () => {
   const [selectedHour, setSelectedHour] = useState('1');
   const [selectedMinute, setSelectedMinute] = useState('1');
 
+  const [notificationTime, setNotificationTime] = useRecoilState(
+    userNotificationTimeState,
+  );
+
   const AmPmOptions = [
     { label: '오전', value: 'AM' },
     { label: '오후', value: 'PM' },
@@ -78,7 +84,19 @@ const AskNotificationTime = () => {
     value: `${index + 1}`,
   }));
 
+  useEffect(() => {
+    const notificationHour =
+      (selectedAmPm === 'AM' ? 0 : 12) + Number(selectedHour);
+
+    const formattedHour = String(notificationHour).padStart(2, '0');
+    const formattedMinute = String(selectedMinute).padStart(2, '0');
+
+    const notificationTime = formattedHour + formattedMinute;
+    setNotificationTime(notificationTime);
+  }, [selectedAmPm, selectedHour, selectedMinute, setNotificationTime]);
+
   const handleSubmit = () => {
+    console.log(notificationTime);
     navigation.navigate('AskOutro');
   };
 
