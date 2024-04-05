@@ -1,18 +1,22 @@
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React, { useEffect } from 'react';
 import SplashScreen from 'react-native-splash-screen';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { NavigationContainer } from '@react-navigation/native';
-import Login from './src/screens/Login';
-import Register from './src/screens/Register';
-import EmailLogin from './src/screens/EmailLogin';
-import LoginReset from './src/screens/LoginReset';
 import Toast from 'react-native-toast-message';
-import { toastConfig } from './src/utils/toastConfig';
-import Greeting from './src/screens/Greeting';
-import GreetNaming from './src/screens/GreetNaming';
-import PasswordReset from './src/screens/PasswordReset';
 import { RecoilRoot } from 'recoil';
 import AskIntro from './src/screens/AskIntro';
+import AskNotificationTime from './src/screens/AskNotificationTime';
+import AskOutro from './src/screens/AskOutro';
+import AskTimeZone from './src/screens/AskTimeZone';
+import AskWeather from './src/screens/AskWeather';
+import EmailLogin from './src/screens/EmailLogin';
+import GreetNaming from './src/screens/GreetNaming';
+import Greeting from './src/screens/Greeting';
+import Login from './src/screens/Login';
+import LoginReset from './src/screens/LoginReset';
+import PasswordReset from './src/screens/PasswordReset';
+import Register from './src/screens/Register';
+import { toastConfig } from './src/utils/toastConfig';
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -43,6 +47,17 @@ export default function App() {
           />
           <Stack.Screen name="GreetNaming" component={GreetNaming} />
           <Stack.Screen name="AskIntro" component={AskIntro} />
+          <Stack.Screen name="AskWeather" component={AskWeather} />
+          <Stack.Screen name="AskTimeZone" component={AskTimeZone} />
+          <Stack.Screen
+            name="AskNotificationTime"
+            component={AskNotificationTime}
+          />
+          <Stack.Screen
+            options={{ headerShown: true }}
+            name="AskOutro"
+            component={AskOutro}
+          />
         </Stack.Navigator>
       </NavigationContainer>
       <Toast config={toastConfig} />

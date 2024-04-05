@@ -1,12 +1,11 @@
+import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
-import WaitherLogo from '../assets/images/waither-logo-svg.svg';
 import styled from 'styled-components/native';
-import { ERROR_COLOR, GREY_COLOR, MAIN_COLOR } from '../styles/color';
 import Error from '../assets/images/Error.png';
 import notError from '../assets/images/notError.png';
-import Toast from 'react-native-toast-message';
+import WaitherLogo from '../assets/images/waither-logo-svg.svg';
+import { ERROR_COLOR, GREY_COLOR, MAIN_COLOR } from '../styles/color';
 import { showToast } from '../utils/showToast';
-import { useNavigation } from '@react-navigation/native';
 
 const Wrapper = styled.View`
   flex-direction: column;

@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import styled from 'styled-components/native';
-import { ERROR_COLOR, GREY_COLOR, MAIN_COLOR } from '../styles/color';
-import Error from '../assets/images/Error.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { userNameState } from '../recoil/userNameRecoil';
-import { useRecoilState, useRecoilValue } from 'recoil';
 import { useNavigation } from '@react-navigation/native';
+import React, { useState } from 'react';
+import { useRecoilState } from 'recoil';
+import styled from 'styled-components/native';
+import Error from '../assets/images/Error.png';
+import { userNameState } from '../recoil/userInitInfoRecoil';
+import { ERROR_COLOR, GREY_COLOR, MAIN_COLOR } from '../styles/color';
 
 const Wrapper = styled.View`
   flex-direction: column;
