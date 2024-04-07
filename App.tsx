@@ -18,6 +18,7 @@ import PasswordReset from './src/screens/PasswordReset';
 import Register from './src/screens/Register';
 import { toastConfig } from './src/utils/toastConfig';
 import Settings from './src/screens/Settings';
+import CompanySetting from './src/screens/CompanySetting';
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -60,6 +61,7 @@ export default function App() {
             component={AskOutro}
           />
           <Stack.Screen name="Settings" component={Settings} />
+          <Stack.Screen name="CompanySetting" component={CompanySetting} />
         </Stack.Navigator>
       </NavigationContainer>
       <Toast config={toastConfig} />
