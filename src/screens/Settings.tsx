@@ -3,7 +3,6 @@ import styled from 'styled-components/native';
 import { MAIN_COLOR } from '../styles/color';
 import settingBtn from '../assets/images/VectorArrow.png';
 import { useNavigation } from '@react-navigation/native';
-import CompanySetting from './CompanySetting';
 
 const Wrapper = styled.View`
   display: flex;
@@ -144,14 +143,9 @@ const PrivacySettingBtn = styled.TouchableOpacity`
 const PrivacySettingInnerView = styled.View`
   width: 80%;
   margin-top: 5px;
-  margin-left: 25px;
+  margin-left: 20px;
+  margin-right: 7px;
   flex-direction: column;
-`;
-
-const PrivacySettingArrow = styled.Image`
-  transform: scale(0.5);
-  margin-left: 22px;
-  margin-top: 9px;
 `;
 
 const Settings = () => {
@@ -224,7 +218,7 @@ const Settings = () => {
               사용자 정보와 계정에 대해 변경할 수 있어요.
             </SettingSubTitle>
           </PrivacySettingInnerView>
-          <PrivacySettingArrow source={settingBtn}></PrivacySettingArrow>
+          <SettingArrow source={settingBtn}></SettingArrow>
         </PrivacySettingBtn>
       </PrivacySettingView>
     </Wrapper>
