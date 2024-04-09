@@ -79,7 +79,7 @@ const AskNotificationTime = () => {
     value: `${index + 1}`,
   }));
 
-  const minuteOptions = Array.from({ length: 60 }, (_, index) => ({
+  const minuteOptions = Array.from({ length: 59 }, (_, index) => ({
     label: `${index + 1}`,
     value: `${index + 1}`,
   }));
