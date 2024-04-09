@@ -70,10 +70,6 @@ const AmPmSelectButtonWrapper = styled.View`
   margin-right: 20px;
 `;
 
-const TimePickerWrapper = styled.View`
-  width: 30%;
-`;
-
 const SubmitButtonWrapper = styled.View`
   width: 60%;
   align-items: center;
@@ -138,6 +134,8 @@ const AskTimeZone = () => {
         <AskTitle>
           {weather === 'option1' || weather === 'option2' ? (
             <Bold>춥다</Bold>
+          ) : weather === 'option3' ? (
+            <Bold>딱 좋다</Bold>
           ) : (
             <Bold>덥다</Bold>
           )}

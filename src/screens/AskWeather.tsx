@@ -94,9 +94,7 @@ const AskWeather = () => {
   const handleSubmit = () => {
     storeWeather(selectedValue);
     {
-      selectedValue === 'option3'
-        ? navigation.navigate('AskNotificationTime')
-        : navigation.navigate('AskTimeZone');
+      navigation.navigate('AskTimeZone');
     }
   };
 

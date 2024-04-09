@@ -188,7 +188,7 @@ export default function Login({ navigation }) {
         <KakaoImage source={KakaoLogo} />
         <KaKaoLoginTitle>Kakao로 계속하기</KaKaoLoginTitle>
       </KakaoLoginBtn>
-      <AppleLoginBtn>
+      <AppleLoginBtn onPress={() => navigation.navigate('PasswordReset')}>
         <AppleImage source={AppleLogo} />
         <AppleLoginTitle>Apple로 계속하기</AppleLoginTitle>
       </AppleLoginBtn>
