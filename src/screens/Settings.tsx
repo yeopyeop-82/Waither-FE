@@ -5,6 +5,7 @@ import settingBtn from '../assets/images/VectorArrow.png';
 import Databox from '../assets/images/ic-ask-databox.svg';
 import { useNavigation } from '@react-navigation/native';
 import Modal from 'react-native-modal';
+import { userFeelingWeatherState } from '../recoil/userInitInfoRecoil';
 
 const Wrapper = styled.View`
   display: flex;
@@ -210,23 +211,27 @@ const DataBoxView = styled.View`
 
 const Settings = () => {
   const navigation = useNavigation();
+  const [previousState, setPreviousState] = useState(false);
   const [isCustomServiceToggleEnabled, setIsCustomServiceToggleEnabled] =
     useState(false);
   const [isCustomServiceEnabled, setIsCustomServiceEnabled] = useState(false);
+  const [isModalVisible, setModalVisible] = useState(false);
   const toggleSwitch = () => {
-    setIsCustomServiceToggleEnabled((previousState) => !previousState);
-    setIsCustomServiceEnabled(isCustomServiceToggleEnabled);
+    setPreviousState(false);
+    if (isCustomServiceEnabled) {
+      setIsCustomServiceToggleEnabled(previousState);
+    } else {
+      setIsCustomServiceToggleEnabled(!previousState);
+    }
+
+    setModalVisible(isCustomServiceToggleEnabled);
   };
 
   useEffect(() => {
     setIsCustomServiceEnabled(isCustomServiceToggleEnabled);
   }, [setIsCustomServiceEnabled, isCustomServiceToggleEnabled]);
 
-  const [isModalVisible, setModalVisible] = useState(false);
-
-  const onChangeModal = () => {
-    setModalVisible(!isModalVisible);
-  };
+  console.log(isCustomServiceEnabled);
 
   return (
     <Wrapper>
@@ -240,9 +245,8 @@ const Settings = () => {
           </CustomServiceSubTitle>
         </CustomServiceTitleView>
         <ToggleSwitch
-          value={isCustomServiceToggleEnabled}
+          value={isCustomServiceEnabled}
           onValueChange={toggleSwitch}
-          onChange={onChangeModal}
           //toggle 활성화 여부에 따른 색상 설정
           trackColor={{ false: '#767577', true: `${MAIN_COLOR}` }}
         ></ToggleSwitch>
@@ -269,10 +273,21 @@ const Settings = () => {
             더이상 사용자 맞춤 서비스를 사용하실 수 없어요.
           </ModalText>
           <ModalBtnView>
-            <ModalTurnOffBtn>
+            <ModalTurnOffBtn
+              onPress={() => {
+                setIsCustomServiceEnabled(isCustomServiceToggleEnabled);
+                setIsCustomServiceEnabled(false);
+                setModalVisible(false);
+              }}
+            >
               <ModalTurnOffBtnText>그래도 끌래요.</ModalTurnOffBtnText>
             </ModalTurnOffBtn>
-            <ModalTurnOnBtn>
+            <ModalTurnOnBtn
+              onPress={() => {
+                setModalVisible(false);
+                setIsCustomServiceEnabled(true);
+              }}
+            >
               <ModalTurnOnBtnText>다시 생각해볼게요.</ModalTurnOnBtnText>
             </ModalTurnOnBtn>
           </ModalBtnView>
