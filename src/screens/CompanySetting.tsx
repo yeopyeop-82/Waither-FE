@@ -101,11 +101,9 @@ const CompanySetting = () => {
     <Wrapper>
       <UserCustomSettingView>
         <CustomServiceTitleView>
-          <CustomServiceMainTitle>
-            사용자 맞춤 서비스 제공
-          </CustomServiceMainTitle>
+          <CustomServiceMainTitle>직장 지역 레포트 받기</CustomServiceMainTitle>
           <CustomServiceSubTitle>
-            사용자 데이터에 맞춰 정확한 데이터를 제공합니다.
+            외출 전 직장 지역의 기상정보를 받을 수 있어요.
           </CustomServiceSubTitle>
         </CustomServiceTitleView>
         <ToggleSwitch

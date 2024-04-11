@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
-import { MAIN_COLOR } from '../styles/color';
+import { GREY_COLOR, MAIN_COLOR } from '../styles/color';
 import settingBtn from '../assets/images/VectorArrow.png';
+import Databox from '../assets/images/ic-ask-databox.svg';
 import { useNavigation } from '@react-navigation/native';
+import Modal from 'react-native-modal';
 
 const Wrapper = styled.View`
   display: flex;
@@ -148,6 +150,64 @@ const PrivacySettingInnerView = styled.View`
   flex-direction: column;
 `;
 
+const ModalView = styled.View`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 20px;
+  border-radius: 15px;
+  width: 90%;
+  height: 230px;
+  background-color: white;
+`;
+
+const ModalText = styled.Text`
+  font-size: 14px;
+  font-weight: 200;
+  margin: 3px 5px;
+`;
+
+const ModalBtnView = styled.View`
+  width: 85%;
+  display: flex;
+  flex-direction: row;
+  margin-top: 40px;
+  justify-content: space-between;
+`;
+
+const ModalTurnOffBtn = styled.TouchableOpacity`
+  background-color: ${GREY_COLOR};
+  width: 48%;
+  height: 42px;
+  border-radius: 20px;
+  align-items: center;
+  justify-content: center;
+`;
+const ModalTurnOnBtn = styled.TouchableOpacity`
+  background-color: ${MAIN_COLOR};
+  width: 48%;
+  height: 42px;
+  border-radius: 20px;
+  align-items: center;
+  justify-content: center;
+`;
+
+const ModalTurnOffBtnText = styled.Text`
+  color: black;
+`;
+const ModalTurnOnBtnText = styled.Text`
+  color: white;
+`;
+
+const DataBoxView = styled.View`
+  width: 100%;
+  z-index: 1;
+  justify-content: center;
+  position: relative;
+  align-items: center;
+  top: 15px;
+`;
+
 const Settings = () => {
   const navigation = useNavigation();
   const [isCustomServiceToggleEnabled, setIsCustomServiceToggleEnabled] =
@@ -161,6 +221,12 @@ const Settings = () => {
   useEffect(() => {
     setIsCustomServiceEnabled(isCustomServiceToggleEnabled);
   }, [setIsCustomServiceEnabled, isCustomServiceToggleEnabled]);
+
+  const [isModalVisible, setModalVisible] = useState(false);
+
+  const onChangeModal = () => {
+    setModalVisible(!isModalVisible);
+  };
 
   return (
     <Wrapper>
@@ -176,10 +242,42 @@ const Settings = () => {
         <ToggleSwitch
           value={isCustomServiceToggleEnabled}
           onValueChange={toggleSwitch}
+          onChange={onChangeModal}
           //toggle 활성화 여부에 따른 색상 설정
           trackColor={{ false: '#767577', true: `${MAIN_COLOR}` }}
         ></ToggleSwitch>
       </UserCustomSettingView>
+      <Modal
+        isVisible={isModalVisible}
+        animationIn={'slideInUp'}
+        animationOut={'bounceOutUp'}
+        animationOutTiming={600}
+        useNativeDriver={true}
+        hideModalContentWhileAnimating={true}
+      >
+        <DataBoxView>
+          <Databox width={60} height={60}></Databox>
+        </DataBoxView>
+
+        <ModalView>
+          <ModalText>해당 모드를 끄시면,</ModalText>
+          <ModalText>재설문 알림이 전송되지 않지만</ModalText>
+          <ModalText style={{ color: 'red' }}>
+            기존 데이터가 모두 삭제되고
+          </ModalText>
+          <ModalText style={{ color: 'red' }}>
+            더이상 사용자 맞춤 서비스를 사용하실 수 없어요.
+          </ModalText>
+          <ModalBtnView>
+            <ModalTurnOffBtn>
+              <ModalTurnOffBtnText>그래도 끌래요.</ModalTurnOffBtnText>
+            </ModalTurnOffBtn>
+            <ModalTurnOnBtn>
+              <ModalTurnOnBtnText>다시 생각해볼게요.</ModalTurnOnBtnText>
+            </ModalTurnOnBtn>
+          </ModalBtnView>
+        </ModalView>
+      </Modal>
       <SettingsView>
         <CompanySettingView>
           <CompanySettingBtn
