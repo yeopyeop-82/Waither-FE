@@ -79,14 +79,19 @@ const AskNotificationTime = () => {
     value: `${index + 1}`,
   }));
 
-  const minuteOptions = Array.from({ length: 60 }, (_, index) => ({
+  const minuteOptions = Array.from({ length: 59 }, (_, index) => ({
     label: `${index + 1}`,
     value: `${index + 1}`,
   }));
 
   useEffect(() => {
-    const notificationHour =
-      (selectedAmPm === 'AM' ? 0 : 12) + Number(selectedHour);
+    let notificationHour;
+    if (selectedAmPm === 'AM') {
+      notificationHour = selectedHour === '12' ? '00' : selectedHour;
+    } else {
+      notificationHour =
+        selectedHour === '12' ? '12' : String(12 + Number(selectedHour));
+    }
 
     const formattedHour = String(notificationHour).padStart(2, '0');
     const formattedMinute = String(selectedMinute).padStart(2, '0');
