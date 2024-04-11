@@ -199,7 +199,9 @@ const Settings = () => {
         </NotificationSettingView>
 
         <MainScreenSettingView>
-          <MainScreenSettingBtn>
+          <MainScreenSettingBtn
+            onPress={() => navigation.navigate('MainScreenSetting')}
+          >
             <MainScreenSettingInnerView>
               <SettingMainTitle>메인 화면 날씨 상세 정보</SettingMainTitle>
               <SettingSubTitle>

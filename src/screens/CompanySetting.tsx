@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
 import { MAIN_COLOR } from '../styles/color';
 import settingBtn from '../assets/images/VectorArrow.png';
@@ -13,7 +13,7 @@ const Wrapper = styled.View`
 `;
 
 const UserCustomSettingView = styled.View`
-  flex: 0.11;
+  flex: 0.1;
   flex-direction: row;
   width: 90%;
   border-radius: 8px;
@@ -84,9 +84,19 @@ const CompanyLocationSettingInnerView = styled.View`
 
 const CompanySetting = () => {
   const navigation = useNavigation();
+  const [isCompanyReportToggleEnabled, setIsCompanyReportToggleEnabled] =
+    useState(false);
   const [isCompanyReportEnabled, setIsCompanyReportEnabled] = useState(false);
-  const toggleSwitch = () =>
-    setIsCompanyReportEnabled((previousState) => !previousState);
+  const toggleSwitch = () => {
+    setIsCompanyReportToggleEnabled((previousState) => !previousState);
+    setIsCompanyReportEnabled(isCompanyReportToggleEnabled);
+  };
+
+  useEffect(() => {
+    setIsCompanyReportEnabled(isCompanyReportToggleEnabled);
+  }, [setIsCompanyReportEnabled, isCompanyReportToggleEnabled]);
+
+  console.log(isCompanyReportEnabled);
   return (
     <Wrapper>
       <UserCustomSettingView>
@@ -99,7 +109,7 @@ const CompanySetting = () => {
           </CustomServiceSubTitle>
         </CustomServiceTitleView>
         <ToggleSwitch
-          value={isCompanyReportEnabled}
+          value={isCompanyReportToggleEnabled}
           onValueChange={toggleSwitch}
           //toggle 활성화 여부에 따른 색상 설정
           trackColor={{ false: '#767577', true: `${MAIN_COLOR}` }}

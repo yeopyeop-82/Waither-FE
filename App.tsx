@@ -19,6 +19,7 @@ import Register from './src/screens/Register';
 import { toastConfig } from './src/utils/toastConfig';
 import Settings from './src/screens/Settings';
 import CompanySetting from './src/screens/CompanySetting';
+import MainScreenSetting from './src/screens/MainScreenSetting';
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -62,6 +63,10 @@ export default function App() {
           />
           <Stack.Screen name="Settings" component={Settings} />
           <Stack.Screen name="CompanySetting" component={CompanySetting} />
+          <Stack.Screen
+            name="MainScreenSetting"
+            component={MainScreenSetting}
+          />
         </Stack.Navigator>
       </NavigationContainer>
       <Toast config={toastConfig} />
