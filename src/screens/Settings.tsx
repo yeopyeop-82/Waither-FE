@@ -217,14 +217,17 @@ const Settings = () => {
   const [isCustomServiceEnabled, setIsCustomServiceEnabled] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
   const toggleSwitch = () => {
-    setPreviousState(false);
-    if (isCustomServiceEnabled) {
-      setIsCustomServiceToggleEnabled(previousState);
-    } else {
-      setIsCustomServiceToggleEnabled(!previousState);
-    }
+    // 이전 상태를 이용
+    setIsCustomServiceToggleEnabled(!isCustomServiceEnabled);
 
-    setModalVisible(isCustomServiceToggleEnabled);
+    // iscustomserviceEnabled가 false이기에 처음에는 else문으로 빠짐
+    // 그리고 토글이 켜지며 true가 된다.
+    // 토글을 다시 눌러 끄려는 순간 true 이기 때문에 modal이 보여진다.
+    if (isCustomServiceEnabled) {
+      setModalVisible(true);
+    } else {
+      setModalVisible(false);
+    }
   };
 
   useEffect(() => {
@@ -275,7 +278,6 @@ const Settings = () => {
           <ModalBtnView>
             <ModalTurnOffBtn
               onPress={() => {
-                setIsCustomServiceEnabled(isCustomServiceToggleEnabled);
                 setIsCustomServiceEnabled(false);
                 setModalVisible(false);
               }}
