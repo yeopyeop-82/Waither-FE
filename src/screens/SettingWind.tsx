@@ -131,7 +131,7 @@ const SettingWind = () => {
             <Slider
               style={{ width: 455, height: 10 }}
               minimumValue={0}
-              maximumValue={18} // 최대 값 변경
+              maximumValue={16} // 최대 값 변경
               minimumTrackTintColor="#D9D9D9"
               maximumTrackTintColor="#D9D9D9"
               value={userWind} // Slider의 값 설정
