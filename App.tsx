@@ -17,6 +17,8 @@ import LoginReset from './src/screens/LoginReset';
 import PasswordReset from './src/screens/PasswordReset';
 import Register from './src/screens/Register';
 import { toastConfig } from './src/utils/toastConfig';
+import SettingWind from './src/screens/SettingWind';
+import { MAIN_COLOR } from './src/styles/color';
 import Settings from './src/screens/Settings';
 import CompanySetting from './src/screens/CompanySetting';
 import MainScreenSetting from './src/screens/MainScreenSetting';
@@ -61,6 +63,16 @@ export default function App() {
             name="AskOutro"
             component={AskOutro}
           />
+          <Stack.Screen
+            name="SettingWind"
+            options={{
+              title: '바람 세기 설정',
+              headerStyle: {
+                backgroundColor: MAIN_COLOR,
+              },
+              headerTintColor: '#fff',
+            }}
+            component={SettingWind}
           <Stack.Screen name="Settings" component={Settings} />
           <Stack.Screen name="CompanySetting" component={CompanySetting} />
           <Stack.Screen
