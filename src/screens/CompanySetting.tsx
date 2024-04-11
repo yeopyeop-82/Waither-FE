@@ -119,9 +119,12 @@ const SearchCompanyTextInput = styled.TextInput`
   width: 100%;
 `;
 
-const SearchCompanyText = styled.Text`
+const SearchCompanyCancleBtn = styled.TouchableOpacity`
   margin-top: 18px;
   margin-left: 10px;
+`;
+
+const SearchCompanyText = styled.Text`
   color: ${MAIN_COLOR};
 `;
 
@@ -144,10 +147,10 @@ const CompanySetting = () => {
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present();
   }, []);
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log('handleSheetChanges', index);
-  }, []);
 
+  const handleDismissModalPress = () => {
+    bottomSheetModalRef.current?.dismiss();
+  };
   //===============================================================
   return (
     <Wrapper>
@@ -185,14 +188,15 @@ const CompanySetting = () => {
             ref={bottomSheetModalRef}
             index={1}
             snapPoints={snapPoints}
-            onChange={handleSheetChanges}
           >
             <SearchCompanyView>
               <SearchCompanyTextInputView>
                 <Pngwing width={25} height={25} style={{ zIndex: 1 }}></Pngwing>
                 <SearchCompanyTextInput></SearchCompanyTextInput>
               </SearchCompanyTextInputView>
-              <SearchCompanyText>취소</SearchCompanyText>
+              <SearchCompanyCancleBtn onPress={handleDismissModalPress}>
+                <SearchCompanyText>취소</SearchCompanyText>
+              </SearchCompanyCancleBtn>
             </SearchCompanyView>
           </BottomSheetModal>
         </BottomSheetModalProvider>
