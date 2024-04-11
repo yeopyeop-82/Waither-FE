@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components/native';
 import { MAIN_COLOR } from '../styles/color';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { userNameState } from '../recoil/userInitInfoRecoil';
+import { userWindState } from '../recoil/userDataRecoil';
 import WindGroup from '../assets/images/wind_group.svg';
 import WindPowerImage from '../assets/images/wind_power.svg';
 import Slider from '@react-native-community/slider';
@@ -94,7 +95,7 @@ const WindGroupImageView = styled.View``;
 
 const SettingWind = () => {
   const [isCustomServiceEnabled, setIsCustomServiceEnabled] = useState(false);
-  const [userWind, setUserWind] = useState(0); // 바람 세기를 0으로 초기화
+  const [userWind, setUserWind] = useRecoilState(userWindState); // 바람 세기를 0으로 초기화
   const toggleSwitch = () =>
     setIsCustomServiceEnabled((previousState) => !previousState);
   const name = useRecoilValue(userNameState);
@@ -102,7 +103,7 @@ const SettingWind = () => {
   return (
     <Wrapper>
       <WindHeaderView>
-        <WindHeaderTitle>10 m/s</WindHeaderTitle>
+        <WindHeaderTitle>{Math.round(userWind)} m/s</WindHeaderTitle>
         <WindHeaderSubtitle>
           {name}님이 설정한 바람 세기를 넘으면 알려드릴게요 !
         </WindHeaderSubtitle>
