@@ -18,6 +18,7 @@ import PasswordReset from './src/screens/PasswordReset';
 import Register from './src/screens/Register';
 import { toastConfig } from './src/utils/toastConfig';
 import SettingWind from './src/screens/SettingWind';
+import { MAIN_COLOR } from './src/styles/color';
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -59,7 +60,17 @@ export default function App() {
             name="AskOutro"
             component={AskOutro}
           />
-          <Stack.Screen name="SettingWind" component={SettingWind} />
+          <Stack.Screen
+            name="SettingWind"
+            options={{
+              title: '바람 세기 설정',
+              headerStyle: {
+                backgroundColor: MAIN_COLOR,
+              },
+              headerTintColor: '#fff',
+            }}
+            component={SettingWind}
+          />
         </Stack.Navigator>
       </NavigationContainer>
       <Toast config={toastConfig} />
