@@ -1,8 +1,21 @@
-import { useNavigation } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import styled from 'styled-components/native';
 import { MAIN_COLOR } from '../styles/color';
 import settingBtn from '../assets/images/VectorArrow.png';
+import {
+  BottomSheetBackdrop,
+  BottomSheetModal,
+  BottomSheetModalProvider,
+} from '@gorhom/bottom-sheet';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { USER_WIDTH } from '../styles/dimension';
+import Pngwing from '../assets/images/pngwing.svg';
 
 const Wrapper = styled.View`
   display: flex;
@@ -82,11 +95,41 @@ const CompanyLocationSettingInnerView = styled.View`
   margin-right: 20px;
 `;
 
+const SearchCompanyView = styled.View`
+  display: flex;
+  width: 100%;
+  flex: 1;
+  flex-direction: row;
+`;
+
+const SearchCompanyTextInputView = styled.View`
+  border: 1px solid ${MAIN_COLOR};
+  margin-top: 10px;
+  margin-left: 20px;
+  background-color: rgba(81, 137, 245, 0.1);
+  border-radius: 13px;
+  width: 80%;
+  height: 5%;
+  padding-left: 8px;
+  flex-direction: row;
+  align-items: center;
+`;
+
+const SearchCompanyTextInput = styled.TextInput`
+  width: 100%;
+`;
+
+const SearchCompanyText = styled.Text`
+  margin-top: 18px;
+  margin-left: 10px;
+  color: ${MAIN_COLOR};
+`;
+
 const CompanySetting = () => {
-  const navigation = useNavigation();
   const [isCompanyReportToggleEnabled, setIsCompanyReportToggleEnabled] =
     useState(false);
   const [isCompanyReportEnabled, setIsCompanyReportEnabled] = useState(false);
+
   const toggleSwitch = () => {
     setIsCompanyReportToggleEnabled((previousState) => !previousState);
     setIsCompanyReportEnabled(isCompanyReportToggleEnabled);
@@ -95,8 +138,17 @@ const CompanySetting = () => {
   useEffect(() => {
     setIsCompanyReportEnabled(isCompanyReportToggleEnabled);
   }, [setIsCompanyReportEnabled, isCompanyReportToggleEnabled]);
+  // ===============================================================
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const snapPoints = useMemo(() => ['1%', '100%'], []);
+  const handlePresentModalPress = useCallback(() => {
+    bottomSheetModalRef.current?.present();
+  }, []);
+  const handleSheetChanges = useCallback((index: number) => {
+    console.log('handleSheetChanges', index);
+  }, []);
 
-  console.log(isCompanyReportEnabled);
+  //===============================================================
   return (
     <Wrapper>
       <UserCustomSettingView>
@@ -113,17 +165,38 @@ const CompanySetting = () => {
           trackColor={{ false: '#767577', true: `${MAIN_COLOR}` }}
         ></ToggleSwitch>
       </UserCustomSettingView>
-      <CompanyLocationSettingView>
-        <CompanyLocationSettingBtn>
-          <CompanyLocationSettingInnerView>
-            <SettingMainTitle>직장 지역 설정</SettingMainTitle>
-            <SettingSubTitle>
-              직장 지역을 설정하여, 해당 지역의 레포트를 받아 볼 수 있어요.
-            </SettingSubTitle>
-          </CompanyLocationSettingInnerView>
-          <SettingArrow source={settingBtn}></SettingArrow>
-        </CompanyLocationSettingBtn>
-      </CompanyLocationSettingView>
+
+      <GestureHandlerRootView style={{ flex: 1, width: USER_WIDTH }}>
+        <BottomSheetModalProvider>
+          <CompanyLocationSettingView>
+            <CompanyLocationSettingBtn onPress={handlePresentModalPress}>
+              <CompanyLocationSettingInnerView>
+                <SettingMainTitle>직장 지역 설정</SettingMainTitle>
+                <SettingSubTitle>
+                  직장 지역을 설정하여, 해당 지역의 레포트를 받아 볼 수 있어요.
+                </SettingSubTitle>
+              </CompanyLocationSettingInnerView>
+              <SettingArrow source={settingBtn}></SettingArrow>
+            </CompanyLocationSettingBtn>
+          </CompanyLocationSettingView>
+
+          <BottomSheetModal
+            style={{ flex: 1 }}
+            ref={bottomSheetModalRef}
+            index={1}
+            snapPoints={snapPoints}
+            onChange={handleSheetChanges}
+          >
+            <SearchCompanyView>
+              <SearchCompanyTextInputView>
+                <Pngwing width={25} height={25} style={{ zIndex: 1 }}></Pngwing>
+                <SearchCompanyTextInput></SearchCompanyTextInput>
+              </SearchCompanyTextInputView>
+              <SearchCompanyText>취소</SearchCompanyText>
+            </SearchCompanyView>
+          </BottomSheetModal>
+        </BottomSheetModalProvider>
+      </GestureHandlerRootView>
     </Wrapper>
   );
 };

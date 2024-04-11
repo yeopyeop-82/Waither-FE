@@ -73,6 +73,7 @@ export default function App() {
               headerTintColor: '#fff',
             }}
             component={SettingWind}
+          />
           <Stack.Screen name="Settings" component={Settings} />
           <Stack.Screen name="CompanySetting" component={CompanySetting} />
           <Stack.Screen

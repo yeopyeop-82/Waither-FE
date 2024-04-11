@@ -5,7 +5,6 @@ import settingBtn from '../assets/images/VectorArrow.png';
 import Databox from '../assets/images/ic-ask-databox.svg';
 import { useNavigation } from '@react-navigation/native';
 import Modal from 'react-native-modal';
-import { userFeelingWeatherState } from '../recoil/userInitInfoRecoil';
 
 const Wrapper = styled.View`
   display: flex;
