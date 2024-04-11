@@ -3,6 +3,7 @@ import styled from 'styled-components/native';
 import { MAIN_COLOR } from '../styles/color';
 import { useRecoilValue } from 'recoil';
 import { userNameState } from '../recoil/userInitInfoRecoil';
+import WindGroup from '../assets/images/wind_group.svg';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -68,7 +69,11 @@ const WindSliderView = styled.View`
   width: 100%;
   background-color: white;
   border-radius: 50px;
+  flex-direction: row;
+  align-items: center;
 `;
+
+const WindGroupImageView = styled.View``;
 
 const SettingWind = () => {
   const [isCustomServiceEnabled, setIsCustomServiceEnabled] = useState(false);
@@ -98,7 +103,11 @@ const SettingWind = () => {
           ></ToggleSwitch>
         </UserCustomSettingView>
       </WindHeaderView>
-      <WindSliderView></WindSliderView>
+      <WindSliderView>
+        <WindGroupImageView>
+          <WindGroup />
+        </WindGroupImageView>
+      </WindSliderView>
     </Wrapper>
   );
 };
