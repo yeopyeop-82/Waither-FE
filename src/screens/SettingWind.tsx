@@ -4,6 +4,8 @@ import { MAIN_COLOR } from '../styles/color';
 import { useRecoilValue } from 'recoil';
 import { userNameState } from '../recoil/userInitInfoRecoil';
 import WindGroup from '../assets/images/wind_group.svg';
+import WindPowerImage from '../assets/images/wind_power.svg';
+import Slider from '@react-native-community/slider';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -71,14 +73,28 @@ const WindSliderView = styled.View`
   border-radius: 50px;
   flex-direction: row;
   align-items: center;
+  justify-content: center; /* 모든 요소들을 수평 중앙 정렬 */
 `;
 
-const WindGroupImageView = styled.View`
-  margin-bottom: 20px;
+const WindSliderContainer = styled.View`
+  height: 10px;
+  width: 10px;
+  margin-left: 30px;
+  margin-right: -8px;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
 `;
+
+const WindSliderWrapper = styled.View`
+  transform: rotate(-90deg);
+`;
+
+const WindGroupImageView = styled.View``;
 
 const SettingWind = () => {
   const [isCustomServiceEnabled, setIsCustomServiceEnabled] = useState(false);
+  const [userWind, setUserWind] = useState(0); // 바람 세기를 0으로 초기화
   const toggleSwitch = () =>
     setIsCustomServiceEnabled((previousState) => !previousState);
   const name = useRecoilValue(userNameState);
@@ -107,8 +123,22 @@ const SettingWind = () => {
       </WindHeaderView>
       <WindSliderView>
         <WindGroupImageView>
-          <WindGroup width={180} height={450} />
+          <WindGroup height={450} />
         </WindGroupImageView>
+        <WindSliderContainer>
+          <WindSliderWrapper>
+            <Slider
+              style={{ width: 455, height: 10 }}
+              minimumValue={0}
+              maximumValue={18} // 최대 값 변경
+              minimumTrackTintColor="#D9D9D9"
+              maximumTrackTintColor="#D9D9D9"
+              value={userWind} // Slider의 값 설정
+              onValueChange={(value) => setUserWind(value)} // userWind 값 변경
+            />
+          </WindSliderWrapper>
+        </WindSliderContainer>
+        <WindPowerImage height={450} />
       </WindSliderView>
     </Wrapper>
   );
