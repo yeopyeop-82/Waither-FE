@@ -73,7 +73,9 @@ const WindSliderView = styled.View`
   align-items: center;
 `;
 
-const WindGroupImageView = styled.View``;
+const WindGroupImageView = styled.View`
+  margin-bottom: 20px;
+`;
 
 const SettingWind = () => {
   const [isCustomServiceEnabled, setIsCustomServiceEnabled] = useState(false);
@@ -105,7 +107,7 @@ const SettingWind = () => {
       </WindHeaderView>
       <WindSliderView>
         <WindGroupImageView>
-          <WindGroup />
+          <WindGroup width={180} height={450} />
         </WindGroupImageView>
       </WindSliderView>
     </Wrapper>
