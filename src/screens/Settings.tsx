@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
 import { MAIN_COLOR } from '../styles/color';
 import settingBtn from '../assets/images/VectorArrow.png';
@@ -150,9 +150,18 @@ const PrivacySettingInnerView = styled.View`
 
 const Settings = () => {
   const navigation = useNavigation();
+  const [isCustomServiceToggleEnabled, setIsCustomServiceToggleEnabled] =
+    useState(false);
   const [isCustomServiceEnabled, setIsCustomServiceEnabled] = useState(false);
-  const toggleSwitch = () =>
-    setIsCustomServiceEnabled((previousState) => !previousState);
+  const toggleSwitch = () => {
+    setIsCustomServiceToggleEnabled((previousState) => !previousState);
+    setIsCustomServiceEnabled(isCustomServiceToggleEnabled);
+  };
+
+  useEffect(() => {
+    setIsCustomServiceEnabled(isCustomServiceToggleEnabled);
+  }, [setIsCustomServiceEnabled, isCustomServiceToggleEnabled]);
+
   return (
     <Wrapper>
       <UserCustomSettingView>
@@ -165,7 +174,7 @@ const Settings = () => {
           </CustomServiceSubTitle>
         </CustomServiceTitleView>
         <ToggleSwitch
-          value={isCustomServiceEnabled}
+          value={isCustomServiceToggleEnabled}
           onValueChange={toggleSwitch}
           //toggle 활성화 여부에 따른 색상 설정
           trackColor={{ false: '#767577', true: `${MAIN_COLOR}` }}
