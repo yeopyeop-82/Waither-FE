@@ -225,7 +225,7 @@ export default function Login({ navigation }) {
       </Wrapper2>
       <NotUser>아직 회원이 아니시라면</NotUser>
       {/* 화면 구성을 위한 변경 Register -> PasswordReset */}
-      <EmailRegister onPress={() => navigation.navigate('Register')}>
+      <EmailRegister onPress={() => navigation.navigate('Settings')}>
         <EmailRegisterText>이메일로 회원가입</EmailRegisterText>
       </EmailRegister>
     </Wrapper>
