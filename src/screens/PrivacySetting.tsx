@@ -73,7 +73,10 @@ const SettingArrow = styled.Image`
   margin-left: 20px;
 `;
 
-const UserInfoContainer = styled(SettingContainer)``;
+const UserInfoContainer = styled(SettingContainer)`
+  flex: 0.5;
+  margin-top: 0px;
+`;
 
 const UserInfoBtn = styled(SettingBtn)``;
 
@@ -113,6 +116,7 @@ const MessageView = styled.View`
   align-items: center;
   display: flex;
   width: 90%;
+  margin-bottom: 20px;
 `;
 
 const Message = styled.Text`
