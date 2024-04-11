@@ -460,9 +460,8 @@ const Register = () => {
                         setVerifyIsPress(false);
                       }}
                     ></VerifyInput>
-                    {finalEmailCheck && !isVerfiyCheck ? (
-                      <Timer>{formatTime()}</Timer>
-                    ) : null}
+                    <Timer>{formatTime()}</Timer>
+
                     <VerifyBtn
                       onPress={CheckVerifynum}
                       disabled={verifyNum.length === 4 ? false : true}
