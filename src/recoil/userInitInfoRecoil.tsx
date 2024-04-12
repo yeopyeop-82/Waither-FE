@@ -17,5 +17,5 @@ export const userFeelingWeatherState = atom({
 
 export const userNameState = atom({
   key: 'userNameState',
-  default: '',
+  default: 'yeop',
 });

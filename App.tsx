@@ -22,6 +22,7 @@ import { MAIN_COLOR } from './src/styles/color';
 import Settings from './src/screens/Settings';
 import CompanySetting from './src/screens/CompanySetting';
 import MainScreenSetting from './src/screens/MainScreenSetting';
+import PrivacySetting from './src/screens/PrivacySetting';
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -73,12 +74,14 @@ export default function App() {
               headerTintColor: '#fff',
             }}
             component={SettingWind}
+          />
           <Stack.Screen name="Settings" component={Settings} />
           <Stack.Screen name="CompanySetting" component={CompanySetting} />
           <Stack.Screen
             name="MainScreenSetting"
             component={MainScreenSetting}
           />
+          <Stack.Screen name="PrivacySetting" component={PrivacySetting} />
         </Stack.Navigator>
       </NavigationContainer>
       <Toast config={toastConfig} />
