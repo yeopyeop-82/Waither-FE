@@ -310,7 +310,9 @@ const Settings = () => {
         </CompanySettingView>
 
         <NotificationSettingView>
-          <NotificationSettingBtn>
+          <NotificationSettingBtn
+            onPress={() => navigation.navigate('SettingNotification')}
+          >
             <NotificationSettingInnerView>
               <SettingMainTitle>알림 설정</SettingMainTitle>
               <SettingSubTitle>

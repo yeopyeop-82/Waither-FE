@@ -22,6 +22,7 @@ import { MAIN_COLOR } from './src/styles/color';
 import Settings from './src/screens/Settings';
 import CompanySetting from './src/screens/CompanySetting';
 import MainScreenSetting from './src/screens/MainScreenSetting';
+import SettingNotification from './src/screens/SettingNotification';
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -79,6 +80,10 @@ export default function App() {
           <Stack.Screen
             name="MainScreenSetting"
             component={MainScreenSetting}
+          />
+          <Stack.Screen
+            name="SettingNotification"
+            component={SettingNotification}
           />
         </Stack.Navigator>
       </NavigationContainer>

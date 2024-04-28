@@ -92,7 +92,7 @@ const CompanyLocationSettingBtn = styled.TouchableOpacity`
 const CompanyLocationSettingInnerView = styled.View`
   display: flex;
   flex-direction: column;
-  margin-right: 20px;
+  margin-right: 70px;
 `;
 
 const SearchCompanyView = styled.View`
@@ -174,9 +174,9 @@ const CompanySetting = () => {
           <CompanyLocationSettingView>
             <CompanyLocationSettingBtn onPress={handlePresentModalPress}>
               <CompanyLocationSettingInnerView>
-                <SettingMainTitle>직장 지역 설정</SettingMainTitle>
+                <SettingMainTitle>직장 지역 위치 설정</SettingMainTitle>
                 <SettingSubTitle>
-                  직장 지역을 설정하여, 해당 지역의 레포트를 받아 볼 수 있어요.
+                  도시를 검색하여 직징 지역 위치를 설정할 수 있어요.
                 </SettingSubTitle>
               </CompanyLocationSettingInnerView>
               <SettingArrow source={settingBtn}></SettingArrow>
