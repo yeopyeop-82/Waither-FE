@@ -23,6 +23,7 @@ import Settings from './src/screens/Settings';
 import CompanySetting from './src/screens/CompanySetting';
 import MainScreenSetting from './src/screens/MainScreenSetting';
 import SettingNotification from './src/screens/SettingNotification';
+import UserDataSetting from './src/screens/UserDataSetting';
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -85,6 +86,7 @@ export default function App() {
             name="SettingNotification"
             component={SettingNotification}
           />
+          <Stack.Screen name="UserDataSetting" component={UserDataSetting} />
         </Stack.Navigator>
       </NavigationContainer>
       <Toast config={toastConfig} />

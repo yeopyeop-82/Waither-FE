@@ -374,7 +374,9 @@ const Settings = () => {
       </PrivacySettingView>
 
       <UserDataSettingView>
-        <UserDataSettingBtn>
+        <UserDataSettingBtn
+          onPress={() => navigation.navigate('UserDataSetting')}
+        >
           <UserDataSettingInnerView>
             <SettingMainTitle>사용자 데이터 설정</SettingMainTitle>
             <SettingSubTitle>
