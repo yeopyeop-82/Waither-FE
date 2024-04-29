@@ -5,6 +5,7 @@ import { GREY_COLOR, MAIN_COLOR } from '../styles/color';
 import { userNameState } from '../recoil/userInitInfoRecoil';
 import { useRecoilValue } from 'recoil';
 import Slider from '@react-native-community/slider';
+import { useNavigation } from '@react-navigation/native';
 
 const Wrapper = styled.View`
   display: flex;
@@ -38,6 +39,8 @@ const HeaderBtn = styled.TouchableOpacity`
 const HeaderBtnTitle = styled.Text`
   color: ${MAIN_COLOR};
 `;
+
+const HeaderBackBtn = styled.TouchableOpacity``;
 
 const HeaderArrow = styled.Image`
   transform: scale(0.8);
@@ -127,6 +130,7 @@ const TemperatureSubTitle = styled.Text`
 `;
 
 const UserDataSetting = () => {
+  const navigation = useNavigation();
   const name = useRecoilValue(userNameState);
   const [TempResponsiveness, setTempREsponsiveness] = useState(0);
   const [Operand, setOperand] = useState('');
@@ -175,7 +179,10 @@ const UserDataSetting = () => {
   return (
     <Wrapper>
       <HeaderView>
-        <HeaderArrow source={settingBtn}></HeaderArrow>
+        <HeaderBackBtn onPress={() => navigation.navigate('Settings')}>
+          <HeaderArrow source={settingBtn}></HeaderArrow>
+        </HeaderBackBtn>
+
         <HeaderTitle>사용자 데이터 설정</HeaderTitle>
         <HeaderBtn>
           <HeaderBtnTitle>완료</HeaderBtnTitle>
