@@ -86,7 +86,13 @@ export default function App() {
             name="SettingNotification"
             component={SettingNotification}
           />
-          <Stack.Screen name="UserDataSetting" component={UserDataSetting} />
+          <Stack.Screen
+            name="UserDataSetting"
+            options={{
+              headerShown: false,
+            }}
+            component={UserDataSetting}
+          />
         </Stack.Navigator>
       </NavigationContainer>
       <Toast config={toastConfig} />
