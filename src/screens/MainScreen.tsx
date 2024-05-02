@@ -3,6 +3,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import styled from 'styled-components/native';
 import NotificationIcon from '../assets/images/ic-main-noti-unread.svg';
 import SettingIcon from '../assets/images/ic-main-settings.svg';
+import RainIcon from '../assets/images/ic_rain.svg';
+import WaitherIcon from '../assets/images/ic-ask-databox_no_shadow.svg';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -10,10 +12,6 @@ const Wrapper = styled.View`
   justify-content: center;
 
   flex: 1;
-`;
-
-const ExampleText = styled.Text`
-  color: black;
 `;
 
 const MainHeader = styled.View`
@@ -45,6 +43,61 @@ const MainHearderRight = styled.View`
   justify-content: flex-end;
 `;
 
+const MainInfoView = styled.View`
+  flex-direction: column;
+  margin-top: 30px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+`;
+
+const MainAccentView = styled.View`
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 12px;
+  background-color: rgba(81, 137, 246, 1);
+  width: 343px;
+  height: 92px;
+  border-radius: 16px;
+`;
+
+const MainAccentIcon = styled.View`
+  width: 70px;
+  justify-content: center;
+  align-items: center;
+  margin-left: 25px;
+  margin-right: 10px;
+`;
+
+const MainAccentTextView = styled.View`
+  flex-direction: column;
+`;
+
+const MainAccentIconImage = styled.Image`
+  width: 50px;
+  height: 50px;
+`;
+
+const MainAccentTitle = styled.Text`
+  color: white;
+  font-weight: 400;
+  font-size: 12px;
+  margin-bottom: 2px;
+`;
+
+const MainAccentText = styled.Text`
+  color: white;
+  font-weight: 400;
+  font-size: 16px;
+`;
+
+const MainWeatherView = styled.View`
+  width: 343px;
+  height: 156px;
+  border-radius: 16px;
+  background-color: rgba(255, 255, 255, 0.15);
+`;
+
 const MainScreen = () => {
   return (
     <Wrapper>
@@ -69,6 +122,27 @@ const MainScreen = () => {
             <SettingIcon height={44} />
           </MainHearderRight>
         </MainHeader>
+        <MainInfoView>
+          <MainAccentView>
+            <MainAccentIcon>
+              <RainIcon height={43} width={65} />
+            </MainAccentIcon>
+            <MainAccentTextView>
+              <MainAccentTitle>비가 오네요. 우산 챙기세요 !</MainAccentTitle>
+              <MainAccentText>15:30에 그칠 예정입니다.</MainAccentText>
+            </MainAccentTextView>
+          </MainAccentView>
+          <MainAccentView>
+            <MainAccentIcon>
+              <WaitherIcon height={50} width={50} />
+            </MainAccentIcon>
+            <MainAccentTextView>
+              <MainAccentTitle>OO님이 춥다고 답변하셨던 날씨</MainAccentTitle>
+              <MainAccentText>오늘은 따뜻하게 입으세요 !</MainAccentText>
+            </MainAccentTextView>
+          </MainAccentView>
+          <MainWeatherView></MainWeatherView>
+        </MainInfoView>
       </LinearGradient>
     </Wrapper>
   );
