@@ -182,6 +182,7 @@ const MainExtraWeatherView = styled.View`
 `;
 
 const MainExtraWeatherViewColumn = styled.View`
+  width: 30%;
   align-items: center;
 `;
 
@@ -284,7 +285,7 @@ const MainScreen = () => {
               <MainExtraWeatherInfoView>
                 <MainExtraWeatherInfoText>남동</MainExtraWeatherInfoText>
                 <MainExtraWeatherTextDivider />
-                <MainExtraWeatherInfoText>2m/s ~ 4m/s</MainExtraWeatherInfoText>
+                <MainExtraWeatherInfoText>2m/s~4m/s</MainExtraWeatherInfoText>
               </MainExtraWeatherInfoView>
             </MainExtraWeatherViewColumn>
             <MainExtraWeatherViewColumn>
