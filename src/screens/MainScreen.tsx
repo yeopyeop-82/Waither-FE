@@ -12,6 +12,8 @@ import TemIcon from '../assets/images/ic_tem.svg';
 import WindIcon from '../assets/images/ic_wind.svg';
 import CloudIcon from '../assets/images/ic_cloud.svg';
 import FineDustIcon from '../assets/images/ic_finedust.svg';
+import ShowerIcon from '../assets/images/ic-weather-rain-sunny.svg';
+import CloudyIcon from '../assets/images/ic-weather-cloudy.svg';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -56,6 +58,7 @@ const MainInfoView = styled.View`
   justify-content: center;
   align-items: center;
   width: 100%;
+  overflow: visible;
 `;
 
 const MainAccentView = styled.View`
@@ -172,6 +175,7 @@ const MainWeatherIconView = styled.View`
 `;
 
 const MainExtraWeatherView = styled.View`
+  margin-bottom: 12px;
   flex-direction: row;
   align-items: center;
   justify-content: center;
@@ -211,6 +215,28 @@ const MainExtraWeatherInfoText = styled.Text`
   color: white;
   font-size: 12px;
 `;
+
+const MainWeatherByHourScrollView = styled.ScrollView`
+  width: 343px;
+  height: 127px;
+  overflow: visible;
+`;
+
+const MainWeatherByHourView = styled.View`
+  width: 643px;
+  height: 127px;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  flex-direction: row;
+`;
+
+const MainWeatherByHourColumn = styled.View`
+  flex-direction: column;
+`;
+
+const MainWeatherByHourTitle = styled.Text``;
+
+const MainWeatherByHourTemperature = styled.Text``;
 
 const MainScreen = () => {
   return (
@@ -309,6 +335,18 @@ const MainScreen = () => {
               </MainExtraWeatherInfoView>
             </MainExtraWeatherViewColumn>
           </MainExtraWeatherView>
+          <MainWeatherByHourScrollView
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+          >
+            <MainWeatherByHourView>
+              <MainWeatherByHourColumn>
+                <MainWeatherByHourTitle>16시</MainWeatherByHourTitle>
+                <ShowerIcon width={42} height={38} />
+                <MainWeatherByHourTemperature>5°C</MainWeatherByHourTemperature>
+              </MainWeatherByHourColumn>
+            </MainWeatherByHourView>
+          </MainWeatherByHourScrollView>
         </MainInfoView>
       </LinearGradient>
     </Wrapper>
