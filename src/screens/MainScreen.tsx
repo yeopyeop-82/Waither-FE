@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import styled from 'styled-components/native';
+import { Shadow } from 'react-native-shadow-2';
 import NotificationIcon from '../assets/images/ic-main-noti-unread.svg';
 import SettingIcon from '../assets/images/ic-main-settings.svg';
 import RainIcon from '../assets/images/ic_rain.svg';
@@ -76,11 +77,6 @@ const MainAccentTextView = styled.View`
   flex-direction: column;
 `;
 
-const MainAccentIconImage = styled.Image`
-  width: 50px;
-  height: 50px;
-`;
-
 const MainAccentTitle = styled.Text`
   color: white;
   font-weight: 400;
@@ -96,6 +92,7 @@ const MainAccentText = styled.Text`
 
 const MainWeatherView = styled.View`
   flex-direction: row;
+  align-items: center;
   width: 343px;
   height: 156px;
   border-radius: 16px;
@@ -104,26 +101,31 @@ const MainWeatherView = styled.View`
 
 const MainWeatherInfoView = styled.View`
   flex-direction: column;
+  margin-left: 37px;
 `;
 
 const MainWeatherLocationView = styled.View`
   flex-direction: row;
+  align-items: center;
 `;
 
 const MainWeatherLocation = styled.Text`
   color: white;
   font-weight: 400;
   font-size: 13px;
+  margin-left: 3px;
 `;
 
 const MainWeatherTemView = styled.View`
   flex-direction: row;
+  margin-top: 10px;
 `;
 
 const MainWeatherTem = styled.Text`
   color: white;
   font-weight: 400;
   font-size: 56px;
+  margin-bottom: 10px;
 `;
 
 const MainWeatherTemDegree = styled.Text`
@@ -134,6 +136,14 @@ const MainWeatherTemDegree = styled.Text`
 
 const MainWeatherMaxMinView = styled.View`
   flex-direction: row;
+  align-items: center;
+`;
+
+const Divider = styled.View`
+  height: 13px;
+  width: 1px;
+  background-color: white;
+  margin: 0px 10px;
 `;
 
 const MainWeatherMaxMinText = styled.Text`
@@ -142,14 +152,22 @@ const MainWeatherMaxMinText = styled.Text`
   font-size: 13px;
 `;
 
+const MainWeatherIconView = styled.View`
+  align-items: center;
+  justify-content: center;
+  margin-top: 30px;
+  height: 85px;
+  width: 118px;
+`;
+
 const MainScreen = () => {
   return (
     <Wrapper>
       <LinearGradient
         colors={[
-          'rgba(179, 166, 155, 0.7)',
-          'rgba(110, 131, 149, 0.7)',
-          'rgba(118, 123, 127, 0.7)',
+          'rgba(179, 166, 155, 1)',
+          'rgba(110, 131, 149, 1)',
+          'rgba(118, 123, 127, 1)',
         ]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
@@ -196,13 +214,15 @@ const MainScreen = () => {
                 <MainWeatherTemDegree>°C</MainWeatherTemDegree>
               </MainWeatherTemView>
               <MainWeatherMaxMinView>
-                <TemIcon height={20} width={13} />
+                <TemIcon height={20} width={13} style={{ marginRight: 5 }} />
                 <MainWeatherMaxMinText>최저 0°C</MainWeatherMaxMinText>
+                <Divider />
                 <MainWeatherMaxMinText>최고 7°C</MainWeatherMaxMinText>
               </MainWeatherMaxMinView>
             </MainWeatherInfoView>
-
-            <RainWithCloudIcon height={118} width={118} />
+            <MainWeatherIconView>
+              <RainWithCloudIcon />
+            </MainWeatherIconView>
           </MainWeatherView>
         </MainInfoView>
       </LinearGradient>
