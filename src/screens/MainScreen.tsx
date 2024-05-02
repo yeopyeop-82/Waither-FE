@@ -4,7 +4,10 @@ import styled from 'styled-components/native';
 import NotificationIcon from '../assets/images/ic-main-noti-unread.svg';
 import SettingIcon from '../assets/images/ic-main-settings.svg';
 import RainIcon from '../assets/images/ic_rain.svg';
+import RainWithCloudIcon from '../assets/images/ic-weather-rain.svg';
 import WaitherIcon from '../assets/images/ic-ask-databox_no_shadow.svg';
+import GpsIcon from '../assets/images/ic_gps.svg';
+import TemIcon from '../assets/images/ic_tem.svg';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -92,10 +95,51 @@ const MainAccentText = styled.Text`
 `;
 
 const MainWeatherView = styled.View`
+  flex-direction: row;
   width: 343px;
   height: 156px;
   border-radius: 16px;
   background-color: rgba(255, 255, 255, 0.15);
+`;
+
+const MainWeatherInfoView = styled.View`
+  flex-direction: column;
+`;
+
+const MainWeatherLocationView = styled.View`
+  flex-direction: row;
+`;
+
+const MainWeatherLocation = styled.Text`
+  color: white;
+  font-weight: 400;
+  font-size: 13px;
+`;
+
+const MainWeatherTemView = styled.View`
+  flex-direction: row;
+`;
+
+const MainWeatherTem = styled.Text`
+  color: white;
+  font-weight: 400;
+  font-size: 56px;
+`;
+
+const MainWeatherTemDegree = styled.Text`
+  color: white;
+  font-weight: 400;
+  font-size: 35px;
+`;
+
+const MainWeatherMaxMinView = styled.View`
+  flex-direction: row;
+`;
+
+const MainWeatherMaxMinText = styled.Text`
+  color: white;
+  font-weight: 400;
+  font-size: 13px;
 `;
 
 const MainScreen = () => {
@@ -141,7 +185,25 @@ const MainScreen = () => {
               <MainAccentText>오늘은 따뜻하게 입으세요 !</MainAccentText>
             </MainAccentTextView>
           </MainAccentView>
-          <MainWeatherView></MainWeatherView>
+          <MainWeatherView>
+            <MainWeatherInfoView>
+              <MainWeatherLocationView>
+                <GpsIcon height={12} width={12} />
+                <MainWeatherLocation>경기도 용인시 기흥구</MainWeatherLocation>
+              </MainWeatherLocationView>
+              <MainWeatherTemView>
+                <MainWeatherTem>5</MainWeatherTem>
+                <MainWeatherTemDegree>°C</MainWeatherTemDegree>
+              </MainWeatherTemView>
+              <MainWeatherMaxMinView>
+                <TemIcon height={20} width={13} />
+                <MainWeatherMaxMinText>최저 0°C</MainWeatherMaxMinText>
+                <MainWeatherMaxMinText>최고 7°C</MainWeatherMaxMinText>
+              </MainWeatherMaxMinView>
+            </MainWeatherInfoView>
+
+            <RainWithCloudIcon height={118} width={118} />
+          </MainWeatherView>
         </MainInfoView>
       </LinearGradient>
     </Wrapper>
