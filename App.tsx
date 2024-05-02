@@ -24,6 +24,7 @@ import CompanySetting from './src/screens/CompanySetting';
 import MainScreenSetting from './src/screens/MainScreenSetting';
 import PrivacySetting from './src/screens/PrivacySetting';
 import MainScreen from './src/screens/MainScreen';
+import Notifications from './src/screens/Notifications';
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -88,6 +89,7 @@ export default function App() {
             name="MainScreen"
             component={MainScreen}
           />
+          <Stack.Screen name="Notifications" component={Notifications} />
         </Stack.Navigator>
       </NavigationContainer>
       <Toast config={toastConfig} />

@@ -329,7 +329,7 @@ const MainScreen = ({ navigation }) => {
           </MainHeaderCenter>
           <MainHearderRight>
             <MainHeaderRightIconView
-              onPress={() => navigation.navigate('Settings')}
+              onPress={() => navigation.navigate('Notifications')}
             >
               <NotificationIcon height={44} />
             </MainHeaderRightIconView>
