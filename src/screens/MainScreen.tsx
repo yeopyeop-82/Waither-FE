@@ -9,6 +9,9 @@ import RainWithCloudIcon from '../assets/images/ic-weather-rain.svg';
 import WaitherIcon from '../assets/images/ic-ask-databox_no_shadow.svg';
 import GpsIcon from '../assets/images/ic_gps.svg';
 import TemIcon from '../assets/images/ic_tem.svg';
+import WindIcon from '../assets/images/ic_wind.svg';
+import CloudIcon from '../assets/images/ic_cloud.svg';
+import FineDustIcon from '../assets/images/ic_finedust.svg';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -97,6 +100,7 @@ const MainWeatherView = styled.View`
   height: 156px;
   border-radius: 16px;
   background-color: rgba(255, 255, 255, 0.15);
+  margin-bottom: 12px;
 `;
 
 const MainWeatherInfoView = styled.View`
@@ -146,6 +150,13 @@ const Divider = styled.View`
   margin: 0px 10px;
 `;
 
+const MainExtraWeatherTextDivider = styled.View`
+  height: 13px;
+  width: 1px;
+  background-color: white;
+  margin: 0px 5px;
+`;
+
 const MainWeatherMaxMinText = styled.Text`
   color: white;
   font-weight: 400;
@@ -158,6 +169,46 @@ const MainWeatherIconView = styled.View`
   margin-top: 30px;
   height: 85px;
   width: 118px;
+`;
+
+const MainExtraWeatherView = styled.View`
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: 343px;
+  height: 127px;
+  border-radius: 16px;
+  background-color: rgba(255, 255, 255, 0.15);
+`;
+
+const MainExtraWeatherViewColumn = styled.View`
+  align-items: center;
+`;
+
+const MainExtraWeatherTitleView = styled.View`
+  background-color: rgba(255, 255, 255, 0.3);
+  justify-content: center;
+  align-items: center;
+  width: 68px;
+  height: 20px;
+  border-radius: 99px;
+  margin-bottom: 18px;
+`;
+
+const MainExtraWeatherTitle = styled.Text`
+  color: white;
+  font-size: 12px;
+`;
+
+const MainExtraWeatherInfoView = styled.View`
+  flex-direction: row;
+  margin-top: 13px;
+  align-items: center;
+`;
+
+const MainExtraWeatherInfoText = styled.Text`
+  color: white;
+  font-size: 12px;
 `;
 
 const MainScreen = () => {
@@ -224,6 +275,39 @@ const MainScreen = () => {
               <RainWithCloudIcon />
             </MainWeatherIconView>
           </MainWeatherView>
+          <MainExtraWeatherView>
+            <MainExtraWeatherViewColumn>
+              <MainExtraWeatherTitleView>
+                <MainExtraWeatherTitle>풍향/풍속</MainExtraWeatherTitle>
+              </MainExtraWeatherTitleView>
+              <WindIcon />
+              <MainExtraWeatherInfoView>
+                <MainExtraWeatherInfoText>남동</MainExtraWeatherInfoText>
+                <MainExtraWeatherTextDivider />
+                <MainExtraWeatherInfoText>2m/s ~ 4m/s</MainExtraWeatherInfoText>
+              </MainExtraWeatherInfoView>
+            </MainExtraWeatherViewColumn>
+            <MainExtraWeatherViewColumn>
+              <MainExtraWeatherTitleView>
+                <MainExtraWeatherTitle>강수량</MainExtraWeatherTitle>
+              </MainExtraWeatherTitleView>
+              <CloudIcon />
+              <MainExtraWeatherInfoView>
+                <MainExtraWeatherInfoText>1~3mm</MainExtraWeatherInfoText>
+              </MainExtraWeatherInfoView>
+            </MainExtraWeatherViewColumn>
+            <MainExtraWeatherViewColumn>
+              <MainExtraWeatherTitleView>
+                <MainExtraWeatherTitle>풍향/풍속</MainExtraWeatherTitle>
+              </MainExtraWeatherTitleView>
+              <FineDustIcon />
+              <MainExtraWeatherInfoView>
+                <MainExtraWeatherInfoText>좋음</MainExtraWeatherInfoText>
+                <MainExtraWeatherTextDivider />
+                <MainExtraWeatherInfoText>20㎍/m³</MainExtraWeatherInfoText>
+              </MainExtraWeatherInfoView>
+            </MainExtraWeatherViewColumn>
+          </MainExtraWeatherView>
         </MainInfoView>
       </LinearGradient>
     </Wrapper>
