@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import styled from 'styled-components/native';
-import { Shadow } from 'react-native-shadow-2';
 import NotificationIcon from '../assets/images/ic-main-noti-unread.svg';
 import SettingIcon from '../assets/images/ic-main-settings.svg';
 import RainIcon from '../assets/images/ic_rain.svg';
@@ -19,7 +18,6 @@ const Wrapper = styled.View`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
   flex: 1;
 `;
 
@@ -32,11 +30,11 @@ const MainHeader = styled.View`
 `;
 
 const MainHeaderLeft = styled.View`
-  flex: 1;
+  width: 33%;
 `;
 
 const MainHeaderCenter = styled.View`
-  flex: 1;
+  width: 33%;
   align-items: center;
 `;
 
@@ -47,9 +45,15 @@ const MainHeaderText = styled.Text`
 `;
 
 const MainHearderRight = styled.View`
-  flex: 1;
+  width: 33%;
   flex-direction: row;
   justify-content: flex-end;
+  padding-right: 17px;
+`;
+
+const MainHeaderRightIconView = styled.TouchableOpacity`
+  width: 44px;
+  height: 44px;
 `;
 
 const MainInfoView = styled.View`
@@ -225,7 +229,7 @@ const MainWeatherByHourScrollView = styled.ScrollView`
 const MainWeatherByHourView = styled.View`
   width: 670px;
   height: 127px;
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.2);
   border-radius: 16px;
   flex-direction: row;
   padding-left: 13px;
@@ -251,7 +255,7 @@ const MainWeatherByHourTemperature = styled.Text`
   margin-top: 7px;
 `;
 
-const MainScreen = () => {
+const MainScreen = ({ navigation }) => {
   const hourlyWeatherData = [
     {
       time: '16시',
@@ -324,8 +328,16 @@ const MainScreen = () => {
             <MainHeaderText>NOW.</MainHeaderText>
           </MainHeaderCenter>
           <MainHearderRight>
-            <NotificationIcon height={44} />
-            <SettingIcon height={44} />
+            <MainHeaderRightIconView
+              onPress={() => navigation.navigate('Settings')}
+            >
+              <NotificationIcon height={44} />
+            </MainHeaderRightIconView>
+            <MainHeaderRightIconView
+              onPress={() => navigation.navigate('Settings')}
+            >
+              <SettingIcon height={44} />
+            </MainHeaderRightIconView>
           </MainHearderRight>
         </MainHeader>
         <MainInfoView>
