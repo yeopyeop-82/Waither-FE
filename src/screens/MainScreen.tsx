@@ -12,8 +12,8 @@ import TemIcon from '../assets/images/ic_tem.svg';
 import WindIcon from '../assets/images/ic_wind.svg';
 import CloudIcon from '../assets/images/ic_cloud.svg';
 import FineDustIcon from '../assets/images/ic_finedust.svg';
-import ShowerIcon from '../assets/images/ic-weather-rain-sunny.svg';
-import CloudyIcon from '../assets/images/ic-weather-cloudy.svg';
+import ShowerIcon from '../assets/images/ic-shower.svg';
+import CloudyIcon from '../assets/images/ic-cloudy.svg';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -223,22 +223,88 @@ const MainWeatherByHourScrollView = styled.ScrollView`
 `;
 
 const MainWeatherByHourView = styled.View`
-  width: 643px;
+  width: 670px;
   height: 127px;
   background-color: rgba(255, 255, 255, 0.3);
   border-radius: 16px;
   flex-direction: row;
+  padding-left: 13px;
 `;
 
 const MainWeatherByHourColumn = styled.View`
   flex-direction: column;
+  align-items: center;
+  margin-top: 15px;
+  margin-left: 15px;
 `;
 
-const MainWeatherByHourTitle = styled.Text``;
+const MainWeatherByHourTitle = styled.Text`
+  color: white;
+  font-size: 15px;
+  margin-bottom: 10px;
+`;
 
-const MainWeatherByHourTemperature = styled.Text``;
+const MainWeatherByHourTemperature = styled.Text`
+  color: white;
+  font-size: 15px;
+  margin-bottom: 12px;
+  margin-top: 7px;
+`;
 
 const MainScreen = () => {
+  const hourlyWeatherData = [
+    {
+      time: '16시',
+      icon: <ShowerIcon width={48} height={45} />,
+      temperature: '5°C',
+    },
+    {
+      time: '17시',
+      icon: <CloudyIcon width={48} height={45} />,
+      temperature: '5°C',
+    },
+    {
+      time: '18시',
+      icon: <CloudyIcon width={48} height={45} />,
+      temperature: '5°C',
+    },
+    {
+      time: '19시',
+      icon: <CloudyIcon width={48} height={45} />,
+      temperature: '5°C',
+    },
+    {
+      time: '20시',
+      icon: <CloudyIcon width={48} height={45} />,
+      temperature: '5°C',
+    },
+    {
+      time: '21시',
+      icon: <CloudyIcon width={48} height={45} />,
+      temperature: '5°C',
+    },
+    {
+      time: '22시',
+      icon: <CloudyIcon width={48} height={45} />,
+      temperature: '5°C',
+    },
+    {
+      time: '23시',
+      icon: <CloudyIcon width={48} height={45} />,
+      temperature: '5°C',
+    },
+    {
+      time: '00시',
+      icon: <CloudyIcon width={48} height={45} />,
+      temperature: '5°C',
+    },
+    {
+      time: '01시',
+      icon: <CloudyIcon width={48} height={45} />,
+      temperature: '5°C',
+    },
+  ];
+
   return (
     <Wrapper>
       <LinearGradient
@@ -340,11 +406,15 @@ const MainScreen = () => {
             showsHorizontalScrollIndicator={false}
           >
             <MainWeatherByHourView>
-              <MainWeatherByHourColumn>
-                <MainWeatherByHourTitle>16시</MainWeatherByHourTitle>
-                <ShowerIcon width={42} height={38} />
-                <MainWeatherByHourTemperature>5°C</MainWeatherByHourTemperature>
-              </MainWeatherByHourColumn>
+              {hourlyWeatherData.map((data, index) => (
+                <MainWeatherByHourColumn key={index}>
+                  <MainWeatherByHourTitle>{data.time}</MainWeatherByHourTitle>
+                  {data.icon}
+                  <MainWeatherByHourTemperature>
+                    {data.temperature}
+                  </MainWeatherByHourTemperature>
+                </MainWeatherByHourColumn>
+              ))}
             </MainWeatherByHourView>
           </MainWeatherByHourScrollView>
         </MainInfoView>
