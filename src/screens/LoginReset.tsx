@@ -140,6 +140,9 @@ const LoginReset = () => {
             Waither에 가입하셨던 이메일을 입력해주세요.
           </ResetMessage>
           <ResetMessage>임시 비밀번호를 보내드릴게요.</ResetMessage>
+          <ResetMessage style={{ color: 'red' }}>
+            기존 비밀번호가 임시 비밀번호로 변경됩니다!
+          </ResetMessage>
         </ResetMessageWrapper>
       </ResetHeader>
 
