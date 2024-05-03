@@ -22,6 +22,8 @@ import { MAIN_COLOR } from './src/styles/color';
 import Settings from './src/screens/Settings';
 import CompanySetting from './src/screens/CompanySetting';
 import MainScreenSetting from './src/screens/MainScreenSetting';
+import SettingNotification from './src/screens/SettingNotification';
+import UserDataSetting from './src/screens/UserDataSetting';
 import PrivacySetting from './src/screens/PrivacySetting';
 
 export default function App() {
@@ -80,6 +82,17 @@ export default function App() {
           <Stack.Screen
             name="MainScreenSetting"
             component={MainScreenSetting}
+          />
+          <Stack.Screen
+            name="SettingNotification"
+            component={SettingNotification}
+          />
+          <Stack.Screen
+            name="UserDataSetting"
+            options={{
+              headerShown: false,
+            }}
+            component={UserDataSetting}
           />
           <Stack.Screen name="PrivacySetting" component={PrivacySetting} />
         </Stack.Navigator>

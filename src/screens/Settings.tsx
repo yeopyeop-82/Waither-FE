@@ -150,6 +150,30 @@ const PrivacySettingInnerView = styled.View`
   flex-direction: column;
 `;
 
+const UserDataSettingView = styled.View`
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  flex: 0.17;
+  background-color: white;
+  justify-content: flex-start;
+  align-items: center;
+  /* margin-top:  */
+`;
+
+const UserDataSettingBtn = styled.TouchableOpacity`
+  display: flex;
+  flex-direction: row;
+`;
+
+const UserDataSettingInnerView = styled.View`
+  width: 80%;
+  margin-top: 5px;
+  margin-left: 20px;
+  margin-right: 7px;
+  flex-direction: column;
+`;
+
 const ModalView = styled.View`
   display: flex;
   align-items: center;
@@ -310,7 +334,9 @@ const Settings = () => {
         </CompanySettingView>
 
         <NotificationSettingView>
-          <NotificationSettingBtn>
+          <NotificationSettingBtn
+            onPress={() => navigation.navigate('SettingNotification')}
+          >
             <NotificationSettingInnerView>
               <SettingMainTitle>알림 설정</SettingMainTitle>
               <SettingSubTitle>
@@ -348,6 +374,20 @@ const Settings = () => {
           <SettingArrow source={settingBtn}></SettingArrow>
         </PrivacySettingBtn>
       </PrivacySettingView>
+
+      <UserDataSettingView>
+        <UserDataSettingBtn
+          onPress={() => navigation.navigate('UserDataSetting')}
+        >
+          <UserDataSettingInnerView>
+            <SettingMainTitle>사용자 데이터 설정</SettingMainTitle>
+            <SettingSubTitle>
+              사용자 맞춤 데이터를 수정할 수 있어요.
+            </SettingSubTitle>
+          </UserDataSettingInnerView>
+          <SettingArrow source={settingBtn}></SettingArrow>
+        </UserDataSettingBtn>
+      </UserDataSettingView>
     </Wrapper>
   );
 };
