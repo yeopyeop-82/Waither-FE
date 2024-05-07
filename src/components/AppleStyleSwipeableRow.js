@@ -12,7 +12,11 @@ export default class AppleStyleSwipeableRow extends Component {
       outputRange: [x, 0],
     });
     const pressHandler = () => {
-      this.close();
+      const { onDelete } = this.props;
+      if (onDelete) {
+        onDelete();
+        this.close();
+      }
     };
     return (
       <Animated.View style={{ flex: 1, transform: [{ translateX: 0 }] }}>
@@ -46,16 +50,14 @@ export default class AppleStyleSwipeableRow extends Component {
   };
 
   render() {
-    const { children, onDelete } = this.props;
+    const { children } = this.props;
     return (
       <Swipeable
         ref={this.updateRef}
         friction={2}
         leftThreshold={30}
         rightThreshold={40}
-        renderRightActions={(progress, dragX) =>
-          this.renderRightActions(progress, dragX, onDelete)
-        }
+        renderRightActions={this.renderRightActions}
       >
         {children}
       </Swipeable>

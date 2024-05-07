@@ -9,18 +9,6 @@ import {
 
 import AppleStyleSwipeableRow from '../components/AppleStyleSwipeableRow';
 
-const Row = ({ item }) => (
-  <RectButton style={styles.rectButton} onPress={() => alert(item.from)}>
-    <Text style={styles.fromText}>{item.from}</Text>
-    <Text numberOfLines={2} style={styles.messageText}>
-      {item.message}
-    </Text>
-    <Text style={styles.dateText}>
-      {item.when} {'❭'}
-    </Text>
-  </RectButton>
-);
-
 const SwipeableRow = ({ item, onDelete }) => {
   return (
     <AppleStyleSwipeableRow onDelete={onDelete}>
