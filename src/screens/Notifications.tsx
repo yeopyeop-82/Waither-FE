@@ -7,9 +7,6 @@ import {
   RectButton,
 } from 'react-native-gesture-handler';
 
-//  To toggle LTR/RTL uncomment the next line
-// I18nManager.allowRTL(true);
-
 import AppleStyleSwipeableRow from '../components/AppleStyleSwipeableRow';
 
 const Row = ({ item }) => (
@@ -24,23 +21,44 @@ const Row = ({ item }) => (
   </RectButton>
 );
 
-const SwipeableRow = ({ item }) => {
+const SwipeableRow = ({ item, onDelete }) => {
   return (
-    <AppleStyleSwipeableRow>
-      <Row item={item} />
+    <AppleStyleSwipeableRow onDelete={onDelete}>
+      <RectButton style={styles.rectButton} onPress={() => alert(item.from)}>
+        <Text style={styles.fromText}>{item.from}</Text>
+        <Text numberOfLines={2} style={styles.messageText}>
+          {item.message}
+        </Text>
+        <Text style={styles.dateText}>
+          {item.when} {'❭'}
+        </Text>
+      </RectButton>
     </AppleStyleSwipeableRow>
   );
 };
 
 export default class Example extends Component {
+  state = {
+    data: DATA,
+  };
+
+  handleDelete = (index) => {
+    const newData = [...this.state.data];
+    newData.splice(index, 1);
+    this.setState({ data: newData });
+  };
+
   render() {
     return (
       <GestureHandlerRootView>
         <FlatList
-          data={DATA}
+          data={this.state.data}
           ItemSeparatorComponent={() => <View style={styles.separator} />}
           renderItem={({ item, index }) => (
-            <SwipeableRow item={item} index={index} />
+            <SwipeableRow
+              item={item}
+              onDelete={() => this.handleDelete(index)}
+            />
           )}
           keyExtractor={(item, index) => `message ${index}`}
         />

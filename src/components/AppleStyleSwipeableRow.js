@@ -1,20 +1,11 @@
+// AppleStyleSwipeableRow.js
+
 import React, { Component } from 'react';
 import { Animated, StyleSheet, Text, View, I18nManager } from 'react-native';
 
 import { RectButton, Swipeable } from 'react-native-gesture-handler';
 
 export default class AppleStyleSwipeableRow extends Component {
-  renderLeftActions = (progress, dragX) => {
-    const trans = dragX.interpolate({
-      inputRange: [0, 50, 100, 101],
-      outputRange: [-20, 0, 0, 1],
-    });
-    return (
-      <RectButton style={styles.leftAction} onPress={this.close}>
-        <Animated.Text style={[styles.actionText]}>Archive</Animated.Text>
-      </RectButton>
-    );
-  };
   renderRightAction = (text, color, x, progress) => {
     const trans = progress.interpolate({
       inputRange: [0, 1],
@@ -22,7 +13,6 @@ export default class AppleStyleSwipeableRow extends Component {
     });
     const pressHandler = () => {
       this.close();
-      alert(text);
     };
     return (
       <Animated.View style={{ flex: 1, transform: [{ translateX: 0 }] }}>
@@ -35,7 +25,8 @@ export default class AppleStyleSwipeableRow extends Component {
       </Animated.View>
     );
   };
-  renderRightActions = (progress) => (
+
+  renderRightActions = (progress, dragX) => (
     <View
       style={{
         width: 80,
@@ -45,21 +36,26 @@ export default class AppleStyleSwipeableRow extends Component {
       {this.renderRightAction('삭제', '#dd2c00', 64, progress)}
     </View>
   );
+
   updateRef = (ref) => {
     this._swipeableRow = ref;
   };
+
   close = () => {
     this._swipeableRow.close();
   };
+
   render() {
-    const { children } = this.props;
+    const { children, onDelete } = this.props;
     return (
       <Swipeable
         ref={this.updateRef}
         friction={2}
         leftThreshold={30}
         rightThreshold={40}
-        renderRightActions={this.renderRightActions}
+        renderRightActions={(progress, dragX) =>
+          this.renderRightActions(progress, dragX, onDelete)
+        }
       >
         {children}
       </Swipeable>
