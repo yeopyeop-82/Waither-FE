@@ -38,13 +38,11 @@ export default class AppleStyleSwipeableRow extends Component {
   renderRightActions = (progress) => (
     <View
       style={{
-        width: 192,
+        width: 80,
         flexDirection: I18nManager.isRTL ? 'row-reverse' : 'row',
       }}
     >
-      {this.renderRightAction('More', '#C8C7CD', 192, progress)}
-      {this.renderRightAction('Flag', '#ffab00', 128, progress)}
-      {this.renderRightAction('More', '#dd2c00', 64, progress)}
+      {this.renderRightAction('삭제', '#dd2c00', 64, progress)}
     </View>
   );
   updateRef = (ref) => {
@@ -61,7 +59,6 @@ export default class AppleStyleSwipeableRow extends Component {
         friction={2}
         leftThreshold={30}
         rightThreshold={40}
-        renderLeftActions={this.renderLeftActions}
         renderRightActions={this.renderRightActions}
       >
         {children}

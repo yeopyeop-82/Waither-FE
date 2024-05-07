@@ -24,20 +24,12 @@ const Row = ({ item }) => (
   </RectButton>
 );
 
-const SwipeableRow = ({ item, index }) => {
-  if (index % 2 === 0) {
-    return (
-      <AppleStyleSwipeableRow>
-        <Row item={item} />
-      </AppleStyleSwipeableRow>
-    );
-  } else {
-    return (
-      <AppleStyleSwipeableRow>
-        <Row item={item} />
-      </AppleStyleSwipeableRow>
-    );
-  }
+const SwipeableRow = ({ item }) => {
+  return (
+    <AppleStyleSwipeableRow>
+      <Row item={item} />
+    </AppleStyleSwipeableRow>
+  );
 };
 
 export default class Example extends Component {
@@ -91,51 +83,58 @@ const styles = StyleSheet.create({
 
 const DATA = [
   {
-    from: "D'Artagnan",
+    from: '날씨 예보',
     when: '3:11 PM',
-    message:
-      'Unus pro omnibus, omnes pro uno. Nunc scelerisque, massa non lacinia porta, quam odio dapibus enim, nec tincidunt dolor leo non neque',
+    message: '14:20 분 부터 비가 와요! 우산을 챙겨가세요.',
   },
   {
-    from: 'Aramis',
+    from: '날씨 예보',
     when: '11:46 AM',
-    message:
-      'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus hendrerit ligula dignissim maximus aliquet. Integer tincidunt, tortor at finibus molestie, ex tellus laoreet libero, lobortis consectetur nisl diam viverra justo.',
+    message: '오늘 오후 6시부터 8시까지 비가 와요! 우산을 챙겨가세요.',
   },
   {
-    from: 'Athos',
+    from: '날씨 예보',
     when: '6:06 AM',
-    message:
-      'Sed non arcu ullamcorper, eleifend velit eu, tristique metus. Duis id sapien eu orci varius malesuada et ac ipsum. Ut a magna vel urna tristique sagittis et dapibus augue. Vivamus non mauris a turpis auctor sagittis vitae vel ex. Curabitur accumsan quis mauris quis venenatis.',
+    message: '오늘 오후 6시부터 8시까지 비가 와요! 우산을 챙겨가세요.',
   },
   {
-    from: 'Porthos',
-    when: 'Yesterday',
-    message:
-      'Vivamus id condimentum lorem. Duis semper euismod luctus. Morbi maximus urna ut mi tempus fermentum. Nam eget dui sed ligula rutrum venenatis.',
-  },
-  {
-    from: 'Domestos',
+    from: '개인 맞춤 날씨 예보',
     when: '2 days ago',
-    message:
-      'Aliquam imperdiet dolor eget aliquet feugiat. Fusce tincidunt mi diam. Pellentesque cursus semper sem. Aliquam ut ullamcorper massa, sed tincidunt eros.',
+    message: '대체로 바람이 많이 부는 날이에요.',
   },
   {
-    from: 'Cardinal Richelieu',
+    from: '개인 맞춤 날씨 예보',
     when: '2 days ago',
-    message:
-      'Pellentesque id quam ac tortor pellentesque tempor tristique ut nunc. Pellentesque posuere ut massa eget imperdiet. Ut at nisi magna. Ut volutpat tellus ut est viverra, eu egestas ex tincidunt. Cras tellus tellus, fringilla eget massa in, ultricies maximus eros.',
+    message: '새벽에 온도가 많이 떨어져요. 창문을 닫고 주무세요.',
   },
   {
-    from: "D'Artagnan",
+    from: '개인 맞춤 날씨 예보',
     when: 'Week ago',
-    message:
-      'Aliquam non aliquet mi. Proin feugiat nisl maximus arcu imperdiet euismod nec at purus. Vestibulum sed dui eget mauris consequat dignissim.',
+    message: '새벽에 온도가 많이 떨어져요. 창문을 닫고 주무세요.',
   },
   {
-    from: 'Cardinal Richelieu',
-    when: '2 weeks ago',
-    message:
-      'Vestibulum ac nisi non augue viverra ullamcorper quis vitae mi. Donec vitae risus aliquam, posuere urna fermentum, fermentum risus. ',
+    from: '개인 맞춤 날씨 예보',
+    when: 'Week ago',
+    message: '새벽에 온도가 많이 떨어져요. 창문을 닫고 주무세요.',
+  },
+  {
+    from: '개인 맞춤 날씨 예보',
+    when: 'Week ago',
+    message: '새벽에 온도가 많이 떨어져요. 창문을 닫고 주무세요.',
+  },
+  {
+    from: '개인 맞춤 날씨 예보',
+    when: 'Week ago',
+    message: '새벽에 온도가 많이 떨어져요. 창문을 닫고 주무세요.',
+  },
+  {
+    from: '개인 맞춤 날씨 예보',
+    when: 'Week ago',
+    message: '새벽에 온도가 많이 떨어져요. 창문을 닫고 주무세요.',
+  },
+  {
+    from: '개인 맞춤 날씨 예보',
+    when: 'Week ago',
+    message: '새벽에 온도가 많이 떨어져요. 창문을 닫고 주무세요.',
   },
 ];
