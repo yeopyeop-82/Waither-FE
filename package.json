@@ -42,6 +42,7 @@
     "react-native-shadow-2": "^7.0.8",
     "react-native-splash-screen": "^3.3.0",
     "react-native-svg": "^15.1.0",
+    "react-native-swipe-list-view": "^3.2.9",
     "react-native-toast-message": "^2.2.0",
     "react-native-vector-icons": "^10.0.3",
     "react-native-webview": "^13.8.4",
