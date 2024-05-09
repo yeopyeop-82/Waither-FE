@@ -10,9 +10,11 @@ import UpIcon from '../assets/images/up-arrow.svg';
 import DownIcon from '../assets/images/down-arrow.svg';
 import CloudIcon from '../assets/images/ic_cloud.svg';
 import DirectionIcon from '../assets/images/direction.svg';
+import DustIcon from '../assets/images/ic-dust.svg';
+import PollenIcon from '../assets/images/ic-pollen.svg';
+import CautionIcon from '../assets/images/caution.svg';
 import { GREY_COLOR, MAIN_COLOR } from '../styles/color';
-import { mainModule } from 'process';
-import { relative } from 'path';
+import { useNavigation } from '@react-navigation/native';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -28,8 +30,6 @@ const HeaderView = styled.View`
   margin-top: 50px;
   align-items: center;
   justify-content: space-between;
-
-  /* background-color: red; */
 `;
 
 const HeaderTitle = styled.Text`
@@ -40,6 +40,8 @@ const HeaderTitle = styled.Text`
   padding-right: 8px;
   color: white;
 `;
+
+const HeaderBtn = styled.TouchableOpacity``;
 
 const ReportView = styled.View`
   width: 100%;
@@ -70,7 +72,6 @@ const MessageView = styled.View`
   border-radius: 20px;
   border: 0.4px solid white;
   justify-content: center;
-  /* align-items: center; */
   flex-direction: row;
   margin-bottom: 20px;
 `;
@@ -117,7 +118,7 @@ const WeatherChangeMessageView = styled.View`
   width: 345px;
   height: 68px;
   border-radius: 15px;
-  background-color: rgb(135, 165, 206);
+  background-color: rgba(255, 255, 255, 0.2);
   border: 0.4px solid white;
   flex-direction: row;
   align-items: center;
@@ -142,7 +143,7 @@ const UserAnswerView = styled.View`
   width: 345px;
   height: 145px;
   border-radius: 15px;
-  background-color: rgb(143, 161, 186);
+  background-color: rgba(255, 255, 255, 0.2);
   border: 0.4px solid white;
   align-items: center;
   justify-content: center;
@@ -165,7 +166,6 @@ const PercentBar = styled.View`
   height: 19px;
   border: 0.4px solid white;
   border-radius: 15px;
-  /* background-color: ${MAIN_COLOR}; */
 `;
 
 const WeatherDetailWrapper = styled.View`
@@ -173,19 +173,19 @@ const WeatherDetailWrapper = styled.View`
   margin-top: 10px;
   margin-bottom: 200px;
   justify-content: center;
-
-  /* background-color: red; */
 `;
 
 const TempRainWrapper = styled.View`
   flex-direction: row;
+  width: 100%;
+  justify-content: center;
 `;
 
 const TempRainBox = styled.View`
-  width: 160px;
+  width: 47%;
   height: 138px;
   border-radius: 15px;
-  background-color: rgb(143, 161, 186);
+  background-color: rgba(255, 255, 255, 0.2);
   border: 0.4px solid white;
   align-items: center;
   justify-content: center;
@@ -211,10 +211,10 @@ const TempRainSubText = styled.Text`
 `;
 
 const WindWrapper = styled.View`
-  width: 345px;
+  width: 100%;
   height: 138px;
   border-radius: 15px;
-  background-color: rgb(143, 161, 186);
+  background-color: rgba(255, 255, 255, 0.2);
   border: 0.4px solid white;
   margin-top: 15px;
   flex-direction: row;
@@ -239,7 +239,42 @@ const WindSubText = styled.Text`
   margin-top: 20px;
 `;
 
-const Report = ({ navigation }) => {
+const CustomWrapper = styled.View`
+  width: 100%;
+  height: 138px;
+  margin-top: 15px;
+  flex-direction: row;
+  justify-content: space-between;
+`;
+
+const CustomBox = styled.View`
+  width: 110px;
+  height: 138px;
+  border-radius: 15px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border: 0.4px solid white;
+  align-items: center;
+  justify-content: center;
+`;
+
+const CustomMainText = styled.Text`
+  color: white;
+  font-size: 14px;
+`;
+const CustomSubText = styled.Text`
+  color: white;
+  font-size: 14px;
+`;
+
+const PollenSubTextView = styled.View`
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding-top: 10px;
+`;
+
+const Report = () => {
+  const navigation = useNavigation();
   return (
     <Wrapper>
       <LinearGradient
@@ -254,9 +289,14 @@ const Report = ({ navigation }) => {
         style={{ flex: 1, width: '100%' }}
       >
         <HeaderView>
-          <NavBackIcon width={46} height={46} />
+          <HeaderBtn onPress={() => navigation.navigate('MainScreen')}>
+            <NavBackIcon width={46} height={46} />
+          </HeaderBtn>
+
           <HeaderTitle>Report</HeaderTitle>
-          <DownLoadIcon style={{ marginRight: 13, marginTop: 4 }} />
+          <HeaderBtn>
+            <DownLoadIcon style={{ marginRight: 13, marginTop: 4 }} />
+          </HeaderBtn>
         </HeaderView>
         <Date>2024년 8월 23일 (목)</Date>
         <ReportView>
@@ -321,7 +361,7 @@ const Report = ({ navigation }) => {
             <ExplainText>유저들의 답변</ExplainText>
             <UserAnswerView>
               <UserAnswerText>
-                전체 유저의 80%가{'\n'} 오늘 춥다고 답변했습니다.
+                전체 유저의 0%가{'\n'} 오늘 춥다고 답변했습니다.
               </UserAnswerText>
               <Percent>0%</Percent>
               <PercentBar></PercentBar>
@@ -359,6 +399,28 @@ const Report = ({ navigation }) => {
                   <WindSubText>남남동</WindSubText>
                 </WindBox>
               </WindWrapper>
+              <CustomWrapper>
+                <CustomBox>
+                  <CustomMainText>미세먼지</CustomMainText>
+                  <DustIcon width={60} height={58} style={{ marginTop: 10 }} />
+                  <CustomSubText>좋음 | 20ug/m</CustomSubText>
+                </CustomBox>
+                <CustomBox>
+                  <CustomMainText>꽃가루</CustomMainText>
+                  <PollenIcon
+                    width={50}
+                    height={50}
+                    style={{ marginTop: 10 }}
+                  />
+                  <PollenSubTextView>
+                    <CautionIcon width={11} height={11} />
+                    <CustomSubText>높음</CustomSubText>
+                  </PollenSubTextView>
+                </CustomBox>
+                <CustomBox>
+                  <CustomMainText>예시 테스트</CustomMainText>
+                </CustomBox>
+              </CustomWrapper>
             </WeatherDetailWrapper>
           </ReportScrollView>
         </ReportView>
