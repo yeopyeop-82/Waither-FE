@@ -185,7 +185,7 @@ export default function Login({ navigation }) {
     <Wrapper>
       <Logo source={waitherLogo} />
       <LoginTitle>로그인</LoginTitle>
-      <KakaoLoginBtn onPress={() => navigation.navigate('SettingWind')}>
+      <KakaoLoginBtn onPress={() => navigation.navigate('Report')}>
         <KakaoImage source={KakaoLogo} />
         <KaKaoLoginTitle>Kakao로 계속하기</KaKaoLoginTitle>
       </KakaoLoginBtn>

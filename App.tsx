@@ -27,6 +27,7 @@ import UserDataSetting from './src/screens/UserDataSetting';
 import PrivacySetting from './src/screens/PrivacySetting';
 import MainScreen from './src/screens/MainScreen';
 import Notifications from './src/screens/Notifications';
+import Report from './src/screens/Report';
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -103,6 +104,13 @@ export default function App() {
             component={MainScreen}
           />
           <Stack.Screen name="Notifications" component={Notifications} />
+          <Stack.Screen
+            name="Report"
+            options={{
+              headerShown: false,
+            }}
+            component={Report}
+          />
         </Stack.Navigator>
       </NavigationContainer>
       <Toast config={toastConfig} />
