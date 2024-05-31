@@ -10,7 +10,9 @@ const Web = () => {
     >
       <WebView
         style={{ flex: 1, width: WINDOW_WIDTH, height: WINDOW_HEIGHT }}
-        source={{ uri: 'https://www.naver.com/' }}
+        source={{
+          uri: 'https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=d123b0e487f515ba55f26453d6537fbc&redirect_uri=https://waither.shop/user/oauth/kakao/callback',
+        }}
       />
     </SafeAreaView>
   );
