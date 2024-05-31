@@ -28,6 +28,8 @@ import PrivacySetting from './src/screens/PrivacySetting';
 import MainScreen from './src/screens/MainScreen';
 import Notifications from './src/screens/Notifications';
 import Report from './src/screens/Report';
+import WebView from 'react-native-webview';
+import Web from './src/screens/Web';
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -110,6 +112,13 @@ export default function App() {
               headerShown: false,
             }}
             component={Report}
+          />
+          <Stack.Screen
+            name="Web"
+            options={{
+              headerShown: true,
+            }}
+            component={Web}
           />
         </Stack.Navigator>
       </NavigationContainer>
