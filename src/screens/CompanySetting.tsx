@@ -6,7 +6,7 @@ import React, {
   useState,
 } from 'react';
 import styled from 'styled-components/native';
-import { MAIN_COLOR } from '../styles/color';
+import { MAIN_COLOR, GREY_COLOR } from '../styles/color';
 import settingBtn from '../assets/images/VectorArrow.png';
 import {
   BottomSheetBackdrop,
@@ -98,8 +98,9 @@ const CompanyLocationSettingInnerView = styled.View`
 const SearchCompanyView = styled.View`
   display: flex;
   width: 100%;
+  height: 1px;
   flex: 1;
-  flex-direction: row;
+  flex-direction: column;
 `;
 
 const SearchCompanyTextInputView = styled.View`
@@ -116,26 +117,69 @@ const SearchCompanyTextInputView = styled.View`
 `;
 
 const SearchCompanyTextInput = styled.TextInput`
-  width: 100%;
+  width: 95%;
 `;
 
 const SearchCompanyCancleBtn = styled.TouchableOpacity`
-  margin-top: 18px;
-  margin-left: 10px;
+  margin-bottom: 15px;
 `;
 
 const SearchCompanyText = styled.Text`
   color: ${MAIN_COLOR};
+  position: absolute;
+  padding-right: 30px;
+`;
+
+const CompanyLocationWrapper = styled.View`
+  display: flex;
+  position: absolute;
+  width: 80%;
+  margin-top: 55px;
+  margin-left: 30px;
+  height: 300px;
+`;
+const CompanyLocationTitle = styled.Text`
+  margin-bottom: 15px;
+  color: rgba(0, 0, 0, 0.5);
 `;
 
 const CompanySetting = () => {
   const [isCompanyReportToggleEnabled, setIsCompanyReportToggleEnabled] =
     useState(false);
   const [isCompanyReportEnabled, setIsCompanyReportEnabled] = useState(false);
+  const [companyLocation, setCompanyLocation] = useState('');
 
   const toggleSwitch = () => {
     setIsCompanyReportToggleEnabled((previousState) => !previousState);
     setIsCompanyReportEnabled(isCompanyReportToggleEnabled);
+  };
+
+  const onChangeCompanyLocation = (text) => {
+    setCompanyLocation(text);
+    console.log(companyLocation);
+  };
+
+  const companyLocationFetch = async () => {
+    const url = `https://dapi.kakao.com/v2/local/search/address.json?query=${companyLocation}&analyze_type=similar&page=1&size=30`;
+
+    const headers = {
+      Authorization: 'KakaoAK d123b0e487f515ba55f26453d6537fbc',
+      'Content-Type': 'application/json;charset=UTF-8',
+    };
+
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: headers,
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      console.log(data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
   };
 
   useEffect(() => {
@@ -192,12 +236,25 @@ const CompanySetting = () => {
             <SearchCompanyView>
               <SearchCompanyTextInputView>
                 <Pngwing width={25} height={25} style={{ zIndex: 1 }}></Pngwing>
-                <SearchCompanyTextInput></SearchCompanyTextInput>
+                <SearchCompanyTextInput
+                  onChangeText={onChangeCompanyLocation}
+                  onChange={companyLocationFetch}
+                  value={companyLocation}
+                ></SearchCompanyTextInput>
+                <SearchCompanyCancleBtn onPress={handleDismissModalPress}>
+                  <SearchCompanyText>취소</SearchCompanyText>
+                </SearchCompanyCancleBtn>
               </SearchCompanyTextInputView>
-              <SearchCompanyCancleBtn onPress={handleDismissModalPress}>
-                <SearchCompanyText>취소</SearchCompanyText>
-              </SearchCompanyCancleBtn>
+              <CompanyLocationWrapper></CompanyLocationWrapper>
             </SearchCompanyView>
+            <CompanyLocationWrapper>
+              <CompanyLocationTitle>
+                대한민국 서울특별시 송파구 잠실동
+              </CompanyLocationTitle>
+              <CompanyLocationTitle>
+                대한민국 서울특별시 송파구 잠실2동
+              </CompanyLocationTitle>
+            </CompanyLocationWrapper>
           </BottomSheetModal>
         </BottomSheetModalProvider>
       </GestureHandlerRootView>
