@@ -40,17 +40,22 @@ const NotificationDay = styled.View`
 const SelectedDayWrapper = styled.View`
   display: flex;
   flex-direction: row;
+  height: 25px;
   margin-top: 20px;
   margin-left: 20px;
+  align-items: center;
 `;
 
 const SelectedDayTitle = styled.Text`
+  position: relative;
   font-size: 18px;
   margin-left: 4px;
+  /* margin-bottom: 1px; */
 `;
 
 const NotificationMainTitle = styled.Text`
   font-size: 18px;
+  margin-right: 5px;
 `;
 
 const NotificationSubTitle = styled.Text`
@@ -217,6 +222,7 @@ const SettingNotification = () => {
   const [Friday, setIsFriday] = useState(false);
   const [Saturday, setIsSaturday] = useState(false);
   const [Sunday, setIsSunday] = useState(false);
+  const [chosenDay, setChosenDay] = useState([]);
 
   const name = useRecoilValue(userNameState);
 
@@ -308,33 +314,51 @@ const SettingNotification = () => {
 
   const SundayClick = () => {
     setIsSunday((previousState) => !previousState);
+    checkDay('일');
   };
   const MondayClick = () => {
     setIsMonday((previousState) => !previousState);
+    checkDay('월');
   };
   const TuesdayClick = () => {
     setIsTuesday((previousState) => !previousState);
+    checkDay('화');
   };
   const WednedayClick = () => {
     setIsWednesday((previousState) => !previousState);
+    checkDay('수');
   };
   const ThursdayClick = () => {
     setIsThursday((previousState) => !previousState);
+    checkDay('목');
   };
   const FridayClick = () => {
     setIsFriday((previousState) => !previousState);
+    checkDay('금');
   };
   const SaturdayClick = () => {
     setIsSaturday((previousState) => !previousState);
+    checkDay('토');
   };
 
-  console.log(Sunday);
-  console.log(Monday);
-  console.log(Tuesday);
-  console.log(Wednesday);
-  console.log(Thursday);
-  console.log(Friday);
-  console.log(Saturday);
+  //배열에 중복되는 요일이 있는지 확인하는 함수
+  const checkDay = (day) => {
+    setChosenDay((chosenDay) =>
+      //chosenDay가 이미 배열에 있는지 확인
+      chosenDay.includes(day)
+        ? //포함되어 있다면 day를 제거
+          chosenDay.filter((d) => d !== day)
+        : //포함되어 있지 않다면 기존의 배열에 day를 추가 후 새로운 배열 생성
+          [...chosenDay, day],
+    );
+  };
+
+  //chosenDay의 배열을 월,화,수 ... 순으로 정렬
+  const dayOrder = ['월', '화', '수', '목', '금', '토', '일'];
+  const sortedChosenDay = [...chosenDay].sort(
+    //프디강의 : 오름차순 정렬 무명함수
+    (a, b) => dayOrder.indexOf(a) - dayOrder.indexOf(b),
+  );
 
   useEffect(() => {
     setIsOutingEnabled(isOutingToggleEnabled);
@@ -351,15 +375,22 @@ const SettingNotification = () => {
     setIsSnowFallEnabled,
     isSnowFallToggleEnabled,
   ]);
+
   return (
     <>
       <Wrapper>
         <NotificationDay>
           <SelectedDayWrapper>
             <NotificationMainTitle>매주</NotificationMainTitle>
-            <SelectedDayTitle>월</SelectedDayTitle>
-            <SelectedDayTitle>수</SelectedDayTitle>
-            <SelectedDayTitle>금</SelectedDayTitle>
+            {sortedChosenDay.length === 0 ? (
+              <SelectedDayTitle>선택된 요일 없음</SelectedDayTitle>
+            ) : (
+              sortedChosenDay.map((date, index) => (
+                <SelectedDayTitle key={date}>
+                  {index === sortedChosenDay.length - 1 ? date : `${date},`}
+                </SelectedDayTitle>
+              ))
+            )}
           </SelectedDayWrapper>
           <NotificationSubTitle>
             선택된 요일에만 알림을 보내드릴게요.
