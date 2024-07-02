@@ -6,7 +6,7 @@ import React, {
   useState,
 } from 'react';
 import styled from 'styled-components/native';
-import { MAIN_COLOR } from '../styles/color';
+import { MAIN_COLOR, GREY_COLOR } from '../styles/color';
 import settingBtn from '../assets/images/VectorArrow.png';
 import {
   BottomSheetBackdrop,
@@ -98,8 +98,9 @@ const CompanyLocationSettingInnerView = styled.View`
 const SearchCompanyView = styled.View`
   display: flex;
   width: 100%;
+  height: 1px;
   flex: 1;
-  flex-direction: row;
+  flex-direction: column;
 `;
 
 const SearchCompanyTextInputView = styled.View`
@@ -115,27 +116,137 @@ const SearchCompanyTextInputView = styled.View`
   align-items: center;
 `;
 
-const SearchCompanyTextInput = styled.TextInput`
-  width: 100%;
+const SearchedLocationTextInput = styled.TextInput`
+  width: 95%;
 `;
 
 const SearchCompanyCancleBtn = styled.TouchableOpacity`
-  margin-top: 18px;
-  margin-left: 10px;
+  margin-bottom: 15px;
 `;
 
 const SearchCompanyText = styled.Text`
   color: ${MAIN_COLOR};
+  position: absolute;
+  padding-right: 30px;
+`;
+
+const CompanyLocationWrapper = styled.View`
+  display: flex;
+  position: absolute;
+  width: 80%;
+  margin-top: 55px;
+  margin-left: 30px;
+  height: 300px;
+`;
+
+const CompanyLocationBtn = styled.TouchableOpacity`
+  /* margin-bottom: 15px; */
+`;
+
+const CompanyLocationTitle = styled.Text`
+  margin-bottom: 15px;
+  color: rgba(0, 0, 0, 0.5);
 `;
 
 const CompanySetting = () => {
   const [isCompanyReportToggleEnabled, setIsCompanyReportToggleEnabled] =
     useState(false);
   const [isCompanyReportEnabled, setIsCompanyReportEnabled] = useState(false);
+  const [searchedLocation, setsearchedLocation] = useState('');
+  const [companyLocationList, setCompanyLocationList] = useState([]);
+
+  //=================================================================================
+
+  const [selectedLocation, setSelectedLocation] = useState();
+
+  const [selectedCompanyLocationsX, setSelectedCompanyLocationsX] = useState(
+    [],
+  );
+  const [selectedCompanyLocationsY, setSelectedCompanyLocationsY] = useState(
+    [],
+  );
 
   const toggleSwitch = () => {
     setIsCompanyReportToggleEnabled((previousState) => !previousState);
     setIsCompanyReportEnabled(isCompanyReportToggleEnabled);
+  };
+
+  const onChangeCompanyLocation = (text) => {
+    setsearchedLocation(text);
+  };
+
+  const onPressSelectCompanyLocationsX = (value) => {
+    setSelectedCompanyLocationsX(value);
+  };
+  const onPressSelectCompanyLocationsY = (value) => {
+    setSelectedCompanyLocationsY(value);
+  };
+
+  const onPressSelectedLocation = (value) => {
+    setSelectedLocation(value);
+  };
+
+  console.log(selectedCompanyLocationsX);
+  console.log(selectedCompanyLocationsY);
+  console.log(selectedLocation);
+
+  //===========================================================
+
+  const companyLocationGet = async () => {
+    const url = `https://dapi.kakao.com/v2/local/search/address.json?query=${searchedLocation}&analyze_type=similar&page=1&size=30`;
+
+    const headers = {
+      Authorization: 'KakaoAK d123b0e487f515ba55f26453d6537fbc',
+      'Content-Type': 'application/json;charset=UTF-8',
+    };
+
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: headers,
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      setCompanyLocationList(data.documents);
+      console.log(data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  //===========================================================
+  const companyLocationPut = async () => {
+    const url = 'https://waither.shop/user/setting/region';
+
+    const headers = {
+      Authorization:
+        'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkaGRiczEyMDhAbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImlhdCI6MTcxOTgyNzg0MCwiZXhwIjoxNzE5ODMxNDQwfQ._NfZiPP0H3Ymi-u2xolBFO1tUliFriTbTpu9ezK-i40',
+      'Content-Type': 'application/json',
+    };
+
+    const body = JSON.stringify({
+      regionName: selectedLocation,
+      longtitude: selectedCompanyLocationsX,
+      latitude: selectedCompanyLocationsY,
+    });
+
+    try {
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: headers,
+        body: body,
+      });
+      // if (!response.ok) {
+      //   throw new Error('Network response was not ok');
+      // }
+      const data = await response.json();
+
+      console.log(data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
   };
 
   useEffect(() => {
@@ -192,12 +303,35 @@ const CompanySetting = () => {
             <SearchCompanyView>
               <SearchCompanyTextInputView>
                 <Pngwing width={25} height={25} style={{ zIndex: 1 }}></Pngwing>
-                <SearchCompanyTextInput></SearchCompanyTextInput>
+                <SearchedLocationTextInput
+                  onChangeText={onChangeCompanyLocation}
+                  onChange={companyLocationGet}
+                  value={searchedLocation}
+                ></SearchedLocationTextInput>
+                <SearchCompanyCancleBtn onPress={handleDismissModalPress}>
+                  <SearchCompanyText>취소</SearchCompanyText>
+                </SearchCompanyCancleBtn>
               </SearchCompanyTextInputView>
-              <SearchCompanyCancleBtn onPress={handleDismissModalPress}>
-                <SearchCompanyText>취소</SearchCompanyText>
-              </SearchCompanyCancleBtn>
+              <CompanyLocationWrapper></CompanyLocationWrapper>
             </SearchCompanyView>
+            <CompanyLocationWrapper>
+              {companyLocationList.map((address) => (
+                <CompanyLocationBtn
+                  key={address}
+                  onPress={() => {
+                    onPressSelectedLocation(address.address_name);
+                    onPressSelectCompanyLocationsX(address.x);
+                    onPressSelectCompanyLocationsY(address.y);
+                    companyLocationPut();
+                    handleDismissModalPress();
+                  }}
+                >
+                  <CompanyLocationTitle key={address}>
+                    {address.address_name}
+                  </CompanyLocationTitle>
+                </CompanyLocationBtn>
+              ))}
+            </CompanyLocationWrapper>
           </BottomSheetModal>
         </BottomSheetModalProvider>
       </GestureHandlerRootView>
