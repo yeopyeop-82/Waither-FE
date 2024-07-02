@@ -165,6 +165,7 @@ const CompanyLocationWrapper = styled.View`
 
 const CompanyLocationBtn = styled.TouchableOpacity`
   /* margin-bottom: 15px; */
+  /* background-color: red; */
 `;
 
 const CompanyLocationTitle = styled.Text`
@@ -179,18 +180,16 @@ const CompanySetting = () => {
   const [searchedLocation, setsearchedLocation] = useState('');
   const [companyLocationList, setCompanyLocationList] = useState([]);
   const [userPresentCompanyLocation, setUserPresentCompanyLocation] =
-    useState();
+    useState(null);
 
   //=================================================================================
 
-  const [selectedLocation, setSelectedLocation] = useState('');
+  const [selectedLocation, setSelectedLocation] = useState(null);
 
-  const [selectedCompanyLocationsX, setSelectedCompanyLocationsX] = useState(
-    [],
-  );
-  const [selectedCompanyLocationsY, setSelectedCompanyLocationsY] = useState(
-    [],
-  );
+  const [selectedCompanyLocationsX, setSelectedCompanyLocationsX] =
+    useState(null);
+  const [selectedCompanyLocationsY, setSelectedCompanyLocationsY] =
+    useState(null);
 
   const toggleSwitch = () => {
     setIsCompanyReportToggleEnabled((previousState) => !previousState);
@@ -256,7 +255,7 @@ const CompanySetting = () => {
 
   //Bearer 토큰
   const authorization =
-    'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkaGRiczEyMDhAbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImlhdCI6MTcxOTkxOTYyMiwiZXhwIjoxNzE5OTIzMjIyfQ.ALnUSkuKanK3m1hSHEBcU15RM5EC8COQF0seu7P9m1E';
+    'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkaGRiczEyMDhAbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImlhdCI6MTcxOTkyNzYyMywiZXhwIjoxNzE5OTMxMjIzfQ.sOj-ZuzVVJ1MfKWMQ9n1w-l2-XS5xO-I86kLZKCAonM';
 
   //직장 지역명, 위도, 경도 호출
   const companyLocationPut = async () => {
@@ -283,6 +282,7 @@ const CompanySetting = () => {
         throw new Error('Network response was not ok');
       }
       const res = await response.json();
+      console.log(res, selectedLocation);
     } catch (error) {
       console.error('Error fetching:', error);
     }
@@ -309,7 +309,7 @@ const CompanySetting = () => {
       });
 
       const res = await response.json();
-      // console.log(res);
+      console.log(res);
     } catch (error) {
       console.log('Error fetching res:');
     }
@@ -330,6 +330,7 @@ const CompanySetting = () => {
       const data = await response.json();
 
       setUserPresentCompanyLocation(data.result.regionName);
+      console.log(data.result.regionName);
     } catch (error) {
       console.log('Error fetching data: 현재 작장 지역 Get');
     }
@@ -337,13 +338,19 @@ const CompanySetting = () => {
 
   presentCompanyLocationGet();
 
-  // console.log(userPresentCompanyLocation);
-  // console.log(selectedCompanyLocationsX);
-  // console.log(selectedCompanyLocationsY);
+  //===============================================================
 
-  //============================================================
-
-  console.log(userPresentCompanyLocation);
+  useEffect(() => {
+    if (
+      selectedLocation &&
+      selectedCompanyLocationsX &&
+      selectedCompanyLocationsY
+    ) {
+      companyLocationPut();
+      // presentCompanyLocationGet();
+      // handleDismissModalPress();
+    }
+  }, [selectedLocation, selectedCompanyLocationsX, selectedCompanyLocationsY]);
 
   //===============================================================
   return (
@@ -370,7 +377,6 @@ const CompanySetting = () => {
             <PresentCompanyLocationSubTitle>
               현재 직장 지역 위치
             </PresentCompanyLocationSubTitle>
-
             <PresentCompanyLocationTitle>
               대한민국 {userPresentCompanyLocation}
             </PresentCompanyLocationTitle>
@@ -415,9 +421,8 @@ const CompanySetting = () => {
                     onPressSelectedLocation(address.address_name);
                     onPressSelectCompanyLocationsX(address.x);
                     onPressSelectCompanyLocationsY(address.y);
+                    setUserPresentCompanyLocation(address.address_name);
                     companyLocationPut();
-                    // presentCompanyLocationGet();
-                    console.log(userPresentCompanyLocation);
                     handleDismissModalPress();
                   }}
                 >
