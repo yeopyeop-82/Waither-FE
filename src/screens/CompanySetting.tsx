@@ -73,6 +73,30 @@ const SettingArrow = styled.Image`
   margin-left: 20px;
 `;
 
+const PresentCompanyLocationView = styled.View`
+  display: flex;
+  flex: 0.12;
+  flex-direction: column;
+  width: 100%;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-top: 25px;
+  background-color: white;
+`;
+
+const PresentCompanyLocationSubTitle = styled.Text`
+  color: rgba(0, 0, 0, 0.7);
+  font-size: 12px;
+  margin-left: 20px;
+  margin-top: 15px;
+`;
+
+const PresentCompanyLocationTitle = styled.Text`
+  font-size: 17px;
+  margin-top: 10px;
+  margin-left: 20px;
+`;
+
 const CompanyLocationSettingView = styled.View`
   display: flex;
   flex: 0.12;
@@ -150,14 +174,16 @@ const CompanyLocationTitle = styled.Text`
 
 const CompanySetting = () => {
   const [isCompanyReportToggleEnabled, setIsCompanyReportToggleEnabled] =
-    useState(false);
-  const [isCompanyReportEnabled, setIsCompanyReportEnabled] = useState(false);
+    useState();
+  const [isCompanyReportEnabled, setIsCompanyReportEnabled] = useState();
   const [searchedLocation, setsearchedLocation] = useState('');
   const [companyLocationList, setCompanyLocationList] = useState([]);
+  const [userPresentCompanyLocation, setUserPresentCompanyLocation] =
+    useState();
 
   //=================================================================================
 
-  const [selectedLocation, setSelectedLocation] = useState();
+  const [selectedLocation, setSelectedLocation] = useState('');
 
   const [selectedCompanyLocationsX, setSelectedCompanyLocationsX] = useState(
     [],
@@ -175,6 +201,10 @@ const CompanySetting = () => {
     setsearchedLocation(text);
   };
 
+  const onPressSelectedLocation = (value) => {
+    setSelectedLocation(value);
+  };
+
   const onPressSelectCompanyLocationsX = (value) => {
     setSelectedCompanyLocationsX(value);
   };
@@ -182,16 +212,24 @@ const CompanySetting = () => {
     setSelectedCompanyLocationsY(value);
   };
 
-  const onPressSelectedLocation = (value) => {
-    setSelectedLocation(value);
-  };
+  useEffect(() => {
+    setIsCompanyReportEnabled(isCompanyReportToggleEnabled);
+  }, [setIsCompanyReportEnabled, isCompanyReportToggleEnabled]);
 
-  console.log(selectedCompanyLocationsX);
-  console.log(selectedCompanyLocationsY);
-  console.log(selectedLocation);
+  // ===============================================================
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const snapPoints = useMemo(() => ['1%', '100%'], []);
+  const handlePresentModalPress = useCallback(() => {
+    bottomSheetModalRef.current?.present();
+  }, []);
+
+  const handleDismissModalPress = () => {
+    bottomSheetModalRef.current?.dismiss();
+  };
 
   //===========================================================
 
+  //지역 검색 API 호출
   const companyLocationGet = async () => {
     const url = `https://dapi.kakao.com/v2/local/search/address.json?query=${searchedLocation}&analyze_type=similar&page=1&size=30`;
 
@@ -210,19 +248,22 @@ const CompanySetting = () => {
       }
       const data = await response.json();
       setCompanyLocationList(data.documents);
-      console.log(data);
+      // console.log(data);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
   };
 
-  //===========================================================
+  //Bearer 토큰
+  const authorization =
+    'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkaGRiczEyMDhAbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImlhdCI6MTcxOTkxOTYyMiwiZXhwIjoxNzE5OTIzMjIyfQ.ALnUSkuKanK3m1hSHEBcU15RM5EC8COQF0seu7P9m1E';
+
+  //직장 지역명, 위도, 경도 호출
   const companyLocationPut = async () => {
     const url = 'https://waither.shop/user/setting/region';
 
     const headers = {
-      Authorization:
-        'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkaGRiczEyMDhAbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImlhdCI6MTcxOTgyNzg0MCwiZXhwIjoxNzE5ODMxNDQwfQ._NfZiPP0H3Ymi-u2xolBFO1tUliFriTbTpu9ezK-i40',
+      Authorization: authorization,
       'Content-Type': 'application/json',
     };
 
@@ -238,30 +279,72 @@ const CompanySetting = () => {
         headers: headers,
         body: body,
       });
-      // if (!response.ok) {
-      //   throw new Error('Network response was not ok');
-      // }
-      const data = await response.json();
-
-      console.log(data);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const res = await response.json();
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Error fetching:', error);
     }
   };
 
-  useEffect(() => {
-    setIsCompanyReportEnabled(isCompanyReportToggleEnabled);
-  }, [setIsCompanyReportEnabled, isCompanyReportToggleEnabled]);
-  // ===============================================================
-  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-  const snapPoints = useMemo(() => ['1%', '100%'], []);
-  const handlePresentModalPress = useCallback(() => {
-    bottomSheetModalRef.current?.present();
-  }, []);
+  //직장 지역 레포트 허용 여부 호출
+  const companyReportPut = async () => {
+    const url = 'https://waither.shop/user/setting/region-report';
 
-  const handleDismissModalPress = () => {
-    bottomSheetModalRef.current?.dismiss();
+    const headers = {
+      Authorization: authorization,
+      'Content-Type': 'application/json',
+    };
+
+    const body = JSON.stringify({
+      regionReport: isCompanyReportEnabled,
+    });
+
+    try {
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: headers,
+        body: body,
+      });
+
+      const res = await response.json();
+      // console.log(res);
+    } catch (error) {
+      console.log('Error fetching res:');
+    }
   };
+
+  // 현재 직장 지역 호출
+  const presentCompanyLocationGet = async () => {
+    const url = 'https://waither.shop/user/setting/region';
+    const headers = {
+      Authorization: authorization,
+    };
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: headers,
+      });
+
+      const data = await response.json();
+
+      setUserPresentCompanyLocation(data.result.regionName);
+    } catch (error) {
+      console.log('Error fetching data: 현재 작장 지역 Get');
+    }
+  };
+
+  presentCompanyLocationGet();
+
+  // console.log(userPresentCompanyLocation);
+  // console.log(selectedCompanyLocationsX);
+  // console.log(selectedCompanyLocationsY);
+
+  //============================================================
+
+  console.log(userPresentCompanyLocation);
+
   //===============================================================
   return (
     <Wrapper>
@@ -275,6 +358,7 @@ const CompanySetting = () => {
         <ToggleSwitch
           value={isCompanyReportToggleEnabled}
           onValueChange={toggleSwitch}
+          onTouchStart={companyReportPut}
           //toggle 활성화 여부에 따른 색상 설정
           trackColor={{ false: '#767577', true: `${MAIN_COLOR}` }}
         ></ToggleSwitch>
@@ -282,6 +366,15 @@ const CompanySetting = () => {
 
       <GestureHandlerRootView style={{ flex: 1, width: USER_WIDTH }}>
         <BottomSheetModalProvider>
+          <PresentCompanyLocationView>
+            <PresentCompanyLocationSubTitle>
+              현재 직장 지역 위치
+            </PresentCompanyLocationSubTitle>
+
+            <PresentCompanyLocationTitle>
+              대한민국 {userPresentCompanyLocation}
+            </PresentCompanyLocationTitle>
+          </PresentCompanyLocationView>
           <CompanyLocationSettingView>
             <CompanyLocationSettingBtn onPress={handlePresentModalPress}>
               <CompanyLocationSettingInnerView>
@@ -317,16 +410,18 @@ const CompanySetting = () => {
             <CompanyLocationWrapper>
               {companyLocationList.map((address) => (
                 <CompanyLocationBtn
-                  key={address}
+                  key={address.adress_name}
                   onPress={() => {
                     onPressSelectedLocation(address.address_name);
                     onPressSelectCompanyLocationsX(address.x);
                     onPressSelectCompanyLocationsY(address.y);
                     companyLocationPut();
+                    // presentCompanyLocationGet();
+                    console.log(userPresentCompanyLocation);
                     handleDismissModalPress();
                   }}
                 >
-                  <CompanyLocationTitle key={address}>
+                  <CompanyLocationTitle>
                     {address.address_name}
                   </CompanyLocationTitle>
                 </CompanyLocationBtn>
