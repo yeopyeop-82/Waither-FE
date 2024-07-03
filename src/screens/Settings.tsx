@@ -234,14 +234,14 @@ const DataBoxView = styled.View`
 
 const Settings = () => {
   const navigation = useNavigation();
-  const [previousState, setPreviousState] = useState(false);
   const [isCustomServiceToggleEnabled, setIsCustomServiceToggleEnabled] =
     useState(false);
   const [isCustomServiceEnabled, setIsCustomServiceEnabled] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
+
   const toggleSwitch = () => {
     // 이전 상태를 이용
-    setIsCustomServiceToggleEnabled(!isCustomServiceEnabled);
+    setIsCustomServiceToggleEnabled((prevState) => !prevState);
 
     // iscustomserviceEnabled가 false이기에 처음에는 else문으로 빠짐
     // 그리고 토글이 켜지며 true가 된다.
@@ -255,9 +255,76 @@ const Settings = () => {
 
   useEffect(() => {
     setIsCustomServiceEnabled(isCustomServiceToggleEnabled);
-  }, [setIsCustomServiceEnabled, isCustomServiceToggleEnabled]);
+  }, [isCustomServiceToggleEnabled]);
 
-  console.log(isCustomServiceEnabled);
+  useEffect(() => {
+    customServiceEnabledPut();
+  }, [isCustomServiceEnabled]);
+
+  //===================================================================
+
+  //Bearer 토큰
+  const authorization =
+    'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOlsiUk9MRV9VU0VSIl0sImlhdCI6MTcxOTgzMTYwMCwiZXhwIjozMzEzNDc0NTYwMH0.getDuds1kSPZ5SeiGtWukiq5qgLrKQiNnpZAX0f4-Ho';
+
+  //사용자 맞춤형 서비스 제공 여부 호출
+  const customServiceEnabledPut = async () => {
+    const url = 'https://waither.shop/user/setting/custom';
+
+    const headers = {
+      Authorization: authorization,
+      'Content-Type': 'application/json',
+    };
+
+    const body = JSON.stringify({
+      custom: isCustomServiceEnabled,
+    });
+
+    try {
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: headers,
+        body: body,
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const res = await response.json();
+      console.log('Put 함수', res, isCustomServiceEnabled);
+    } catch (error) {
+      console.error('Error fetching: 사용자 맞춤형 서비스 PUT ', error);
+    }
+  };
+
+  const customServiceEnabledGet = async () => {
+    const url = 'https://waither.shop/user/setting/custom';
+
+    const headers = {
+      Authorization: authorization,
+      'Content-Type': 'application/json',
+    };
+
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: headers,
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const res = await response.json();
+      console.log('Get 함수', res.result.custom);
+      setIsCustomServiceToggleEnabled(res.result.custom);
+    } catch (error) {
+      console.error('Error fetching: 사용자 맞춤형 서비스 GET ', error);
+    }
+  };
+
+  //===================================================================
+  useEffect(() => {
+    customServiceEnabledGet();
+  }, []);
+  //===================================================================
 
   return (
     <Wrapper>
@@ -270,8 +337,9 @@ const Settings = () => {
             사용자 데이터에 맞춰 정확한 데이터를 제공합니다.
           </CustomServiceSubTitle>
         </CustomServiceTitleView>
+
         <ToggleSwitch
-          value={isCustomServiceEnabled}
+          value={isCustomServiceToggleEnabled}
           onValueChange={toggleSwitch}
           //toggle 활성화 여부에 따른 색상 설정
           trackColor={{ false: '#767577', true: `${MAIN_COLOR}` }}
@@ -309,8 +377,9 @@ const Settings = () => {
             </ModalTurnOffBtn>
             <ModalTurnOnBtn
               onPress={() => {
-                setModalVisible(false);
                 setIsCustomServiceEnabled(true);
+                setModalVisible(false);
+                setIsCustomServiceToggleEnabled(true);
               }}
             >
               <ModalTurnOnBtnText>다시 생각해볼게요.</ModalTurnOnBtnText>
