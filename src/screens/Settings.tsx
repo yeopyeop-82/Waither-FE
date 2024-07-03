@@ -251,7 +251,6 @@ const Settings = () => {
     } else {
       setModalVisible(false);
     }
-    dsds;
   };
 
   useEffect(() => {
