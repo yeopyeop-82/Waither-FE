@@ -7,6 +7,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Error from '../assets/images/Error.png';
 import notError from '../assets/images/notError.png';
 import { useTogglePasswordVisibility } from '../utils/useTogglePasswordVisibility';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LogoWrapper = styled.View`
   flex: 0.3;
@@ -184,11 +185,46 @@ const EmailLogin = ({ navigation }) => {
     }
   };
 
-  const handleLogin = () => {
-    if (email !== 'waither@example.com' || password !== 'qwer1234!') {
+  const handleLogin = async () => {
+    try {
+      const response = await fetch('https://waither.shop/user/login', {
+        // 실제 API 엔드포인트 URL 사용
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+
+        // Ensure data.result and tokens are defined
+        if (
+          data.result &&
+          data.result.accessToken &&
+          data.result.refreshToken
+        ) {
+          const { accessToken, refreshToken } = data.result;
+
+          await AsyncStorage.setItem('accessToken', accessToken);
+          await AsyncStorage.setItem('refreshToken', refreshToken);
+
+          navigation.navigate('MainScreen');
+        } else {
+          console.error('Invalid response structure:', data);
+          setShowPasswordErrorMessage(true);
+        }
+      } else {
+        setShowPasswordErrorMessage(true);
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
       setShowPasswordErrorMessage(true);
-    } else {
-      setShowPasswordErrorMessage(false);
     }
   };
 
