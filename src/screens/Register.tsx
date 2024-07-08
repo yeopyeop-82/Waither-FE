@@ -399,6 +399,33 @@ const Register = () => {
     }
   };
 
+  const handleSignup = async () => {
+    try {
+      const response = await fetch('https://waither.shop/user/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
+      });
+
+      if (response.ok) {
+        navigation.navigate('Greeting');
+      } else {
+        // 실패 시 에러 메시지 처리
+        const result = await response.json();
+        console.log('Signup failed:', result.message);
+        alert('회원가입 실패: ' + result.message);
+      }
+    } catch (error) {
+      console.error('Signup error:', error);
+      alert('회원가입 중 오류가 발생했습니다.');
+    }
+  };
+
   return (
     <Wrapper>
       <KeyboardAwareScrollView
@@ -656,7 +683,7 @@ const Register = () => {
         </FormWrapper>
       </KeyboardAwareScrollView>
       <RegisterCompleteBtn
-        onPress={() => navigation.navigate('Greeting')}
+        onPress={handleSignup}
         disabled={!isPasswordChecked}
         style={{
           backgroundColor: isPasswordChecked
