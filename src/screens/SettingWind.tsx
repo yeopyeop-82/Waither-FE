@@ -99,10 +99,12 @@ const SettingWind = () => {
   const toggleSwitch = () =>
     setIsCustomServiceEnabled((previousState) => !previousState);
   const name = useRecoilValue(userNameState);
+  const [isLoading, setIsLoading] = useState(false);
 
-  console.log(isCustomServiceEnabled);
   useEffect(() => {
-    windPut();
+    if (isLoading) {
+      windPut();
+    }
   }, [isCustomServiceEnabled, userWind]);
 
   //===============================================================
@@ -160,6 +162,7 @@ const SettingWind = () => {
       const res = await response.json();
       setIsCustomServiceEnabled(res.result.windAlert);
       setUserWind(res.result.windDegree);
+      setIsLoading(true);
       console.log('바람 설정', res);
     } catch (error) {
       console.error('바람 설정', error);
