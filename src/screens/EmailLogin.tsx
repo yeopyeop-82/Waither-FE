@@ -7,7 +7,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Error from '../assets/images/Error.png';
 import notError from '../assets/images/notError.png';
 import { useTogglePasswordVisibility } from '../utils/useTogglePasswordVisibility';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // For storing the token
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LogoWrapper = styled.View`
   flex: 0.3;
@@ -187,7 +187,8 @@ const EmailLogin = ({ navigation }) => {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch('/user/login', {
+      const response = await fetch('https://waither.shop/user/login', {
+        // 실제 API 엔드포인트 URL 사용
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -200,8 +201,24 @@ const EmailLogin = ({ navigation }) => {
 
       if (response.ok) {
         const data = await response.json();
-        await AsyncStorage.setItem('token', data.token);
-        // Navigate to the next screen or perform other actions after successful login
+        console.log(data);
+
+        // Ensure data.result and tokens are defined
+        if (
+          data.result &&
+          data.result.accessToken &&
+          data.result.refreshToken
+        ) {
+          const { accessToken, refreshToken } = data.result;
+
+          await AsyncStorage.setItem('accessToken', accessToken);
+          await AsyncStorage.setItem('refreshToken', refreshToken);
+
+          navigation.navigate('MainScreen');
+        } else {
+          console.error('Invalid response structure:', data);
+          setShowPasswordErrorMessage(true);
+        }
       } else {
         setShowPasswordErrorMessage(true);
       }
