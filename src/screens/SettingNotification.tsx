@@ -215,6 +215,8 @@ const ModalCompleteBtn = styled.TouchableOpacity``;
 
 const SettingNotification = () => {
   const navigation = useNavigation();
+  const name = useRecoilValue(userNameState);
+  //======================================================
   const [Monday, setIsMonday] = useState(false);
   const [Tuesday, setIsTuesday] = useState(false);
   const [Wednesday, setIsWednesday] = useState(false);
@@ -225,12 +227,6 @@ const SettingNotification = () => {
 
   const [chosenDay, setChosenDay] = useState([]);
   const [outTime, setOutTime] = useState('');
-
-  const name = useRecoilValue(userNameState);
-
-  //   ==========================================================================================
-
-  //===============================================================
 
   const [selectedAmPm, setSelectedAmPm] = useState('AM');
   const [selectedHour, setSelectedHour] = useState('1');
@@ -270,59 +266,6 @@ const SettingNotification = () => {
     const notificationTime = formattedHour + formattedMinute;
     setNotificationTime(notificationTime);
   }, [selectedAmPm, selectedHour, selectedMinute, setNotificationTime]);
-
-  //   ==========================================================================================
-  const [isOutingToggleEnabled, setIsOutingToggleEnabled] = useState(false);
-  const [isOutingEnabled, setIsOutingEnabled] = useState(false);
-  const [isWeatherWarningToggleEnabled, setIsWeatherWarningToggleEnabled] =
-    useState(false);
-  const [isWeatherWarningEnabled, setIsWeatherWarningEnabled] = useState(false);
-  const [isUserCustomToggleEnabled, setIsUserCustomToggleEnabled] =
-    useState(false);
-  const [isUserCustomEnabled, setIsUserCustomEnabled] = useState(false);
-  const [isSnowFallToggleEnabled, setIsSnowFallToggleEnabled] = useState(false);
-  const [isSnowFallEnabled, setIsSnowFallEnabled] = useState(false);
-
-  const OutingtoggleSwitch = () => {
-    setIsOutingToggleEnabled((previousState) => !previousState);
-  };
-  const WeatherWarningtoggleSwitch = () => {
-    setIsWeatherWarningToggleEnabled((previousState) => !previousState);
-  };
-  const UserCustomtoggleSwitch = () => {
-    setIsUserCustomToggleEnabled((previousState) => !previousState);
-  };
-  const SnowFalltoggleSwitch = () => {
-    setIsSnowFallToggleEnabled((previousState) => !previousState);
-  };
-
-  useEffect(() => {
-    setIsOutingEnabled(isOutingToggleEnabled);
-    setIsWeatherWarningEnabled(isWeatherWarningToggleEnabled);
-    setIsUserCustomEnabled(isUserCustomToggleEnabled);
-    setIsSnowFallEnabled(isSnowFallToggleEnabled);
-  }, [
-    isOutingToggleEnabled,
-    isWeatherWarningToggleEnabled,
-    isUserCustomToggleEnabled,
-    isSnowFallToggleEnabled,
-  ]);
-
-  //===============================================================
-
-  useEffect(() => {
-    outAlertPut();
-    climateAlertPut();
-    userAlertPut();
-    snowAlertPut();
-  }, [
-    isOutingEnabled,
-    isWeatherWarningEnabled,
-    isUserCustomEnabled,
-    isSnowFallEnabled,
-  ]);
-
-  //===============================================================
 
   const SundayClick = () => {
     setIsSunday((previousState) => !previousState);
@@ -414,8 +357,6 @@ const SettingNotification = () => {
     }
   }, [handleCompleteModalPress]);
 
-  //===============================================================
-
   useEffect(() => {
     if (selectedAmPm == 'PM' && timeSelected) {
       setOutTime(
@@ -428,6 +369,51 @@ const SettingNotification = () => {
       );
     }
   }, [isModalPress]);
+
+  //==========================================================================================
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [isOutingEnabled, setIsOutingEnabled] = useState(false);
+  const [isWeatherWarningEnabled, setIsWeatherWarningEnabled] = useState(false);
+  const [isUserCustomEnabled, setIsUserCustomEnabled] = useState(false);
+  const [isSnowFallEnabled, setIsSnowFallEnabled] = useState(false);
+
+  const OutingtoggleSwitch = () => {
+    setIsOutingEnabled((previousState) => !previousState);
+  };
+  const WeatherWarningtoggleSwitch = () => {
+    setIsWeatherWarningEnabled((previousState) => !previousState);
+  };
+  const UserCustomtoggleSwitch = () => {
+    setIsUserCustomEnabled((previousState) => !previousState);
+  };
+  const SnowFalltoggleSwitch = () => {
+    setIsSnowFallEnabled((previousState) => !previousState);
+  };
+
+  useEffect(() => {
+    if (isLoading) {
+      outAlertPut();
+    }
+  }, [isOutingEnabled]);
+
+  useEffect(() => {
+    if (isLoading) {
+      climateAlertPut();
+    }
+  }, [isWeatherWarningEnabled]);
+
+  useEffect(() => {
+    if (isLoading) {
+      userAlertPut();
+    }
+  }, [isUserCustomEnabled]);
+
+  useEffect(() => {
+    if (isLoading) {
+      snowAlertPut();
+    }
+  }, [isSnowFallEnabled]);
 
   //===============================================================
 
@@ -517,7 +503,7 @@ const SettingNotification = () => {
         throw new Error('Network response was not ok');
       }
       const res = await response.json();
-      // console.log('기상 특보 알림 여부', res);
+      console.log('기상 특보 알림 여부', res);
     } catch (error) {
       console.error('기상 특보 알림 여부', error);
     }
@@ -546,7 +532,7 @@ const SettingNotification = () => {
         throw new Error('Network response was not ok');
       }
       const res = await response.json();
-      // console.log('사용자 맞춤 예보 여부', res);
+      console.log('사용자 맞춤 예보 여부', res);
     } catch (error) {
       console.error('사용자 맞춤 예보 여부', error);
     }
@@ -575,7 +561,7 @@ const SettingNotification = () => {
         throw new Error('Network response was not ok');
       }
       const res = await response.json();
-      // console.log('강설 정보 여부', res);
+      console.log('강설 정보 여부', res);
     } catch (error) {
       console.error('강설 정보 여부', error);
     }
@@ -599,16 +585,16 @@ const SettingNotification = () => {
         throw new Error('Network response was not ok');
       }
       const res = await response.json();
-      setIsOutingToggleEnabled(res.result.outAlert);
-      setIsWeatherWarningToggleEnabled(res.result.climateAlert);
-      setIsUserCustomToggleEnabled(res.result.userAlert);
-      setIsSnowFallToggleEnabled(res.result.snowAlert);
+
+      setIsOutingEnabled(res.result.outAlert);
+      setIsWeatherWarningEnabled(res.result.climateAlert);
+      setIsUserCustomEnabled(res.result.userAlert);
+      setIsSnowFallEnabled(res.result.snowAlert);
       setOutTime(res.result.outTime);
 
-      // if (res.result.days.includes('SATURDAY')) {
-      //   setIsSaturday(true);
-      // }
+      setIsLoading(true);
 
+      //===========================================
       //res로 온 날짜를 전부 검사하여 true로 만들기
       const dayMapping = {
         MONDAY: () => setIsMonday(true),
@@ -620,13 +606,7 @@ const SettingNotification = () => {
         SUNDAY: () => setIsSunday(true),
       };
 
-      res.result.days.forEach((day) => {
-        if (dayMapping[day]) {
-          dayMapping[day]();
-        }
-      });
-
-      const dayKoreanMap = {
+      const dayKoreanMapping = {
         MONDAY: '월',
         TUESDAY: '화',
         WEDNESDAY: '수',
@@ -636,10 +616,18 @@ const SettingNotification = () => {
         SUNDAY: '일',
       };
 
+      res.result.days.forEach((day) => {
+        if (dayMapping[day]) {
+          dayMapping[day]();
+        }
+      });
+
       const chosenDays = res.result.days
-        .filter((day) => dayKoreanMap.hasOwnProperty(day)) //dayKoreanMap
-        .map((day) => dayKoreanMap[day]);
+        .filter((day) => dayKoreanMapping.hasOwnProperty(day))
+        .map((day) => dayKoreanMapping[day]);
       setChosenDay(chosenDays);
+
+      //========================================
 
       console.log('알림 설정 정보', res);
     } catch (error) {
@@ -762,7 +750,7 @@ const SettingNotification = () => {
               </CustomServiceSubTitle>
             </MainScreenTitleView>
             <ToggleSwitch
-              value={isOutingToggleEnabled}
+              value={isOutingEnabled}
               onValueChange={OutingtoggleSwitch}
               //toggle 활성화 여부에 따른 색상 설정
               trackColor={{ false: '#767577', true: `${MAIN_COLOR}` }}
@@ -778,7 +766,7 @@ const SettingNotification = () => {
               </CustomServiceSubTitle>
             </MainScreenTitleView>
             <ToggleSwitch
-              value={isWeatherWarningToggleEnabled}
+              value={isWeatherWarningEnabled}
               onValueChange={WeatherWarningtoggleSwitch}
               //toggle 활성화 여부에 따른 색상 설정
               trackColor={{ false: '#767577', true: `${MAIN_COLOR}` }}
@@ -794,7 +782,7 @@ const SettingNotification = () => {
               </CustomServiceSubTitle>
             </MainScreenTitleView>
             <ToggleSwitch
-              value={isUserCustomToggleEnabled}
+              value={isUserCustomEnabled}
               onValueChange={UserCustomtoggleSwitch}
               //toggle 활성화 여부에 따른 색상 설정
               trackColor={{ false: '#767577', true: `${MAIN_COLOR}` }}
@@ -808,7 +796,7 @@ const SettingNotification = () => {
               </CustomServiceSubTitle>
             </MainScreenTitleView>
             <ToggleSwitch
-              value={isSnowFallToggleEnabled}
+              value={isSnowFallEnabled}
               onValueChange={SnowFalltoggleSwitch}
               //toggle 활성화 여부에 따른 색상 설정
               trackColor={{ false: '#767577', true: `${MAIN_COLOR}` }}
