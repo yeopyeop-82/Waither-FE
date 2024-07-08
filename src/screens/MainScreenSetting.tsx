@@ -62,33 +62,93 @@ const MainScreenSetting = () => {
   const [isFineDustEnabled, setIsFineDustEnabled] = useState(false);
   const RainFalltoggleSwitch = () => {
     setIsRainfallToggleEnabled((previousState) => !previousState);
-    setIsRainfallEnabled(isRainfallToggleEnabled);
   };
   const WindtoggleSwitch = () => {
     setIsWindToggleEnabled((previousState) => !previousState);
-    setIsWindEnabled(isWindToggleEnabled);
   };
   const FineDusttoggleSwitch = () => {
     setIsFineDustToglleEnabled((previousState) => !previousState);
-    setIsFineDustEnabled(isFineDustToggleEnabled);
   };
-
-  console.log(isRainfallEnabled);
-  console.log(isWindEnabled);
-  console.log(isFineDustEnabled);
 
   useEffect(() => {
     setIsRainfallEnabled(isRainfallToggleEnabled);
     setIsWindEnabled(isWindToggleEnabled);
     setIsFineDustEnabled(isFineDustToggleEnabled);
-  }, [
-    setIsRainfallEnabled,
-    isRainfallToggleEnabled,
-    setIsWindEnabled,
-    isWindToggleEnabled,
-    setIsFineDustEnabled,
-    isFineDustToggleEnabled,
-  ]);
+  }, [isRainfallToggleEnabled, isWindToggleEnabled, isFineDustToggleEnabled]);
+
+  useEffect(() => {
+    userDisplayCustomPatch();
+  }, [isRainfallEnabled, isWindEnabled, isFineDustEnabled]);
+
+  //===============================================================
+
+  //Bearer 토큰
+  const authorization =
+    'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOlsiUk9MRV9VU0VSIl0sImlhdCI6MTcxOTgzMTYwMCwiZXhwIjozMzEzNDc0NTYwMH0.getDuds1kSPZ5SeiGtWukiq5qgLrKQiNnpZAX0f4-Ho';
+
+  //사용자 메인화면 커스텀 호출
+  const userDisplayCustomPatch = async () => {
+    const url = 'https://waither.shop/user/setting/display';
+
+    const headers = {
+      Authorization: authorization,
+      'Content-Type': 'application/json',
+    };
+
+    const body = JSON.stringify({
+      precipitation: isRainfallEnabled,
+      wind: isWindEnabled,
+      dust: isFineDustEnabled,
+    });
+
+    try {
+      const response = await fetch(url, {
+        method: 'PATCH',
+        headers: headers,
+        body: body,
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const res = await response.json();
+      console.log('사용자 메인화면 여부 PATCH', res);
+    } catch (error) {
+      console.error('사용자 메인화면 여부 PATCH', error);
+    }
+  };
+
+  //사용자 메인화면 커스텀 호출
+  const userDisplayCustomGet = async () => {
+    const url = 'https://waither.shop/user/setting/display';
+
+    const headers = {
+      Authorization: authorization,
+      'Content-Type': 'application/json',
+    };
+
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: headers,
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const res = await response.json();
+      setIsRainfallToggleEnabled(res.result.precipitation);
+      setIsWindToggleEnabled(res.result.wind);
+      setIsFineDustToglleEnabled(res.result.dust);
+      console.log('사용자 메인화면 여부 GET', res);
+    } catch (error) {
+      console.error('사용자 메인화면 여부 GET', error);
+    }
+  };
+
+  //===============================================================
+  useEffect(() => {
+    userDisplayCustomGet();
+  }, []);
+  //===============================================================
 
   return (
     <Wrapper>
