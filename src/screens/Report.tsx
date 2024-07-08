@@ -19,7 +19,6 @@ import { useNavigation } from '@react-navigation/native';
 const Wrapper = styled.View`
   flex-direction: column;
   align-items: center;
-
   flex: 1;
 `;
 const HeaderView = styled.View`
