@@ -311,7 +311,6 @@ const Register = () => {
         const result = await response.json();
         console.log('서버 응답:', result); // 서버 응답 로깅
 
-        // 서버에서 응답받은 코드를 정확하게 참조
         if (result.code == 200) {
           setEmailMessage('사용할 수 있는 이메일이에요.');
           setIsDuplication(false);
@@ -320,12 +319,12 @@ const Register = () => {
         } else {
           setEmailMessage('이미 사용하고 있는 이메일이에요.');
           setIsDuplication(true);
-          setIsEmailVerifyReady(false); // 상태를 명확히 관리
+          setIsEmailVerifyReady(false);
         }
       } else {
         setEmailMessage('이미 사용하고 있는 이메일이에요.');
         setIsDuplication(true);
-        setIsEmailVerifyReady(false); // 상태를 명확히 관리
+        setIsEmailVerifyReady(false);
       }
     } catch (error) {
       console.error('Error during request:', error);
@@ -339,13 +338,41 @@ const Register = () => {
     setVerifyNum(text);
   };
 
-  const CheckVerifynum = () => {
-    setIsVerifyBtn(true);
-    if (TestNum == verifyNum) {
-      setVerifyMessage('인증이 완료되었어요.');
-      setIsVerfityCheck(true);
-    } else {
-      setVerifyMessage('인증번호가 일치하지 않아요. 다시 한 번 확인해주세요.');
+  const CheckVerifynum = async () => {
+    setIsVerifyBtn(true); // 인증 시도 표시
+    try {
+      const response = await fetch(
+        'https://waither.shop/user/emails/verifications',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            accept: 'application/json',
+          },
+          body: JSON.stringify({
+            email: email,
+            authCode: verifyNum,
+          }),
+        },
+      );
+
+      const result = await response.json();
+      console.log(result);
+
+      if (response.ok && result.code === 200) {
+        // 서버 응답이 성공적이고, 결과 코드가 200인 경우
+        setVerifyMessage('인증이 완료되었어요.');
+        setIsVerfityCheck(true);
+      } else {
+        // 인증번호가 일치하지 않는 경우
+        setVerifyMessage(
+          '인증번호가 일치하지 않아요. 다시 한 번 확인해주세요.',
+        );
+        setIsVerfityCheck(false);
+      }
+    } catch (error) {
+      console.error('Error during verification request:', error);
+      setVerifyMessage('오류가 발생했습니다. 다시 시도해주세요.');
       setIsVerfityCheck(false);
     }
   };
@@ -492,11 +519,10 @@ const Register = () => {
 
                     <VerifyBtn
                       onPress={CheckVerifynum}
-                      disabled={verifyNum.length === 4 ? false : true}
+                      disabled={verifyNum.length === 6 ? false : true}
                       style={{
                         backgroundColor:
-                          // 인증번호 길이는 임시로 4로 지정
-                          verifyIsPress && verifyNum.length === 4
+                          verifyIsPress && verifyNum.length === 6
                             ? `${MAIN_COLOR}`
                             : `${GREY_COLOR}`,
                       }}
