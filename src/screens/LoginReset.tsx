@@ -123,6 +123,13 @@ const LoginReset = () => {
       return;
     }
 
+    // 이메일 유효성 검사 통과 시 화면 전환
+    navigation.navigate('EmailLogin');
+    showToast(
+      '가입된 이메일로 임시 비밀번호를 전송했어요',
+      '메일함을 확인해주세요',
+    );
+
     try {
       const response = await fetch(
         `https://waither.shop/user/emails/temporary-password?email=${encodeURIComponent(
@@ -136,13 +143,7 @@ const LoginReset = () => {
         },
       );
 
-      if (response.ok) {
-        showToast(
-          '가입된 이메일로 임시 비밀번호를 전송했어요',
-          '메일함을 확인해주세요',
-        );
-        navigation.navigate('EmailLogin');
-      } else {
+      if (!response.ok) {
         setEmailMessage(
           '등록된 이메일이 없습니다. 이메일을 다시 확인해주세요.',
         );
