@@ -359,12 +359,10 @@ const Register = () => {
       const result = await response.json();
       console.log(result);
 
-      if (response.ok && result.code === 200) {
-        // 서버 응답이 성공적이고, 결과 코드가 200인 경우
+      if (response.ok && result.code == 200) {
         setVerifyMessage('인증이 완료되었어요.');
         setIsVerfityCheck(true);
       } else {
-        // 인증번호가 일치하지 않는 경우
         setVerifyMessage(
           '인증번호가 일치하지 않아요. 다시 한 번 확인해주세요.',
         );
