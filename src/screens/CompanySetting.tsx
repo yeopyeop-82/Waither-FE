@@ -255,7 +255,7 @@ const CompanySetting = () => {
 
   //Bearer 토큰
   const authorization =
-    'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkaGRiczEyMDhAbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImlhdCI6MTcxOTkyNzYyMywiZXhwIjoxNzE5OTMxMjIzfQ.sOj-ZuzVVJ1MfKWMQ9n1w-l2-XS5xO-I86kLZKCAonM';
+    'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOlsiUk9MRV9VU0VSIl0sImlhdCI6MTcxOTgzMTYwMCwiZXhwIjozMzEzNDc0NTYwMH0.getDuds1kSPZ5SeiGtWukiq5qgLrKQiNnpZAX0f4-Ho';
 
   //직장 지역명, 위도, 경도 호출
   const companyLocationPut = async () => {
@@ -416,7 +416,7 @@ const CompanySetting = () => {
             <CompanyLocationWrapper>
               {companyLocationList.map((address) => (
                 <CompanyLocationBtn
-                  key={address.adress_name}
+                  key={address.address_name}
                   onPress={() => {
                     onPressSelectedLocation(address.address_name);
                     onPressSelectCompanyLocationsX(address.x);
