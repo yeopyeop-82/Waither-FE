@@ -295,15 +295,43 @@ const Register = () => {
     }
   };
 
-  const CheckEmail = () => {
-    if (email == TestEmail) {
-      setEmailMessage('이미 사용하고 있는 이메일이에요.');
+  const CheckEmail = async () => {
+    try {
+      const response = await fetch(
+        `https://waither.shop/user/emails/submit-authcode?email=${encodeURIComponent(email)}`,
+        {
+          method: 'GET',
+          headers: {
+            accept: 'application/json',
+          },
+        },
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('서버 응답:', result); // 서버 응답 로깅
+
+        // 서버에서 응답받은 코드를 정확하게 참조
+        if (result.code == 200) {
+          setEmailMessage('사용할 수 있는 이메일이에요.');
+          setIsDuplication(false);
+          setIsEmailVerifyReady(true);
+          setFinalEmailCheck(true);
+        } else {
+          setEmailMessage('이미 사용하고 있는 이메일이에요.');
+          setIsDuplication(true);
+          setIsEmailVerifyReady(false); // 상태를 명확히 관리
+        }
+      } else {
+        setEmailMessage('이미 사용하고 있는 이메일이에요.');
+        setIsDuplication(true);
+        setIsEmailVerifyReady(false); // 상태를 명확히 관리
+      }
+    } catch (error) {
+      console.error('Error during request:', error);
+      setEmailMessage('오류가 발생했습니다. 다시 시도해주세요.');
       setIsDuplication(true);
-    } else {
-      setEmailMessage('사용할 수 있는 이메일이에요.');
-      setIsDuplication(false);
-      setIsEmailVerifyReady(true);
-      setFinalEmailCheck(true);
+      setIsEmailVerifyReady(false); // 상태를 명확히 관리
     }
   };
 
