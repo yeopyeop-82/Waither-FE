@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
 import { ERROR_COLOR, GREY_COLOR, MAIN_COLOR } from '../styles/color';
 import Error from '../assets/images/Error.png';
 import notError from '../assets/images/notError.png';
 import { useTogglePasswordVisibility } from '../utils/useTogglePasswordVisibility';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { Alert } from 'react-native';
+import test from 'node:test';
 const Wrapper = styled.View`
   flex-direction: column;
   align-items: center;
@@ -120,8 +123,9 @@ const ReSettingBtnTitle = styled.Text`
   font-size: 17px;
 `;
 
-const TestPassword = 'waither';
+const TestPassword = 'test1111!';
 const PasswordReset = () => {
+  const navigation = useNavigation();
   //현재 비밀번호 확인 버튼이 눌렸는지
   const [isPasswordCheckBtnPressed, setIsPasswordCheckBtnPressed] =
     useState(false);
@@ -150,6 +154,8 @@ const PasswordReset = () => {
   //확인 password text input이 눌렸는지
   const [checkPasswordIsPress, setCheckPasswordIsPress] = useState(false);
 
+  // const [isPasswordChanged, setIsPasswordChanged] = useState(false);
+
   const onChangePassword = (text) => {
     setPassword(text);
   };
@@ -169,16 +175,24 @@ const PasswordReset = () => {
 
   const onChangeNewPassword = (text) => {
     setNewPassword(text);
+  };
+
+  useEffect(() => {
     const passwordRegExp = /^(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&]).{8,64}$/;
 
-    if (!passwordRegExp.test(text)) {
-      setNewPasswordMessage('비밀번호는 최소 8자리 이상이어야 합니다.');
+    if (!passwordRegExp.test(newPassword)) {
+      setNewPasswordMessage(
+        '비밀번호는 최소 8자리 이상이며 특수문자를 포함해야 합니다.',
+      );
+      setIsNewPasswordChecked(false);
+    } else if (TestPassword === newPassword) {
+      setNewPasswordMessage('기존 비밀번호와 동일해요.');
       setIsNewPasswordChecked(false);
     } else {
       setNewPasswordMessage('사용할 수 있는 비밀번호에요.');
       setIsNewPasswordChecked(true);
     }
-  };
+  }, [newPassword]);
 
   const onChangeCheckPassword = (text) => {
     setCheckPassword(text);
@@ -193,6 +207,57 @@ const PasswordReset = () => {
 
   const { passwordVisibility, rightIcon, handlePasswordVisibility } =
     useTogglePasswordVisibility();
+
+  const onPressChangePassword = () => {
+    changePasswordPut();
+    Alert.alert(
+      '알림',
+      '비밀번호가 변경되었습니다.',
+      [
+        {
+          text: '확인',
+          onPress: () => navigation.navigate('PrivacySetting'),
+        },
+      ],
+      { cancelable: false },
+    );
+  };
+
+  //===============================================================
+
+  //Bearer 토큰
+  const authorization =
+    'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOlsiUk9MRV9VU0VSIl0sImlhdCI6MTcxOTgzMTYwMCwiZXhwIjozMzEzNDc0NTYwMH0.getDuds1kSPZ5SeiGtWukiq5qgLrKQiNnpZAX0f4-Ho';
+
+  //비밀번호 변경 호출
+  const changePasswordPut = async () => {
+    const url = 'https://waither.shop/user/password';
+
+    const headers = {
+      Authorization: authorization,
+      'Content-Type': 'application/json',
+    };
+
+    const body = JSON.stringify({
+      password: newPassword,
+    });
+
+    try {
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: headers,
+        body: body,
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const res = await response.json();
+      console.log('비밀번호 변경', res);
+    } catch (error) {
+      console.error('비밀번호 변경', error);
+    }
+  };
 
   return (
     <Wrapper>
@@ -365,6 +430,9 @@ const PasswordReset = () => {
         disabled={isPasswordEqual ? false : true}
         style={{
           backgroundColor: isPasswordEqual ? `${MAIN_COLOR}` : `${GREY_COLOR}`,
+        }}
+        onPress={() => {
+          onPressChangePassword();
         }}
       >
         <ReSettingBtnTitle>재설정</ReSettingBtnTitle>

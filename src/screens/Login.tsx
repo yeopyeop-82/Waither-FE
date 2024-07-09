@@ -194,7 +194,7 @@ export default function Login({ navigation }) {
         <AppleLoginTitle>Apple로 계속하기</AppleLoginTitle>
       </AppleLoginBtn>
       <Wrapper2>
-        <EmailLoginBtn onPress={() => navigation.navigate('Settings')}>
+        <EmailLoginBtn onPress={() => navigation.navigate('EmailLogin')}>
           <EmailLoginText>이메일 로그인</EmailLoginText>
         </EmailLoginBtn>
         <DivideText>|</DivideText>
@@ -233,7 +233,7 @@ export default function Login({ navigation }) {
       {/* 화면 구성을 위한 변경 Register -> PasswordReset */}
       <EmailRegister
         onPress={() => {
-          navigation.navigate('Register');
+          navigation.navigate('Settings');
         }}
       >
         <EmailRegisterText>이메일로 회원가입</EmailRegisterText>
