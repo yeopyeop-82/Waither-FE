@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
 import settingBtn from '../assets/images/ic-nav-back.png';
 import { GREY_COLOR, MAIN_COLOR } from '../styles/color';
@@ -6,6 +6,7 @@ import { userNameState } from '../recoil/userInitInfoRecoil';
 import { useRecoilValue } from 'recoil';
 import Slider from '@react-native-community/slider';
 import { useNavigation } from '@react-navigation/native';
+import { Alert } from 'react-native';
 
 const Wrapper = styled.View`
   display: flex;
@@ -76,7 +77,6 @@ const TempResponsivenessView = styled.View`
 `;
 
 const TempReponsivenessTitle = styled.Text`
-  /* color: ${MAIN_COLOR}; */
   color: ${MAIN_COLOR};
   padding-left: 20px;
   letter-spacing: 35px;
@@ -133,48 +133,108 @@ const UserDataSetting = () => {
   const navigation = useNavigation();
   const name = useRecoilValue(userNameState);
   const [TempResponsiveness, setTempREsponsiveness] = useState(0);
+  const [tempText, setTempText] = useState('');
   const [Operand, setOperand] = useState('');
-  const checkTemp = (value) => {
-    if (TempResponsiveness > 0) {
+  const checkTemp = (temp) => {
+    if (temp > 0) {
       setOperand('+');
-    } else {
+    } else if (temp < 0) {
       setOperand('-');
+    } else {
+      setOperand('');
     }
   };
-  console.log(Operand);
 
-  let num: number = TempResponsiveness;
-  let RealTemp: string;
+  const renderTempResponsiveness = (temp) => {
+    if (temp > 0 && temp < 10) {
+      setTempText('0' + temp);
+    } else if (temp == 10) {
+      setTempText('' + temp);
+    }
 
-  if (num >= 0 && num < 10 && num === Math.floor(num)) {
-    RealTemp = '0' + num.toString();
-  } else if (num < 0 && num > -10 && num === Math.floor(num)) {
-    RealTemp = '-0' + Math.abs(num).toString();
-  } else if (num === Math.floor(num)) {
-    RealTemp = num.toString();
-  } else {
-    RealTemp = Math.floor(num).toString();
-  }
+    if (temp < 0 && temp > -10) {
+      setTempText('0' + Math.abs(temp));
+    } else if (temp == -10) {
+      setTempText('' + Math.abs(temp));
+    }
 
-  // 한 자리 정수일 때 앞에 0을 붙임
-  if (
-    ((num >= 0 && num < 10) || (num < 0 && num > -10)) &&
-    RealTemp.length === 2
-  ) {
-    RealTemp = '0' + RealTemp.slice(1);
-  } else if (num >= 0 && num < 10) {
-    RealTemp = '0' + RealTemp;
-  }
+    if (temp == 0) {
+      setTempText('00');
+    }
+  };
+  console.log(TempResponsiveness);
 
-  // -10일 때 10으로 출력되도록 수정
-  if (num === -10 || num === 10) {
-    RealTemp = '10';
-  } else if (num < 0 && num > -10 && num === Math.floor(num)) {
-    RealTemp = '-0' + Math.abs(num).toString();
-  }
+  //===============================================================
 
-  // 출력
-  console.log(RealTemp);
+  //Bearer 토큰
+  const authorization =
+    'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOlsiUk9MRV9VU0VSIl0sImlhdCI6MTcxOTgzMTYwMCwiZXhwIjozMzEzNDc0NTYwMH0.getDuds1kSPZ5SeiGtWukiq5qgLrKQiNnpZAX0f4-Ho';
+
+  //사용자 온도 민감도 호출
+  const userWeightPut = async () => {
+    const url = 'https://waither.shop/user/setting/user-weight';
+
+    const headers = {
+      Authorization: authorization,
+      'Content-Type': 'application/json',
+    };
+
+    const body = JSON.stringify({
+      weight: Math.ceil(TempResponsiveness),
+    });
+
+    try {
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: headers,
+        body: body,
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      alert('정상적으로 설정되었습니다.');
+      const res = await response.json();
+      console.log('사용자 온도 민감도', res);
+    } catch (error) {
+      console.error('사용자 온도 민감도', error);
+    }
+  };
+
+  //외출 요일 및 외출 시간대 호출
+  const userWeightGet = async () => {
+    const url = 'https://waither.shop/user/setting/user-weight';
+
+    const headers = {
+      Authorization: authorization,
+      'Content-Type': 'application/json',
+    };
+
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: headers,
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const res = await response.json();
+
+      setTempREsponsiveness(res.result.weight);
+      renderTempResponsiveness(res.result.weight);
+      checkTemp(res.result.weight);
+
+      console.log(Operand);
+
+      console.log('사용자 온도 민감도', res);
+    } catch (error) {
+      console.error('사용자 온도 민감도', error);
+    }
+  };
+
+  useEffect(() => {
+    userWeightGet();
+  }, []);
 
   return (
     <Wrapper>
@@ -184,12 +244,12 @@ const UserDataSetting = () => {
         </HeaderBackBtn>
 
         <HeaderTitle>사용자 데이터 설정</HeaderTitle>
-        <HeaderBtn>
+        <HeaderBtn onPress={userWeightPut}>
           <HeaderBtnTitle>완료</HeaderBtnTitle>
         </HeaderBtn>
       </HeaderView>
       <TipTitle>
-        Waiter가 제공한 정보가{name}님에게 적절했나요?{'\n'}하단 바를 조절하여
+        Waiter가 제공한 정보가 {name}님에게 적절했나요?{'\n'}하단 바를 조절하여
         더욱 맞춤형된 정보를 받으실 수 있어요!
       </TipTitle>
       <Slider
@@ -200,10 +260,14 @@ const UserDataSetting = () => {
         maximumTrackTintColor="#D9D9D9"
         value={TempResponsiveness} // Slider의 값 설정
         onValueChange={(value) => {
-          setTempREsponsiveness(value);
+          if (value < 0) {
+            setTempREsponsiveness(Math.round(value));
+          } else {
+            setTempREsponsiveness(Math.ceil(value));
+          }
           checkTemp(value);
+          renderTempResponsiveness(TempResponsiveness);
         }}
-        // userWind 값 변경
       />
 
       <SliderTitleWrapper>
@@ -218,7 +282,7 @@ const UserDataSetting = () => {
 
         <TemperatureWrapper>
           <TemperatureOperrand>{Operand}</TemperatureOperrand>
-          <TempReponsivenessTitle>{RealTemp}</TempReponsivenessTitle>
+          <TempReponsivenessTitle>{tempText}</TempReponsivenessTitle>
           <TemperatureView></TemperatureView>
           <TemperatureView></TemperatureView>
         </TemperatureWrapper>
