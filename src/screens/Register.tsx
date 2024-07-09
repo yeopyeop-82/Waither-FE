@@ -295,15 +295,42 @@ const Register = () => {
     }
   };
 
-  const CheckEmail = () => {
-    if (email == TestEmail) {
-      setEmailMessage('이미 사용하고 있는 이메일이에요.');
+  const CheckEmail = async () => {
+    try {
+      const response = await fetch(
+        `https://waither.shop/user/emails/submit-authcode?email=${encodeURIComponent(email)}`,
+        {
+          method: 'GET',
+          headers: {
+            accept: 'application/json',
+          },
+        },
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('서버 응답:', result); // 서버 응답 로깅
+
+        if (result.code == 200) {
+          setEmailMessage('사용할 수 있는 이메일이에요.');
+          setIsDuplication(false);
+          setIsEmailVerifyReady(true);
+          setFinalEmailCheck(true);
+        } else {
+          setEmailMessage('이미 사용하고 있는 이메일이에요.');
+          setIsDuplication(true);
+          setIsEmailVerifyReady(false);
+        }
+      } else {
+        setEmailMessage('이미 사용하고 있는 이메일이에요.');
+        setIsDuplication(true);
+        setIsEmailVerifyReady(false);
+      }
+    } catch (error) {
+      console.error('Error during request:', error);
+      setEmailMessage('오류가 발생했습니다. 다시 시도해주세요.');
       setIsDuplication(true);
-    } else {
-      setEmailMessage('사용할 수 있는 이메일이에요.');
-      setIsDuplication(false);
-      setIsEmailVerifyReady(true);
-      setFinalEmailCheck(true);
+      setIsEmailVerifyReady(false); // 상태를 명확히 관리
     }
   };
 
@@ -311,13 +338,39 @@ const Register = () => {
     setVerifyNum(text);
   };
 
-  const CheckVerifynum = () => {
-    setIsVerifyBtn(true);
-    if (TestNum == verifyNum) {
-      setVerifyMessage('인증이 완료되었어요.');
-      setIsVerfityCheck(true);
-    } else {
-      setVerifyMessage('인증번호가 일치하지 않아요. 다시 한 번 확인해주세요.');
+  const CheckVerifynum = async () => {
+    setIsVerifyBtn(true); // 인증 시도 표시
+    try {
+      const response = await fetch(
+        'https://waither.shop/user/emails/verifications',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            accept: 'application/json',
+          },
+          body: JSON.stringify({
+            email: email,
+            authCode: verifyNum,
+          }),
+        },
+      );
+
+      const result = await response.json();
+      console.log(result);
+
+      if (response.ok && result.code == 200) {
+        setVerifyMessage('인증이 완료되었어요.');
+        setIsVerfityCheck(true);
+      } else {
+        setVerifyMessage(
+          '인증번호가 일치하지 않아요. 다시 한 번 확인해주세요.',
+        );
+        setIsVerfityCheck(false);
+      }
+    } catch (error) {
+      console.error('Error during verification request:', error);
+      setVerifyMessage('오류가 발생했습니다. 다시 시도해주세요.');
       setIsVerfityCheck(false);
     }
   };
@@ -343,6 +396,33 @@ const Register = () => {
     } else {
       setCheckPasswordMessage('비밀번호가 일치하지 않아요.');
       setIsPasswordChecked(false);
+    }
+  };
+
+  const handleSignup = async () => {
+    try {
+      const response = await fetch('https://waither.shop/user/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
+      });
+
+      if (response.ok) {
+        navigation.navigate('Greeting');
+      } else {
+        // 실패 시 에러 메시지 처리
+        const result = await response.json();
+        console.log('Signup failed:', result.message);
+        alert('회원가입 실패: ' + result.message);
+      }
+    } catch (error) {
+      console.error('Signup error:', error);
+      alert('회원가입 중 오류가 발생했습니다.');
     }
   };
 
@@ -464,11 +544,10 @@ const Register = () => {
 
                     <VerifyBtn
                       onPress={CheckVerifynum}
-                      disabled={verifyNum.length === 4 ? false : true}
+                      disabled={verifyNum.length === 6 ? false : true}
                       style={{
                         backgroundColor:
-                          // 인증번호 길이는 임시로 4로 지정
-                          verifyIsPress && verifyNum.length === 4
+                          verifyIsPress && verifyNum.length === 6
                             ? `${MAIN_COLOR}`
                             : `${GREY_COLOR}`,
                       }}
@@ -604,7 +683,7 @@ const Register = () => {
         </FormWrapper>
       </KeyboardAwareScrollView>
       <RegisterCompleteBtn
-        onPress={() => navigation.navigate('Greeting')}
+        onPress={handleSignup}
         disabled={!isPasswordChecked}
         style={{
           backgroundColor: isPasswordChecked
