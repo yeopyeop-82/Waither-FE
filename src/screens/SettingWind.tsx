@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
 import { MAIN_COLOR } from '../styles/color';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -99,6 +99,79 @@ const SettingWind = () => {
   const toggleSwitch = () =>
     setIsCustomServiceEnabled((previousState) => !previousState);
   const name = useRecoilValue(userNameState);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (isLoading) {
+      windPut();
+    }
+  }, [isCustomServiceEnabled, userWind]);
+
+  //===============================================================
+
+  //Bearer 토큰
+  const authorization =
+    'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOlsiUk9MRV9VU0VSIl0sImlhdCI6MTcxOTgzMTYwMCwiZXhwIjozMzEzNDc0NTYwMH0.getDuds1kSPZ5SeiGtWukiq5qgLrKQiNnpZAX0f4-Ho';
+
+  //바람 세기 호출
+  const windPut = async () => {
+    const url = 'https://waither.shop/user/setting/noti/wind';
+
+    const headers = {
+      Authorization: authorization,
+      'Content-Type': 'application/json',
+    };
+
+    const body = JSON.stringify({
+      windAlert: isCustomServiceEnabled,
+      windDegree: Math.round(userWind),
+    });
+
+    try {
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: headers,
+        body: body,
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const res = await response.json();
+      console.log('바람 설정', res);
+    } catch (error) {
+      console.error('바람 설정', error);
+    }
+  };
+
+  const windGet = async () => {
+    const url = 'https://waither.shop/user/setting/noti/wind';
+
+    const headers = {
+      Authorization: authorization,
+      'Content-Type': 'application/json',
+    };
+
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: headers,
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const res = await response.json();
+      setIsCustomServiceEnabled(res.result.windAlert);
+      setUserWind(res.result.windDegree);
+      setIsLoading(true);
+      console.log('바람 설정', res);
+    } catch (error) {
+      console.error('바람 설정', error);
+    }
+  };
+
+  useEffect(() => {
+    windGet();
+  }, []);
 
   return (
     <Wrapper>

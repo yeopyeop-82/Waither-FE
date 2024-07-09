@@ -215,6 +215,8 @@ const ModalCompleteBtn = styled.TouchableOpacity``;
 
 const SettingNotification = () => {
   const navigation = useNavigation();
+  const name = useRecoilValue(userNameState);
+  //======================================================
   const [Monday, setIsMonday] = useState(false);
   const [Tuesday, setIsTuesday] = useState(false);
   const [Wednesday, setIsWednesday] = useState(false);
@@ -222,28 +224,9 @@ const SettingNotification = () => {
   const [Friday, setIsFriday] = useState(false);
   const [Saturday, setIsSaturday] = useState(false);
   const [Sunday, setIsSunday] = useState(false);
+
   const [chosenDay, setChosenDay] = useState([]);
-
-  const name = useRecoilValue(userNameState);
-
-  //   ==========================================================================================
-
-  // ===============================================================
-  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-  const snapPoints = useMemo(() => ['1%', '100%'], []);
-  const handlePresentModalPress = useCallback(() => {
-    bottomSheetModalRef.current?.present();
-    setIsModalPress(true);
-  }, []);
-
-  const [isModalPress, setIsModalPress] = useState(false);
-
-  const handleDismissModalPress = () => {
-    bottomSheetModalRef.current?.dismiss();
-    setIsModalPress(false);
-  };
-
-  //===============================================================
+  const [outTime, setOutTime] = useState('');
 
   const [selectedAmPm, setSelectedAmPm] = useState('AM');
   const [selectedHour, setSelectedHour] = useState('1');
@@ -284,34 +267,6 @@ const SettingNotification = () => {
     setNotificationTime(notificationTime);
   }, [selectedAmPm, selectedHour, selectedMinute, setNotificationTime]);
 
-  //   ==========================================================================================
-  const [isOutingToggleEnabled, setIsOutingToggleEnabled] = useState(false);
-  const [isOutingEnabled, setIsOutingEnabled] = useState(false);
-  const [isWeatherWarningToggleEnabled, setIsWeatherWarningToggleEnabled] =
-    useState(false);
-  const [isWeatherWarningEnabled, setIsWeatherWarningEnabled] = useState(false);
-  const [isUserCustomToggleEnabled, setIsUserCustomToglleEnabled] =
-    useState(false);
-  const [isUserCustomEnabled, setIsUserCustomEnabled] = useState(false);
-  const [isSnowFallToggleEnabled, setIsSnowFallToglleEnabled] = useState(false);
-  const [isSnowFallEnabled, setIsSnowFallEnabled] = useState(false);
-  const OutingtoggleSwitch = () => {
-    setIsOutingToggleEnabled((previousState) => !previousState);
-    setIsOutingEnabled(isOutingToggleEnabled);
-  };
-  const WeatherWarningtoggleSwitch = () => {
-    setIsWeatherWarningToggleEnabled((previousState) => !previousState);
-    setIsWeatherWarningEnabled(isWeatherWarningToggleEnabled);
-  };
-  const UserCustomtoggleSwitch = () => {
-    setIsUserCustomToglleEnabled((previousState) => !previousState);
-    setIsUserCustomEnabled(isUserCustomToggleEnabled);
-  };
-  const SnowFalltoggleSwitch = () => {
-    setIsSnowFallToglleEnabled((previousState) => !previousState);
-    setIsSnowFallEnabled(isSnowFallToggleEnabled);
-  };
-
   const SundayClick = () => {
     setIsSunday((previousState) => !previousState);
     checkDay('일');
@@ -341,6 +296,16 @@ const SettingNotification = () => {
     checkDay('토');
   };
 
+  const dayMapping = {
+    월: 'Monday',
+    화: 'Tuesday',
+    수: 'Wednesday',
+    목: 'Thursday',
+    금: 'Friday',
+    토: 'Saturday',
+    일: 'Sunday',
+  };
+
   //배열에 중복되는 요일이 있는지 확인하는 함수
   const checkDay = (day) => {
     setChosenDay((chosenDay) =>
@@ -355,26 +320,326 @@ const SettingNotification = () => {
 
   //chosenDay의 배열을 월,화,수 ... 순으로 정렬
   const dayOrder = ['월', '화', '수', '목', '금', '토', '일'];
-  const sortedChosenDay = [...chosenDay].sort(
+  const sortedChosenDays = [...chosenDay].sort(
     //프디강의 : 오름차순 정렬 무명함수
     (a, b) => dayOrder.indexOf(a) - dayOrder.indexOf(b),
   );
 
+  const chosenEnglishDays = sortedChosenDays.map((day) => dayMapping[day]);
+
+  //===============================================================
+
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const snapPoints = useMemo(() => ['1%', '100%'], []);
+  const [isModalPress, setIsModalPress] = useState(false);
+  const handlePresentModalPress = useCallback(() => {
+    bottomSheetModalRef.current?.present();
+    setIsModalPress(true);
+  }, []);
+
+  const [timeSelected, setTimeSelected] = useState(false);
+
+  const handleDismissModalPress = () => {
+    bottomSheetModalRef.current?.dismiss();
+    setIsModalPress(false);
+    setTimeSelected(false);
+  };
+
+  const handleCompleteModalPress = () => {
+    bottomSheetModalRef.current?.dismiss();
+    setIsModalPress(false);
+    setTimeSelected(true);
+  };
+
   useEffect(() => {
-    setIsOutingEnabled(isOutingToggleEnabled);
-    setIsWeatherWarningEnabled(isWeatherWarningToggleEnabled);
-    setIsUserCustomEnabled(isUserCustomToggleEnabled);
-    setIsSnowFallEnabled(isSnowFallToggleEnabled);
-  }, [
-    setIsOutingEnabled,
-    isOutingToggleEnabled,
-    setIsWeatherWarningEnabled,
-    isWeatherWarningEnabled,
-    setIsUserCustomEnabled,
-    isUserCustomToggleEnabled,
-    setIsSnowFallEnabled,
-    isSnowFallToggleEnabled,
-  ]);
+    if (timeSelected) {
+      notificationTimeZonePut();
+    }
+  }, [handleCompleteModalPress]);
+
+  useEffect(() => {
+    if (selectedAmPm == 'PM' && timeSelected) {
+      setOutTime(
+        `${parseInt(selectedHour) + 12}:${selectedMinute.padStart(2, '0')}:00`,
+      );
+    }
+    if (selectedAmPm == 'AM' && timeSelected) {
+      setOutTime(
+        `${selectedHour.padStart(2, '0')}:${selectedMinute.padStart(2, '0')}:00`,
+      );
+    }
+  }, [isModalPress]);
+
+  //==========================================================================================
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [isOutingEnabled, setIsOutingEnabled] = useState(false);
+  const [isWeatherWarningEnabled, setIsWeatherWarningEnabled] = useState(false);
+  const [isUserCustomEnabled, setIsUserCustomEnabled] = useState(false);
+  const [isSnowFallEnabled, setIsSnowFallEnabled] = useState(false);
+
+  const OutingtoggleSwitch = () => {
+    setIsOutingEnabled((previousState) => !previousState);
+  };
+  const WeatherWarningtoggleSwitch = () => {
+    setIsWeatherWarningEnabled((previousState) => !previousState);
+  };
+  const UserCustomtoggleSwitch = () => {
+    setIsUserCustomEnabled((previousState) => !previousState);
+  };
+  const SnowFalltoggleSwitch = () => {
+    setIsSnowFallEnabled((previousState) => !previousState);
+  };
+
+  useEffect(() => {
+    if (isLoading) {
+      outAlertPut();
+    }
+  }, [isOutingEnabled]);
+
+  useEffect(() => {
+    if (isLoading) {
+      climateAlertPut();
+    }
+  }, [isWeatherWarningEnabled]);
+
+  useEffect(() => {
+    if (isLoading) {
+      userAlertPut();
+    }
+  }, [isUserCustomEnabled]);
+
+  useEffect(() => {
+    if (isLoading) {
+      snowAlertPut();
+    }
+  }, [isSnowFallEnabled]);
+
+  //===============================================================
+
+  //Bearer 토큰
+  const authorization =
+    'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOlsiUk9MRV9VU0VSIl0sImlhdCI6MTcxOTgzMTYwMCwiZXhwIjozMzEzNDc0NTYwMH0.getDuds1kSPZ5SeiGtWukiq5qgLrKQiNnpZAX0f4-Ho';
+
+  //외출 요일 및 외출 시간대 호출
+  const notificationTimeZonePut = async () => {
+    const url = 'https://waither.shop/user/setting/noti/out-alert-set';
+
+    const headers = {
+      Authorization: authorization,
+      'Content-Type': 'application/json',
+    };
+
+    const body = JSON.stringify({
+      days: chosenEnglishDays,
+      outTime: outTime,
+    });
+
+    try {
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: headers,
+        body: body,
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const res = await response.json();
+      console.log('외출 요일 및 외출 시간대', res);
+    } catch (error) {
+      console.error('외출 요일 및 외출 시간대', error);
+    }
+  };
+
+  //외출 시간 알림 여부 호출
+  const outAlertPut = async () => {
+    const url = 'https://waither.shop/user/setting/noti/out-alert';
+
+    const headers = {
+      Authorization: authorization,
+      'Content-Type': 'application/json',
+    };
+
+    const body = JSON.stringify({
+      outAlert: isOutingEnabled,
+    });
+
+    try {
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: headers,
+        body: body,
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const res = await response.json();
+      console.log('외출 시간 알림 여부', res);
+    } catch (error) {
+      console.error('외출 시간 알림 여부', error);
+    }
+  };
+
+  //기상 특보 알림 여부 호출
+  const climateAlertPut = async () => {
+    const url = 'https://waither.shop/user/setting/noti/climate-alert';
+
+    const headers = {
+      Authorization: authorization,
+      'Content-Type': 'application/json',
+    };
+
+    const body = JSON.stringify({
+      climateAlert: isWeatherWarningEnabled,
+    });
+
+    try {
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: headers,
+        body: body,
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const res = await response.json();
+      console.log('기상 특보 알림 여부', res);
+    } catch (error) {
+      console.error('기상 특보 알림 여부', error);
+    }
+  };
+
+  //사용자 맞춤 예보 여부 호출
+  const userAlertPut = async () => {
+    const url = 'https://waither.shop/user/setting/noti/user-alert';
+
+    const headers = {
+      Authorization: authorization,
+      'Content-Type': 'application/json',
+    };
+
+    const body = JSON.stringify({
+      userAlert: isUserCustomEnabled,
+    });
+
+    try {
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: headers,
+        body: body,
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const res = await response.json();
+      console.log('사용자 맞춤 예보 여부', res);
+    } catch (error) {
+      console.error('사용자 맞춤 예보 여부', error);
+    }
+  };
+
+  //강설 정보 여부 호출
+  const snowAlertPut = async () => {
+    const url = 'https://waither.shop/user/setting/noti/snow-alert';
+
+    const headers = {
+      Authorization: authorization,
+      'Content-Type': 'application/json',
+    };
+
+    const body = JSON.stringify({
+      snowAlert: isSnowFallEnabled,
+    });
+
+    try {
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: headers,
+        body: body,
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const res = await response.json();
+      console.log('강설 정보 여부', res);
+    } catch (error) {
+      console.error('강설 정보 여부', error);
+    }
+  };
+
+  //알림 설정 정보 호출
+  const userNotiSettingsGet = async () => {
+    const url = 'https://waither.shop/user/setting/noti';
+
+    const headers = {
+      Authorization: authorization,
+      'Content-Type': 'application/json',
+    };
+
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: headers,
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const res = await response.json();
+
+      setIsOutingEnabled(res.result.outAlert);
+      setIsWeatherWarningEnabled(res.result.climateAlert);
+      setIsUserCustomEnabled(res.result.userAlert);
+      setIsSnowFallEnabled(res.result.snowAlert);
+      setOutTime(res.result.outTime);
+
+      setIsLoading(true);
+
+      //===========================================
+      //res로 온 날짜를 전부 검사하여 true로 만들기
+      const dayMapping = {
+        MONDAY: () => setIsMonday(true),
+        TUESDAY: () => setIsTuesday(true),
+        WEDNESDAY: () => setIsWednesday(true),
+        THURSDAY: () => setIsThursday(true),
+        FRIDAY: () => setIsFriday(true),
+        SATURDAY: () => setIsSaturday(true),
+        SUNDAY: () => setIsSunday(true),
+      };
+
+      const dayKoreanMapping = {
+        MONDAY: '월',
+        TUESDAY: '화',
+        WEDNESDAY: '수',
+        THURSDAY: '목',
+        FRIDAY: '금',
+        SATURDAY: '토',
+        SUNDAY: '일',
+      };
+
+      res.result.days.forEach((day) => {
+        if (dayMapping[day]) {
+          dayMapping[day]();
+        }
+      });
+
+      const chosenDays = res.result.days
+        .filter((day) => dayKoreanMapping.hasOwnProperty(day))
+        .map((day) => dayKoreanMapping[day]);
+      setChosenDay(chosenDays);
+
+      //========================================
+
+      console.log('알림 설정 정보', res);
+    } catch (error) {
+      console.error('알림 설정 정보', error);
+    }
+  };
+
+  //===============================================================
+  useEffect(() => {
+    userNotiSettingsGet();
+  }, []);
+  //===============================================================
 
   return (
     <>
@@ -382,12 +647,12 @@ const SettingNotification = () => {
         <NotificationDay>
           <SelectedDayWrapper>
             <NotificationMainTitle>매주</NotificationMainTitle>
-            {sortedChosenDay.length === 0 ? (
+            {sortedChosenDays.length === 0 ? (
               <SelectedDayTitle>선택된 요일 없음</SelectedDayTitle>
             ) : (
-              sortedChosenDay.map((date, index) => (
+              sortedChosenDays.map((date, index) => (
                 <SelectedDayTitle key={date}>
-                  {index === sortedChosenDay.length - 1 ? date : `${date},`}
+                  {index === sortedChosenDays.length - 1 ? date : `${date},`}
                 </SelectedDayTitle>
               ))
             )}
@@ -462,7 +727,10 @@ const SettingNotification = () => {
         <TimeSettingView>
           <TimeSettingBtn onPress={handlePresentModalPress}>
             <TimeSettingInnerView>
-              <SettingMainTitle>오전 9:00</SettingMainTitle>
+              <SettingMainTitle>
+                {parseInt(outTime.slice(0, 3)) >= 13 ? '오후' : '오전'}{' '}
+                {outTime.slice(0, -3)}
+              </SettingMainTitle>
               <SettingSubTitle>
                 설정하신 시간대에 알림을 보내드릴게요.
               </SettingSubTitle>
@@ -482,7 +750,7 @@ const SettingNotification = () => {
               </CustomServiceSubTitle>
             </MainScreenTitleView>
             <ToggleSwitch
-              value={isOutingToggleEnabled}
+              value={isOutingEnabled}
               onValueChange={OutingtoggleSwitch}
               //toggle 활성화 여부에 따른 색상 설정
               trackColor={{ false: '#767577', true: `${MAIN_COLOR}` }}
@@ -498,7 +766,7 @@ const SettingNotification = () => {
               </CustomServiceSubTitle>
             </MainScreenTitleView>
             <ToggleSwitch
-              value={isWeatherWarningToggleEnabled}
+              value={isWeatherWarningEnabled}
               onValueChange={WeatherWarningtoggleSwitch}
               //toggle 활성화 여부에 따른 색상 설정
               trackColor={{ false: '#767577', true: `${MAIN_COLOR}` }}
@@ -514,7 +782,7 @@ const SettingNotification = () => {
               </CustomServiceSubTitle>
             </MainScreenTitleView>
             <ToggleSwitch
-              value={isUserCustomToggleEnabled}
+              value={isUserCustomEnabled}
               onValueChange={UserCustomtoggleSwitch}
               //toggle 활성화 여부에 따른 색상 설정
               trackColor={{ false: '#767577', true: `${MAIN_COLOR}` }}
@@ -528,7 +796,7 @@ const SettingNotification = () => {
               </CustomServiceSubTitle>
             </MainScreenTitleView>
             <ToggleSwitch
-              value={isSnowFallToggleEnabled}
+              value={isSnowFallEnabled}
               onValueChange={SnowFalltoggleSwitch}
               //toggle 활성화 여부에 따른 색상 설정
               trackColor={{ false: '#767577', true: `${MAIN_COLOR}` }}
@@ -568,7 +836,7 @@ const SettingNotification = () => {
               >
                 <ModalText>취소</ModalText>
               </ModalCancleBtn>
-              <ModalCompleteBtn onPress={handleDismissModalPress}>
+              <ModalCompleteBtn onPress={handleCompleteModalPress}>
                 <ModalText>완료</ModalText>
               </ModalCompleteBtn>
             </ModalBtnView>
