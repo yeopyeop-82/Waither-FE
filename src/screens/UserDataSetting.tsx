@@ -135,12 +135,13 @@ const UserDataSetting = () => {
   const [TempResponsiveness, setTempREsponsiveness] = useState(0);
   const [tempText, setTempText] = useState('');
   const [Operand, setOperand] = useState('');
+  const [userInfo, setUserInfo] = useState('');
   const checkTemp = (temp) => {
     if (temp > 0) {
       setOperand('+');
     } else if (temp < 0) {
       setOperand('-');
-    } else {
+    } else if (temp == -0 || temp == 0) {
       setOperand('');
     }
   };
@@ -163,6 +164,22 @@ const UserDataSetting = () => {
     }
   };
   console.log(TempResponsiveness);
+
+  const ForUserInfo = (temp) => {
+    if (temp > 0) {
+      setUserInfo(
+        name +
+          '님은 더위를 많이 타는 편이군요!\n참고해서 더욱 정확한 정보를 보내드릴게요!',
+      );
+    } else if (temp < 0) {
+      setUserInfo(
+        name +
+          '님은 추위를 많이 타는 편이군요!\n참고해서 더욱 정확한 정보를 보내드릴게요!',
+      );
+    } else {
+      setUserInfo('온도 민감도를 설정해 주세요');
+    }
+  };
 
   //===============================================================
 
@@ -219,10 +236,10 @@ const UserDataSetting = () => {
         throw new Error('Network response was not ok');
       }
       const res = await response.json();
-
       setTempREsponsiveness(res.result.weight);
       renderTempResponsiveness(res.result.weight);
       checkTemp(res.result.weight);
+      ForUserInfo(res.result.weight);
 
       console.log(Operand);
 
@@ -265,8 +282,9 @@ const UserDataSetting = () => {
           } else {
             setTempREsponsiveness(Math.ceil(value));
           }
-          checkTemp(value);
+          checkTemp(TempResponsiveness);
           renderTempResponsiveness(TempResponsiveness);
+          ForUserInfo(TempResponsiveness);
         }}
       />
 
@@ -279,17 +297,13 @@ const UserDataSetting = () => {
         <TemperatureMainTitle>
           <Username>Waither</Username>님의 온도 민감도
         </TemperatureMainTitle>
-
         <TemperatureWrapper>
           <TemperatureOperrand>{Operand}</TemperatureOperrand>
           <TempReponsivenessTitle>{tempText}</TempReponsivenessTitle>
           <TemperatureView></TemperatureView>
           <TemperatureView></TemperatureView>
         </TemperatureWrapper>
-        <TemperatureSubTitle>
-          {name} 님은 더위를 많이 타는 편이군요!{'\n'}참고해서 더욱 정확한
-          정보를 보내드릴게요!
-        </TemperatureSubTitle>
+        <TemperatureSubTitle>{userInfo}</TemperatureSubTitle>
       </TempResponsivenessView>
     </Wrapper>
   );
