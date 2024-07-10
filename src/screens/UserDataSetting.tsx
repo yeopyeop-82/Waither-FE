@@ -6,7 +6,7 @@ import { userNameState } from '../recoil/userInitInfoRecoil';
 import { useRecoilValue } from 'recoil';
 import Slider from '@react-native-community/slider';
 import { useNavigation } from '@react-navigation/native';
-import { Alert } from 'react-native';
+import authTokens from '../utils/authTokens';
 
 const Wrapper = styled.View`
   display: flex;
@@ -183,16 +183,12 @@ const UserDataSetting = () => {
 
   //===============================================================
 
-  //Bearer 토큰
-  const authorization =
-    'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOlsiUk9MRV9VU0VSIl0sImlhdCI6MTcxOTgzMTYwMCwiZXhwIjozMzEzNDc0NTYwMH0.getDuds1kSPZ5SeiGtWukiq5qgLrKQiNnpZAX0f4-Ho';
-
   //사용자 온도 민감도 호출
   const userWeightPut = async () => {
     const url = 'https://waither.shop/user/setting/user-weight';
 
     const headers = {
-      Authorization: authorization,
+      Authorization: authTokens.accessToken,
       'Content-Type': 'application/json',
     };
 
@@ -223,7 +219,7 @@ const UserDataSetting = () => {
     const url = 'https://waither.shop/user/setting/user-weight';
 
     const headers = {
-      Authorization: authorization,
+      Authorization: authTokens.accessToken,
       'Content-Type': 'application/json',
     };
 

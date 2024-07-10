@@ -8,6 +8,7 @@ import { userNameState } from '../recoil/userInitInfoRecoil';
 import { ERROR_COLOR, GREY_COLOR, MAIN_COLOR } from '../styles/color';
 import Error from '../assets/images/Error.png';
 import NotError from '../assets/images/notError.png';
+import authTokens from '../utils/authTokens';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -23,6 +24,12 @@ const UserInfoView = styled.View`
   width: 100%;
 `;
 
+const SettingMainTitle = styled.Text`
+  font-weight: 300;
+  font-size: 15px;
+  margin-bottom: 6px;
+`;
+
 const SettingContainer = styled.View`
   display: flex;
   flex-direction: row;
@@ -32,6 +39,15 @@ const SettingContainer = styled.View`
   justify-content: flex-start;
   align-items: center;
   margin-top: 20px;
+  /* margin-bottom: 15px; */
+`;
+
+const SettingBtnContainer = styled.View`
+  display: flex;
+  background-color: white;
+  width: 100%;
+  position: fixed;
+  top: 50px;
 `;
 
 const SettingBtn = styled.TouchableOpacity`
@@ -55,12 +71,6 @@ const SettingsView = styled.View`
   align-items: center;
   margin-top: 20px;
   background-color: white;
-`;
-
-const SettingMainTitle = styled.Text`
-  font-weight: 300;
-  font-size: 15px;
-  margin-bottom: 6px;
 `;
 
 const SettingSubTitle = styled.Text`
@@ -149,9 +159,10 @@ const NameCheckTitle = styled.Text`
 
 const PrivacySetting = () => {
   const navigation = useNavigation();
-
   const [isEditingName, setIsEditingName] = useState(false);
-  const [name, setName] = useRecoilState(userNameState);
+
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [nameMessage, setNameMessage] = useState('');
   const [isNameValid, setIsNameValid] = useState(true);
   const [inputName, setInputName] = useState(name);
@@ -174,18 +185,115 @@ const PrivacySetting = () => {
       // 이름이 편집 중일 때만 Recoil 상태에 저장합니다.
       setIsEditingName(false);
       setName(inputName);
+      nicknamePut();
     } else {
       setIsEditingName(true);
     }
   };
 
+  const onPressLogout = () => {
+    LogoutPost();
+    navigation.navigate('Login');
+  };
+
+  //===============================================================
+
+  //사용자 정보 호출
+  const userInfoGet = async () => {
+    const url = 'https://waither.shop/user/setting/mypage';
+
+    const headers = {
+      Authorization: authTokens.accessToken,
+      'Content-Type': 'application/json',
+    };
+
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: headers,
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const res = await response.json();
+      setName(res.result.nickname);
+      setEmail(res.result.email);
+      setInputName(res.result.nickname);
+      console.log('사용자 정보 불러오기', res);
+    } catch (error) {
+      console.error('사용자 정보 불러오기', error);
+    }
+  };
+
+  useEffect(() => {
+    userInfoGet();
+  }, []);
+
+  //닉네임 변경 호출
+  const nicknamePut = async () => {
+    const url = 'https://waither.shop/user/nickname';
+
+    const headers = {
+      Authorization: authTokens.accessToken,
+      'Content-Type': 'application/json',
+    };
+
+    const body = JSON.stringify({
+      nickname: inputName,
+    });
+
+    try {
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: headers,
+        body: body,
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const res = await response.json();
+      console.log('닉네임 변경', res);
+    } catch (error) {
+      console.error('닉네임 변경', error);
+    }
+  };
+
+  //로그아웃 호출
+  const LogoutPost = async () => {
+    const url = 'https://waither.shop/user/logout';
+
+    const headers = {
+      Authorization: authTokens.accessToken,
+      'Content-Type': 'application/json',
+    };
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: headers,
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      console.log('로그아웃 성공 status code:', response.status);
+    } catch (error) {
+      console.error('로그아웃 에러', error);
+    }
+  };
+
+  //===============================================================
   return (
     <Wrapper>
       <UserInfoView>
         <UserInfoContainer>
           <UserInfoInnerView>
             <UserInfoTitle>이메일 아이디</UserInfoTitle>
-            <UserEmail>waither@example.com</UserEmail>
+            <UserEmail>{email}</UserEmail>
           </UserInfoInnerView>
         </UserInfoContainer>
         <UserInfoContainer>
@@ -255,14 +363,18 @@ const PrivacySetting = () => {
       <SettingsView>
         {[
           { title: '비밀번호 재설정', navigate: 'PasswordReset' },
-          { title: '로그아웃' },
+          { title: '로그아웃', logout: onPressLogout },
           { title: '회원탈퇴' },
         ].map((setting, index) => (
           <SettingContainer key={index}>
             <SettingBtn
-              onPress={() =>
-                setting.navigate && navigation.navigate(setting.navigate)
-              }
+              onPress={() => {
+                if (index == 0) {
+                  navigation.navigate(setting.navigate);
+                } else if (index == 1) {
+                  setting.logout();
+                }
+              }}
             >
               <SettingInnerView>
                 <SettingMainTitle>{setting.title}</SettingMainTitle>

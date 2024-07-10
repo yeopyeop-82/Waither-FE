@@ -5,6 +5,7 @@ import settingBtn from '../assets/images/VectorArrow.png';
 import Databox from '../assets/images/ic-ask-databox.svg';
 import { useNavigation } from '@react-navigation/native';
 import Modal from 'react-native-modal';
+import authTokens from '../utils/authTokens';
 
 const Wrapper = styled.View`
   display: flex;
@@ -263,16 +264,12 @@ const Settings = () => {
 
   //===================================================================
 
-  //Bearer 토큰
-  const authorization =
-    'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOlsiUk9MRV9VU0VSIl0sImlhdCI6MTcxOTgzMTYwMCwiZXhwIjozMzEzNDc0NTYwMH0.getDuds1kSPZ5SeiGtWukiq5qgLrKQiNnpZAX0f4-Ho';
-
   //사용자 맞춤형 서비스 제공 여부 호출
   const customServiceEnabledPut = async () => {
     const url = 'https://waither.shop/user/setting/custom';
 
     const headers = {
-      Authorization: authorization,
+      Authorization: authTokens.accessToken,
       'Content-Type': 'application/json',
     };
 
@@ -300,7 +297,7 @@ const Settings = () => {
     const url = 'https://waither.shop/user/setting/custom';
 
     const headers = {
-      Authorization: authorization,
+      Authorization: authTokens.accessToken,
       'Content-Type': 'application/json',
     };
 

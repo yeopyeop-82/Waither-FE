@@ -23,6 +23,7 @@ import {
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { USER_WIDTH } from '../styles/dimension';
 import { Picker } from '@react-native-picker/picker';
+import authTokens from '../utils/authTokens';
 
 const Wrapper = styled.View`
   display: flex;
@@ -417,16 +418,12 @@ const SettingNotification = () => {
 
   //===============================================================
 
-  //Bearer 토큰
-  const authorization =
-    'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOlsiUk9MRV9VU0VSIl0sImlhdCI6MTcxOTgzMTYwMCwiZXhwIjozMzEzNDc0NTYwMH0.getDuds1kSPZ5SeiGtWukiq5qgLrKQiNnpZAX0f4-Ho';
-
   //외출 요일 및 외출 시간대 호출
   const notificationTimeZonePut = async () => {
     const url = 'https://waither.shop/user/setting/noti/out-alert-set';
 
     const headers = {
-      Authorization: authorization,
+      Authorization: authTokens.accessToken,
       'Content-Type': 'application/json',
     };
 
@@ -456,7 +453,7 @@ const SettingNotification = () => {
     const url = 'https://waither.shop/user/setting/noti/out-alert';
 
     const headers = {
-      Authorization: authorization,
+      Authorization: authTokens.accessToken,
       'Content-Type': 'application/json',
     };
 
@@ -485,7 +482,7 @@ const SettingNotification = () => {
     const url = 'https://waither.shop/user/setting/noti/climate-alert';
 
     const headers = {
-      Authorization: authorization,
+      Authorization: authTokens.accessToken,
       'Content-Type': 'application/json',
     };
 
@@ -514,7 +511,7 @@ const SettingNotification = () => {
     const url = 'https://waither.shop/user/setting/noti/user-alert';
 
     const headers = {
-      Authorization: authorization,
+      Authorization: authTokens.accessToken,
       'Content-Type': 'application/json',
     };
 
@@ -543,7 +540,7 @@ const SettingNotification = () => {
     const url = 'https://waither.shop/user/setting/noti/snow-alert';
 
     const headers = {
-      Authorization: authorization,
+      Authorization: authTokens.accessToken,
       'Content-Type': 'application/json',
     };
 
@@ -572,7 +569,7 @@ const SettingNotification = () => {
     const url = 'https://waither.shop/user/setting/noti';
 
     const headers = {
-      Authorization: authorization,
+      Authorization: authTokens.accessToken,
       'Content-Type': 'application/json',
     };
 

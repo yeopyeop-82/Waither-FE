@@ -1,0 +1,8 @@
+const authTokens = {
+  accessToken:
+    'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJST0xFX1VTRVIiLCJpYXQiOjE3MjA1Nzg0MDgsImV4cCI6MTcyMDU4MjAwOH0.K6m-0aVWL9tlHV2JL5B59Giyc3NMtf25_jlWCHxWu-8',
+  refreshToken:
+    'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJST0xFX1VTRVIiLCJpYXQiOjE3MjA1Nzc5MTAsImV4cCI6MTcyMDY2NDMxMH0.9qnHjePKA9nRzQWmABJva8urHNv4OYRKBzgDmBnppTg',
+};
+
+export default authTokens;

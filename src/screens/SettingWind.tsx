@@ -7,6 +7,7 @@ import { userWindState } from '../recoil/userDataRecoil';
 import WindGroup from '../assets/images/wind_group.svg';
 import WindPowerImage from '../assets/images/wind_power.svg';
 import Slider from '@react-native-community/slider';
+import authTokens from '../utils/authTokens.js';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -118,7 +119,7 @@ const SettingWind = () => {
     const url = 'https://waither.shop/user/setting/noti/wind';
 
     const headers = {
-      Authorization: authorization,
+      Authorization: authTokens.accessToken,
       'Content-Type': 'application/json',
     };
 
@@ -147,7 +148,7 @@ const SettingWind = () => {
     const url = 'https://waither.shop/user/setting/noti/wind';
 
     const headers = {
-      Authorization: authorization,
+      Authorization: authTokens.accessToken,
       'Content-Type': 'application/json',
     };
 
