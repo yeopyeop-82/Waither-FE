@@ -237,7 +237,7 @@ const Settings = () => {
   const navigation = useNavigation();
   const [isCustomServiceEnabled, setIsCustomServiceEnabled] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
-  const [api, setApi] = useState(null);
+  const [forDeclineApiCall, setForDeclineApiCall] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const toggleSwitch = () => {
@@ -254,9 +254,9 @@ const Settings = () => {
     if (isLoading) {
       //1. 모달이 뜨지 않았을때 (false에서 true로 수정될 경우)
       //2. 모달이 떴을 경우 (true에서 false로 수정할 경우)
-      //  1. true인 상태에서 다시 생각해볼게요 선택 시 api가 true가 되기 때문에 API가 호출되지 않음
-      //  2. true인 상태에서 그래도 끌래요 선택 시 api가 false가 되기 때문에 API 호출
-      if (!isModalVisible && !api) {
+      //  1. true인 상태에서 다시 생각해볼게요 선택 시 forDeclineApiCall가 true가 되기 때문에 API가 호출되지 않음
+      //  2. true인 상태에서 그래도 끌래요 선택 시 forDeclineApiCall가 false가 되기 때문에 API 호출
+      if (!isModalVisible && !forDeclineApiCall) {
         customServiceEnabledPut();
       }
     }
@@ -369,7 +369,7 @@ const Settings = () => {
               onPress={() => {
                 setIsCustomServiceEnabled(false);
                 setModalVisible(false);
-                setApi(false);
+                setForDeclineApiCall(false);
               }}
             >
               <ModalTurnOffBtnText>그래도 끌래요.</ModalTurnOffBtnText>
@@ -378,7 +378,7 @@ const Settings = () => {
               onPress={() => {
                 setIsCustomServiceEnabled(true);
                 setModalVisible(false);
-                setApi(true);
+                setForDeclineApiCall(true);
               }}
             >
               <ModalTurnOnBtnText>다시 생각해볼게요.</ModalTurnOnBtnText>
