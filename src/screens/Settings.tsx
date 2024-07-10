@@ -235,18 +235,16 @@ const DataBoxView = styled.View`
 
 const Settings = () => {
   const navigation = useNavigation();
-  const [isCustomServiceToggleEnabled, setIsCustomServiceToggleEnabled] =
-    useState(false);
+  // const [isCustomServiceToggleEnabled, setIsCustomServiceToggleEnabled] =
+  //   useState(false);
   const [isCustomServiceEnabled, setIsCustomServiceEnabled] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [api, setApi] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const toggleSwitch = () => {
     // 이전 상태를 이용
-    setIsCustomServiceToggleEnabled((prevState) => !prevState);
-
-    // iscustomserviceEnabled가 false이기에 처음에는 else문으로 빠짐
-    // 그리고 토글이 켜지며 true가 된다.
-    // 토글을 다시 눌러 끄려는 순간 true 이기 때문에 modal이 보여진다.
+    setIsCustomServiceEnabled((prevState) => !prevState);
     if (isCustomServiceEnabled) {
       setModalVisible(true);
     } else {
@@ -255,12 +253,16 @@ const Settings = () => {
   };
 
   useEffect(() => {
-    setIsCustomServiceEnabled(isCustomServiceToggleEnabled);
-  }, [isCustomServiceToggleEnabled]);
-
-  useEffect(() => {
-    customServiceEnabledPut();
-  }, [isCustomServiceEnabled]);
+    if (isLoading) {
+      //1. 모달이 뜨지 않았을때 (false에서 true로 수정될 경우)
+      //2. 모달이 떴을 경우 (true에서 false로 수정할 경우)
+      //  1. true인 상태에서 다시 생각해볼게요 선택 시 api가 true가 되기 때문에 API가 호출되지 않음
+      //  2. true인 상태에서 그래도 끌래요 선택 시 api가 false가 되기 때문에 API 호출
+      if (!isModalVisible && !api) {
+        customServiceEnabledPut();
+      }
+    }
+  }, [isCustomServiceEnabled, isModalVisible]);
 
   //===================================================================
 
@@ -310,8 +312,9 @@ const Settings = () => {
         throw new Error('Network response was not ok');
       }
       const res = await response.json();
+      setIsCustomServiceEnabled(res.result.custom);
+      setIsLoading(true);
       console.log('Get 함수', res.result.custom);
-      setIsCustomServiceToggleEnabled(res.result.custom);
     } catch (error) {
       console.error('Error fetching: 사용자 맞춤형 서비스 GET ', error);
     }
@@ -336,7 +339,7 @@ const Settings = () => {
         </CustomServiceTitleView>
 
         <ToggleSwitch
-          value={isCustomServiceToggleEnabled}
+          value={isCustomServiceEnabled}
           onValueChange={toggleSwitch}
           //toggle 활성화 여부에 따른 색상 설정
           trackColor={{ false: '#767577', true: `${MAIN_COLOR}` }}
@@ -368,6 +371,7 @@ const Settings = () => {
               onPress={() => {
                 setIsCustomServiceEnabled(false);
                 setModalVisible(false);
+                setApi(false);
               }}
             >
               <ModalTurnOffBtnText>그래도 끌래요.</ModalTurnOffBtnText>
@@ -376,7 +380,7 @@ const Settings = () => {
               onPress={() => {
                 setIsCustomServiceEnabled(true);
                 setModalVisible(false);
-                setIsCustomServiceToggleEnabled(true);
+                setApi(true);
               }}
             >
               <ModalTurnOnBtnText>다시 생각해볼게요.</ModalTurnOnBtnText>
