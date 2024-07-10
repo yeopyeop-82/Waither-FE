@@ -191,15 +191,15 @@ const PrivacySetting = () => {
   };
 
   const onPressLogout = () => {
-    navigation.navigate('Login');
     LogoutPost();
+    navigation.navigate('Login');
   };
 
   //===============================================================
 
   //Bearer 토큰
   const authorization =
-    'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJST0xFX1VTRVIiLCJpYXQiOjE3MjA1MTI2ODUsImV4cCI6MTcyMDUxNjI4NX0.InQvkKjgv0x0AwD--eZ4gTX5MrZPLBx-f_Vm7zIlojg';
+    'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJST0xFX1VTRVIiLCJpYXQiOjE3MjA1Nzc3ODAsImV4cCI6MTcyMDU4MTM4MH0.6km1VsiXMindF1eJ9mM94JClzGivAAesEz46YB1btTE';
 
   //사용자 정보 호출
   const userInfoGet = async () => {
@@ -283,8 +283,7 @@ const PrivacySetting = () => {
         throw new Error('Network response was not ok');
       }
 
-      const res = await response.json();
-      console.log('로그아웃 성공', res);
+      console.log('로그아웃 성공 status code:', response.status);
     } catch (error) {
       console.error('로그아웃 에러', error);
     }
@@ -388,35 +387,6 @@ const PrivacySetting = () => {
           </SettingContainer>
         ))}
       </SettingsView>
-
-      {/* <SettingsView>
-        <SettingContainer>
-          <SettingBtnContainer>
-            <SettingBtn
-              onPress={() => {
-                navigation.navigate('PasswordReset');
-              }}
-            >
-              <SettingInnerView>
-                <SettingMainTitle>비밀번호 재설정</SettingMainTitle>
-              </SettingInnerView>
-              <SettingArrow source={settingBtn}></SettingArrow>
-            </SettingBtn>
-            <SettingBtn onPress={onPressLogout}>
-              <SettingInnerView>
-                <SettingMainTitle>로그아웃</SettingMainTitle>
-              </SettingInnerView>
-              <SettingArrow source={settingBtn}></SettingArrow>
-            </SettingBtn>
-            <SettingBtn>
-              <SettingInnerView>
-                <SettingMainTitle>회원 탈퇴</SettingMainTitle>
-              </SettingInnerView>
-              <SettingArrow source={settingBtn}></SettingArrow>
-            </SettingBtn>
-          </SettingBtnContainer>
-      </SettingContainer>
-      </SettingsView> */}
     </Wrapper>
   );
 };
