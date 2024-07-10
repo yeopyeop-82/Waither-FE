@@ -55,30 +55,31 @@ const CustomServiceSubTitle = styled.Text`
 `;
 
 const MainScreenSetting = () => {
-  const [isRainfallToggleEnabled, setIsRainfallToggleEnabled] = useState(false);
   const [isRainfallEnabled, setIsRainfallEnabled] = useState(false);
-  const [isWindToggleEnabled, setIsWindToggleEnabled] = useState(false);
   const [isWindEnabled, setIsWindEnabled] = useState(false);
-  const [isFineDustToggleEnabled, setIsFineDustToglleEnabled] = useState(false);
   const [isFineDustEnabled, setIsFineDustEnabled] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
   const RainFalltoggleSwitch = () => {
-    setIsRainfallToggleEnabled((previousState) => !previousState);
+    setIsRainfallEnabled((previousState) => !previousState);
   };
   const WindtoggleSwitch = () => {
-    setIsWindToggleEnabled((previousState) => !previousState);
+    setIsWindEnabled((previousState) => !previousState);
   };
   const FineDusttoggleSwitch = () => {
-    setIsFineDustToglleEnabled((previousState) => !previousState);
+    setIsFineDustEnabled((previousState) => !previousState);
   };
 
   useEffect(() => {
-    setIsRainfallEnabled(isRainfallToggleEnabled);
-    setIsWindEnabled(isWindToggleEnabled);
-    setIsFineDustEnabled(isFineDustToggleEnabled);
-  }, [isRainfallToggleEnabled, isWindToggleEnabled, isFineDustToggleEnabled]);
+    setIsRainfallEnabled;
+    setIsWindEnabled;
+    setIsFineDustEnabled;
+  }, [isRainfallEnabled, isWindEnabled, isFineDustEnabled]);
 
   useEffect(() => {
-    userDisplayCustomPatch();
+    if (isLoading) {
+      userDisplayCustomPatch();
+    }
   }, [isRainfallEnabled, isWindEnabled, isFineDustEnabled]);
 
   //===============================================================
@@ -132,9 +133,10 @@ const MainScreenSetting = () => {
         throw new Error('Network response was not ok');
       }
       const res = await response.json();
-      setIsRainfallToggleEnabled(res.result.precipitation);
-      setIsWindToggleEnabled(res.result.wind);
-      setIsFineDustToglleEnabled(res.result.dust);
+      setIsRainfallEnabled(res.result.precipitation);
+      setIsWindEnabled(res.result.wind);
+      setIsFineDustEnabled(res.result.dust);
+      setIsLoading(true);
       console.log('사용자 메인화면 여부 GET', res);
     } catch (error) {
       console.error('사용자 메인화면 여부 GET', error);
@@ -158,7 +160,7 @@ const MainScreenSetting = () => {
             </CustomServiceSubTitle>
           </MainScreenTitleView>
           <ToggleSwitch
-            value={isRainfallToggleEnabled}
+            value={isRainfallEnabled}
             onValueChange={RainFalltoggleSwitch}
             //toggle 활성화 여부에 따른 색상 설정
             trackColor={{ false: '#767577', true: `${MAIN_COLOR}` }}
@@ -172,7 +174,7 @@ const MainScreenSetting = () => {
             </CustomServiceSubTitle>
           </MainScreenTitleView>
           <ToggleSwitch
-            value={isWindToggleEnabled}
+            value={isWindEnabled}
             onValueChange={WindtoggleSwitch}
             //toggle 활성화 여부에 따른 색상 설정
             trackColor={{ false: '#767577', true: `${MAIN_COLOR}` }}
@@ -186,7 +188,7 @@ const MainScreenSetting = () => {
             </CustomServiceSubTitle>
           </MainScreenTitleView>
           <ToggleSwitch
-            value={isFineDustToggleEnabled}
+            value={isFineDustEnabled}
             onValueChange={FineDusttoggleSwitch}
             //toggle 활성화 여부에 따른 색상 설정
             trackColor={{ false: '#767577', true: `${MAIN_COLOR}` }}
