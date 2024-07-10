@@ -235,8 +235,6 @@ const DataBoxView = styled.View`
 
 const Settings = () => {
   const navigation = useNavigation();
-  // const [isCustomServiceToggleEnabled, setIsCustomServiceToggleEnabled] =
-  //   useState(false);
   const [isCustomServiceEnabled, setIsCustomServiceEnabled] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
   const [api, setApi] = useState(null);
