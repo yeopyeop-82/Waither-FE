@@ -55,12 +55,11 @@ const CustomServiceSubTitle = styled.Text`
 `;
 
 const MainScreenSetting = () => {
-  // const [isRainfallToggleEnabled, setIsRainfallToggleEnabled] = useState(false);
   const [isRainfallEnabled, setIsRainfallEnabled] = useState(false);
-  // const [isWindToggleEnabled, setIsWindToggleEnabled] = useState(false);
   const [isWindEnabled, setIsWindEnabled] = useState(false);
-  // const [isFineDustToggleEnabled, setIsFineDustToglleEnabled] = useState(false);
   const [isFineDustEnabled, setIsFineDustEnabled] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
   const RainFalltoggleSwitch = () => {
     setIsRainfallEnabled((previousState) => !previousState);
   };
@@ -78,7 +77,9 @@ const MainScreenSetting = () => {
   }, [isRainfallEnabled, isWindEnabled, isFineDustEnabled]);
 
   useEffect(() => {
-    userDisplayCustomPatch();
+    if (isLoading) {
+      userDisplayCustomPatch();
+    }
   }, [isRainfallEnabled, isWindEnabled, isFineDustEnabled]);
 
   //===============================================================
@@ -135,6 +136,7 @@ const MainScreenSetting = () => {
       setIsRainfallEnabled(res.result.precipitation);
       setIsWindEnabled(res.result.wind);
       setIsFineDustEnabled(res.result.dust);
+      setIsLoading(true);
       console.log('사용자 메인화면 여부 GET', res);
     } catch (error) {
       console.error('사용자 메인화면 여부 GET', error);
