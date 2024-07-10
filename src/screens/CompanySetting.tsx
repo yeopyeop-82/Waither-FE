@@ -16,6 +16,7 @@ import {
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { USER_WIDTH } from '../styles/dimension';
 import Pngwing from '../assets/images/pngwing.svg';
+import authTokens from '../utils/authTokens';
 
 const Wrapper = styled.View`
   display: flex;
@@ -253,16 +254,12 @@ const CompanySetting = () => {
     }
   };
 
-  //Bearer 토큰
-  const authorization =
-    'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOlsiUk9MRV9VU0VSIl0sImlhdCI6MTcxOTgzMTYwMCwiZXhwIjozMzEzNDc0NTYwMH0.getDuds1kSPZ5SeiGtWukiq5qgLrKQiNnpZAX0f4-Ho';
-
   //직장 지역명, 위도, 경도 호출
   const companyLocationPut = async () => {
     const url = 'https://waither.shop/user/setting/region';
 
     const headers = {
-      Authorization: authorization,
+      Authorization: authTokens.accessToken,
       'Content-Type': 'application/json',
     };
 
@@ -293,7 +290,7 @@ const CompanySetting = () => {
     const url = 'https://waither.shop/user/setting/region-report';
 
     const headers = {
-      Authorization: authorization,
+      Authorization: authTokens.accessToken,
       'Content-Type': 'application/json',
     };
 
@@ -319,7 +316,7 @@ const CompanySetting = () => {
   const presentCompanyLocationGet = async () => {
     const url = 'https://waither.shop/user/setting/region';
     const headers = {
-      Authorization: authorization,
+      Authorization: authTokens.accessToken,
     };
     try {
       const response = await fetch(url, {

@@ -8,6 +8,7 @@ import { userNameState } from '../recoil/userInitInfoRecoil';
 import { ERROR_COLOR, GREY_COLOR, MAIN_COLOR } from '../styles/color';
 import Error from '../assets/images/Error.png';
 import NotError from '../assets/images/notError.png';
+import authTokens from '../utils/authTokens';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -197,16 +198,12 @@ const PrivacySetting = () => {
 
   //===============================================================
 
-  //Bearer 토큰
-  const authorization =
-    'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJST0xFX1VTRVIiLCJpYXQiOjE3MjA1Nzc3ODAsImV4cCI6MTcyMDU4MTM4MH0.6km1VsiXMindF1eJ9mM94JClzGivAAesEz46YB1btTE';
-
   //사용자 정보 호출
   const userInfoGet = async () => {
     const url = 'https://waither.shop/user/setting/mypage';
 
     const headers = {
-      Authorization: authorization,
+      Authorization: authTokens.accessToken,
       'Content-Type': 'application/json',
     };
 
@@ -238,7 +235,7 @@ const PrivacySetting = () => {
     const url = 'https://waither.shop/user/nickname';
 
     const headers = {
-      Authorization: authorization,
+      Authorization: authTokens.accessToken,
       'Content-Type': 'application/json',
     };
 
@@ -269,7 +266,7 @@ const PrivacySetting = () => {
     const url = 'https://waither.shop/user/logout';
 
     const headers = {
-      Authorization: authorization,
+      Authorization: authTokens.accessToken,
       'Content-Type': 'application/json',
     };
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
 import { MAIN_COLOR } from '../styles/color';
+import authTokens from '../utils/authTokens';
 
 const Wrapper = styled.View`
   display: flex;
@@ -82,16 +83,12 @@ const MainScreenSetting = () => {
 
   //===============================================================
 
-  //Bearer 토큰
-  const authorization =
-    'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOlsiUk9MRV9VU0VSIl0sImlhdCI6MTcxOTgzMTYwMCwiZXhwIjozMzEzNDc0NTYwMH0.getDuds1kSPZ5SeiGtWukiq5qgLrKQiNnpZAX0f4-Ho';
-
   //사용자 메인화면 커스텀 호출
   const userDisplayCustomPatch = async () => {
     const url = 'https://waither.shop/user/setting/display';
 
     const headers = {
-      Authorization: authorization,
+      Authorization: authTokens.accessToken,
       'Content-Type': 'application/json',
     };
 
@@ -122,7 +119,7 @@ const MainScreenSetting = () => {
     const url = 'https://waither.shop/user/setting/display';
 
     const headers = {
-      Authorization: authorization,
+      Authorization: authTokens.accessToken,
       'Content-Type': 'application/json',
     };
 

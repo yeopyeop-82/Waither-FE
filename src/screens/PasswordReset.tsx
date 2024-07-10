@@ -7,7 +7,7 @@ import { useTogglePasswordVisibility } from '../utils/useTogglePasswordVisibilit
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { Alert } from 'react-native';
-import test from 'node:test';
+import authTokens from '../utils/authTokens';
 const Wrapper = styled.View`
   flex-direction: column;
   align-items: center;
@@ -225,16 +225,12 @@ const PasswordReset = () => {
 
   //===============================================================
 
-  //Bearer 토큰
-  const authorization =
-    'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOlsiUk9MRV9VU0VSIl0sImlhdCI6MTcxOTgzMTYwMCwiZXhwIjozMzEzNDc0NTYwMH0.getDuds1kSPZ5SeiGtWukiq5qgLrKQiNnpZAX0f4-Ho';
-
   //비밀번호 변경 호출
   const changePasswordPut = async () => {
     const url = 'https://waither.shop/user/password';
 
     const headers = {
-      Authorization: authorization,
+      Authorization: authTokens.accessToken,
       'Content-Type': 'application/json',
     };
 
