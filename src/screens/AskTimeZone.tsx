@@ -119,7 +119,13 @@ const AskTimeZone = () => {
 
   useEffect(() => {
     const userTimeZone =
-      (selectedAmPm === 'AM' ? 0 : 12) + Number(selectedTime);
+      selectedAmPm === 'AM'
+        ? selectedTime === '12'
+          ? 0
+          : Number(selectedTime)
+        : selectedTime === '12'
+          ? 12
+          : Number(selectedTime) + 12;
     setUserTimeZone(userTimeZone);
   }, [selectedAmPm, selectedTime, setUserTimeZone]);
 
