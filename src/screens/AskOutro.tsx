@@ -80,6 +80,89 @@ const AskOutro = () => {
     fetchUserSettings();
   }, [setName]);
 
+  useEffect(() => {
+    const submitSurvey = async () => {
+      try {
+        const accessToken = await AsyncStorage.getItem('accessToken');
+        if (!accessToken) {
+          console.log('No access token found');
+          return;
+        }
+
+        const surveyResponse = await fetch(
+          'https://waither.shop/user/survey/submit',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({
+              ans: feelingWeather,
+              time: new Date().toISOString(),
+            }),
+          },
+        );
+
+        if (!surveyResponse.ok) {
+          console.log('Failed to submit survey:', surveyResponse.statusText);
+        }
+      } catch (error) {
+        console.log('Error submitting survey:', error);
+      }
+    };
+
+    const setNotification = async () => {
+      try {
+        const accessToken = await AsyncStorage.getItem('accessToken');
+        if (!accessToken) {
+          console.log('No access token found');
+          return;
+        }
+
+        const notificationHour = notificationTime.slice(0, 2);
+        const notificationMinute = notificationTime.slice(2, 4);
+
+        const notificationResponse = await fetch(
+          'https://waither.shop/setting/noti/out-alert-set',
+          {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({
+              days: [
+                'Monday',
+                'Tuesday',
+                'Wednesday',
+                'Thursday',
+                'Friday',
+                'Saturday',
+                'Sunday',
+              ],
+              outTime: `${notificationHour}:${notificationMinute}:00`,
+            }),
+          },
+        );
+
+        if (!notificationResponse.ok) {
+          console.log(
+            'Failed to set notification:',
+            notificationResponse.statusText,
+          );
+        }
+      } catch (error) {
+        console.log('Error setting notification:', error);
+      }
+    };
+
+    if (feelingWeather && feelingTimeZone && notificationTime) {
+      submitSurvey();
+      setNotification();
+    }
+  }, [feelingWeather, feelingTimeZone, notificationTime]);
+
   return (
     <Wrapper>
       <Logo resizeMode="contain" source={AskDataboxPng} />

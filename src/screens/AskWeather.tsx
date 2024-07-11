@@ -75,11 +75,11 @@ const AskWeather = () => {
     userFeelingWeatherState,
   );
   const weatherOptions = [
-    { label: '추웠어요', value: 'option1' },
-    { label: '조금 추웠어요', value: 'option2' },
-    { label: '딱 좋았어요', value: 'option3' },
-    { label: '조금 더웠어요', value: 'option4' },
-    { label: '더웠어요', value: 'option5' },
+    { label: '추웠어요', value: '1' },
+    { label: '조금 추웠어요', value: '2' },
+    { label: '딱 좋았어요', value: '3' },
+    { label: '조금 더웠어요', value: '4' },
+    { label: '더웠어요', value: '5' },
   ];
 
   const storeWeather = async (weather) => {
@@ -93,9 +93,7 @@ const AskWeather = () => {
 
   const handleSubmit = () => {
     storeWeather(selectedValue);
-    {
-      navigation.navigate('AskTimeZone');
-    }
+    navigation.navigate('AskTimeZone');
   };
 
   return (

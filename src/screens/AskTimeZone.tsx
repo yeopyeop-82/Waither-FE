@@ -1,193 +1,190 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import styled from 'styled-components/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import AskDataboxPng from '../assets/images/img-ask1-databox-check.png';
-import {
-  userFeelingTimeZoneState,
-  userFeelingWeatherState,
-  userNameState,
-  userNotificationTimeState,
-} from '../recoil/userInitInfoRecoil';
+import { userFeelingWeatherState } from '../recoil/userInitInfoRecoil';
+import { Picker } from '@react-native-picker/picker';
 import { MAIN_COLOR } from '../styles/color';
+import { useNavigation } from '@react-navigation/native';
+import { userFeelingTimeZoneState } from '../recoil/userInitInfoRecoil';
 
 const Wrapper = styled.View`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: ${MAIN_COLOR};
+  background-color: white;
   flex: 1;
 `;
 
-const Logo = styled.Image`
-  width: 150px;
-  height: 150px;
-  margin-bottom: 50px;
-`;
-
-const AskMessageWrapper = styled.View`
+const AskTitleWrapper = styled.View`
   align-items: center;
 `;
 
-const AskMessage = styled.Text`
-  color: white;
-  font-size: 20px;
-  margin-bottom: 5px;
-  font-weight: 200;
+const AskTitle = styled.Text`
+  font-size: 30px;
 `;
+
+const AskAmPmButton = styled.TouchableOpacity`
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  border-radius: 30px;
+  margin-bottom: 5px;
+`;
+
+const AskAmPmButtonText = styled.Text`
+  font-size: 15px;
+  font-weight: 800;
+`;
+
+// eslint-disable-next-line react/prop-types
+const AskAmPmRadioButton = ({ label, selected, onSelect }) => (
+  <AskAmPmButton
+    activeOpacity={1}
+    onPress={onSelect}
+    style={{ backgroundColor: selected ? `${MAIN_COLOR}` : '#e0e1e4' }}
+  >
+    <AskAmPmButtonText style={{ color: selected ? '#FFF' : '#9f9f9f' }}>
+      {label}
+    </AskAmPmButtonText>
+  </AskAmPmButton>
+);
 
 const Bold = styled.Text`
   font-weight: 800;
 `;
 
-const AskOutro = () => {
-  const [name, setName] = useRecoilState(userNameState);
-  const feelingWeather = useRecoilValue(userFeelingWeatherState);
-  const feelingTimeZone = useRecoilValue(userFeelingTimeZoneState);
-  const notificationTime = useRecoilValue(userNotificationTimeState);
+const SelectTimeWrapper = styled.View`
+  flex: 0.3;
+  width: 80%;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+`;
+
+const TimeText = styled.Text`
+  font-size: 30px;
+`;
+
+const AmPmSelectButtonWrapper = styled.View`
+  width: 25%;
+  margin-right: 20px;
+`;
+
+const SubmitButtonWrapper = styled.View`
+  width: 60%;
+  align-items: center;
+  justify-content: center;
+`;
+
+const SubmitButton = styled.TouchableOpacity`
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 45px;
+  border-radius: 30px;
+  margin-bottom: 10px;
+  background-color: ${MAIN_COLOR};
+`;
+
+const DontKnowSubmitButton = styled(SubmitButton)`
+  background-color: #e0e1e4;
+`;
+
+const SubmitButtonText = styled(AskAmPmButtonText)`
+  color: white;
+`;
+
+const DontKnowSubmitButtonText = styled(AskAmPmButtonText)`
+  color: #9f9f9f;
+`;
+
+const AskTimeZone = () => {
+  const navigation = useNavigation();
+  const weather = useRecoilValue(userFeelingWeatherState);
+  const [selectedAmPm, setSelectedAmPm] = useState('AM');
+  const [selectedTime, setSelectedTime] = useState('1');
+  const [userTimeZone, setUserTimeZone] = useRecoilState(
+    userFeelingTimeZoneState,
+  );
+
+  const AmPmOptions = [
+    { label: '오전', value: 'AM' },
+    { label: '오후', value: 'PM' },
+  ];
+
+  const timeOptions = Array.from({ length: 12 }, (_, index) => ({
+    label: `${index + 1}`,
+    value: `${index + 1}`,
+  }));
 
   useEffect(() => {
-    const fetchUserSettings = async () => {
-      try {
-        const accessToken = await AsyncStorage.getItem('accessToken');
-        if (!accessToken) {
-          console.log('No access token found');
-          return;
-        }
+    const userTimeZone =
+      (selectedAmPm === 'AM' ? 0 : 12) + Number(selectedTime);
+    setUserTimeZone(userTimeZone);
+  }, [selectedAmPm, selectedTime, setUserTimeZone]);
 
-        const response = await fetch(
-          'https://waither.shop/user/setting/mypage',
-          {
-            method: 'GET',
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          },
-        );
-
-        const data = await response.json();
-
-        if (data.code === '200') {
-          setName(data.result.nickname);
-        } else {
-          console.log('Failed to fetch user settings:', data.message);
-        }
-      } catch (error) {
-        console.log('Error fetching user settings:', error);
-      }
-    };
-
-    fetchUserSettings();
-  }, [setName]);
-
-  useEffect(() => {
-    const submitSurvey = async () => {
-      try {
-        const accessToken = await AsyncStorage.getItem('accessToken');
-        if (!accessToken) {
-          console.log('No access token found');
-          return;
-        }
-
-        const surveyResponse = await fetch(
-          'https://waither.shop/user/survey/submit',
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${accessToken}`,
-            },
-            body: JSON.stringify({
-              ans: feelingWeather,
-              time: new Date().toISOString(),
-            }),
-          },
-        );
-
-        if (!surveyResponse.ok) {
-          console.log('Failed to submit survey:', surveyResponse.statusText);
-        }
-      } catch (error) {
-        console.log('Error submitting survey:', error);
-      }
-    };
-
-    const setNotification = async () => {
-      try {
-        const accessToken = await AsyncStorage.getItem('accessToken');
-        if (!accessToken) {
-          console.log('No access token found');
-          return;
-        }
-
-        const notificationHour = notificationTime.slice(0, 2);
-        const notificationMinute = notificationTime.slice(2, 4);
-
-        const notificationResponse = await fetch(
-          'https://waither.shop/setting/noti/out-alert-set',
-          {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${accessToken}`,
-            },
-            body: JSON.stringify({
-              days: [
-                'Monday',
-                'Tuesday',
-                'Wednesday',
-                'Thursday',
-                'Friday',
-                'Saturday',
-                'Sunday',
-              ],
-              outTime: `${notificationHour}:${notificationMinute}:00`,
-            }),
-          },
-        );
-
-        if (!notificationResponse.ok) {
-          console.log(
-            'Failed to set notification:',
-            notificationResponse.statusText,
-          );
-        }
-      } catch (error) {
-        console.log('Error setting notification:', error);
-      }
-    };
-
-    if (feelingWeather && feelingTimeZone && notificationTime) {
-      submitSurvey();
-      setNotification();
-    }
-  }, [feelingWeather, feelingTimeZone, notificationTime]);
+  const handleSubmit = () => {
+    console.log(userTimeZone);
+    navigation.navigate('AskNotificationTime');
+  };
 
   return (
     <Wrapper>
-      <Logo resizeMode="contain" source={AskDataboxPng} />
-      <AskMessageWrapper>
-        <AskMessage>{name} 님의</AskMessage>
-        <AskMessage style={{ marginBottom: 30 }}>
-          데이터가 저장되었어요.
-        </AskMessage>
-        <AskMessage>이제 웨이더가</AskMessage>
-        <AskMessage>
-          {name} 님에게 <Bold>꼭 맞는</Bold>
-        </AskMessage>
-        <AskMessage>
-          <Bold>기상예보를 보내드릴게요.</Bold>
-        </AskMessage>
-        <AskMessage>
-          이름 : {name} / 어제 날씨 : {feelingWeather}
-        </AskMessage>
-        <AskMessage>
-          춥/덥다고 느낀 시간 : {feelingTimeZone} / 알림시간 :{' '}
-          {notificationTime}
-        </AskMessage>
-      </AskMessageWrapper>
+      <AskTitleWrapper>
+        <AskTitle>
+          {weather === 'option1' || weather === 'option2' ? (
+            <Bold>춥다</Bold>
+          ) : weather === 'option3' ? (
+            <Bold>딱 좋다</Bold>
+          ) : (
+            <Bold>덥다</Bold>
+          )}
+          고 느낀
+        </AskTitle>
+        <AskTitle>
+          <Bold>시간대</Bold>가 언제인가요 ?
+        </AskTitle>
+      </AskTitleWrapper>
+      <SelectTimeWrapper>
+        <AmPmSelectButtonWrapper>
+          {AmPmOptions.map((option) => (
+            <AskAmPmRadioButton
+              key={option.value}
+              label={option.label}
+              selected={selectedAmPm === option.value}
+              onSelect={() => setSelectedAmPm(option.value)}
+            />
+          ))}
+        </AmPmSelectButtonWrapper>
+        <Picker
+          style={{ width: 100 }}
+          //   itemStyle={{ width: 100, height: 150 }}
+          selectionColor={'rgba(81, 137, 246, 0.2)'}
+          numberOfLines={2}
+          selectedValue={selectedTime}
+          onValueChange={(itemValue, itemIndex) => setSelectedTime(itemValue)}
+        >
+          {timeOptions.map((option) => (
+            <Picker.Item
+              key={option.value}
+              label={option.label}
+              value={option.value}
+              style={{ backgroundColor: 'tomato' }}
+            />
+          ))}
+        </Picker>
+        <TimeText>시</TimeText>
+      </SelectTimeWrapper>
+      <SubmitButtonWrapper>
+        <SubmitButton onPress={handleSubmit}>
+          <SubmitButtonText>확인</SubmitButtonText>
+        </SubmitButton>
+        <DontKnowSubmitButton>
+          <DontKnowSubmitButtonText>잘 모르겠어요</DontKnowSubmitButtonText>
+        </DontKnowSubmitButton>
+      </SubmitButtonWrapper>
     </Wrapper>
   );
 };
 
-export default AskOutro;
+export default AskTimeZone;
