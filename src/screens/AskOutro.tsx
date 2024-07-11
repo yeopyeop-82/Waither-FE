@@ -89,6 +89,14 @@ const AskOutro = () => {
           return;
         }
 
+        const padToTwoDigits = (num) => num.toString().padStart(2, '0');
+
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const date = yesterday.toISOString().split('T')[0];
+        const timeHour = padToTwoDigits(parseInt(feelingTimeZone, 10));
+        const time = `${timeHour}:00:00`;
+
         const surveyResponse = await fetch(
           'https://waither.shop/user/survey/submit',
           {
@@ -98,8 +106,8 @@ const AskOutro = () => {
               Authorization: `Bearer ${accessToken}`,
             },
             body: JSON.stringify({
-              ans: feelingWeather,
-              time: new Date().toISOString(),
+              ans: parseInt(feelingWeather, 10),
+              time: `${date}T${time}`,
             }),
           },
         );
@@ -120,8 +128,15 @@ const AskOutro = () => {
           return;
         }
 
-        const notificationHour = notificationTime.slice(0, 2);
-        const notificationMinute = notificationTime.slice(2, 4);
+        const padToTwoDigits = (num) => num.toString().padStart(2, '0');
+
+        const notificationHour = padToTwoDigits(
+          parseInt(notificationTime.slice(0, 2), 10),
+        );
+        const notificationMinute = padToTwoDigits(
+          parseInt(notificationTime.slice(2, 4), 10),
+        );
+        const notificationFormatted = `${notificationHour}:${notificationMinute}:00`;
 
         const notificationResponse = await fetch(
           'https://waither.shop/setting/noti/out-alert-set',
@@ -141,7 +156,7 @@ const AskOutro = () => {
                 'Saturday',
                 'Sunday',
               ],
-              outTime: `${notificationHour}:${notificationMinute}:00`,
+              outTime: notificationFormatted,
             }),
           },
         );
