@@ -112,18 +112,19 @@ const GreetNaming = () => {
   const updateNickname = async (nickname) => {
     try {
       const accessToken = await AsyncStorage.getItem('accessToken');
+
       if (!accessToken) {
         console.log('No access token found');
         return;
       }
 
-      const response = await fetch('/user/nickname', {
+      const response = await fetch('https://waither.shop/user/nickname', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({ nickname }),
+        body: JSON.stringify({ nickname: nickname }),
       });
 
       if (response.ok) {
@@ -139,6 +140,7 @@ const GreetNaming = () => {
   const handleSubmit = () => {
     if (isName) {
       storeName(name);
+      updateNickname(name);
       navigation.navigate('AskIntro');
     }
   };
@@ -165,7 +167,6 @@ const GreetNaming = () => {
           inputMode="text"
           placeholder="추워하는 곰탱이"
           placeholderTextColor="#ced4da"
-          value={name}
           onChangeText={onChangeName}
           onFocus={() => {
             setNameIsPress(true);
