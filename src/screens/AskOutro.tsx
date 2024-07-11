@@ -1,7 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import styled from 'styled-components/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AskDataboxPng from '../assets/images/img-ask1-databox-check.png';
+import {
+  userFeelingTimeZoneState,
+  userFeelingWeatherState,
+  userNameState,
+  userNotificationTimeState,
+} from '../recoil/userInitInfoRecoil';
 import { MAIN_COLOR } from '../styles/color';
 
 const Wrapper = styled.View`
@@ -34,7 +41,10 @@ const Bold = styled.Text`
 `;
 
 const AskOutro = () => {
-  const [name, setName] = useState('');
+  const [name, setName] = useRecoilState(userNameState);
+  const feelingWeather = useRecoilValue(userFeelingWeatherState);
+  const feelingTimeZone = useRecoilValue(userFeelingTimeZoneState);
+  const notificationTime = useRecoilValue(userNotificationTimeState);
 
   useEffect(() => {
     const fetchUserSettings = async () => {
@@ -46,7 +56,7 @@ const AskOutro = () => {
         }
 
         const response = await fetch(
-          'https://waither.shop//user/setting/mypage',
+          'https://waither.shop/user/setting/mypage',
           {
             method: 'GET',
             headers: {
@@ -59,7 +69,6 @@ const AskOutro = () => {
 
         if (data.code === '200') {
           setName(data.result.nickname);
-          console.log(data);
         } else {
           console.log('Failed to fetch user settings:', data.message);
         }
@@ -69,7 +78,7 @@ const AskOutro = () => {
     };
 
     fetchUserSettings();
-  }, []);
+  }, [setName]);
 
   return (
     <Wrapper>
