@@ -1,6 +1,7 @@
-import React from 'react';
-import { useRecoilValue } from 'recoil';
+import React, { useEffect } from 'react';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import styled from 'styled-components/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import AskDataboxPng from '../assets/images/img-ask1-databox-check.png';
 import {
   userFeelingTimeZoneState,
@@ -40,10 +41,44 @@ const Bold = styled.Text`
 `;
 
 const AskOutro = () => {
-  const name = useRecoilValue(userNameState);
-  const feelingWeather = useRecoilValue(userFeelingWeatherState);
-  const feelingTimeZone = useRecoilValue(userFeelingTimeZoneState);
-  const notificationTime = useRecoilValue(userNotificationTimeState);
+  const [name, setName] = useRecoilState(userNameState);
+  const feelingWeather = useRecoilState(userFeelingWeatherState);
+  const feelingTimeZone = useRecoilState(userFeelingTimeZoneState);
+  const notificationTime = useRecoilState(userNotificationTimeState);
+
+  useEffect(() => {
+    const fetchUserSettings = async () => {
+      try {
+        const accessToken = await AsyncStorage.getItem('accessToken');
+        if (!accessToken) {
+          console.log('No access token found');
+          return;
+        }
+
+        const response = await fetch(
+          'https://waither.shop//user/setting/mypage',
+          {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          },
+        );
+
+        const data = await response.json();
+
+        if (data.code === '200') {
+          setName(data.result.nickname);
+        } else {
+          console.log('Failed to fetch user settings:', data.message);
+        }
+      } catch (error) {
+        console.log('Error fetching user settings:', error);
+      }
+    };
+
+    fetchUserSettings();
+  }, [setName]);
 
   return (
     <Wrapper>
