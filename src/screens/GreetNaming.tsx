@@ -109,6 +109,33 @@ const GreetNaming = () => {
     }
   };
 
+  const updateNickname = async (nickname) => {
+    try {
+      const accessToken = await AsyncStorage.getItem('accessToken');
+      if (!accessToken) {
+        console.log('No access token found');
+        return;
+      }
+
+      const response = await fetch('/user/nickname', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ nickname }),
+      });
+
+      if (response.ok) {
+        console.log('닉네임 업데이트 성공');
+      } else {
+        console.log('닉네임 업데이트 실패:', response.statusText);
+      }
+    } catch (error) {
+      console.log('Error updating nickname:', error);
+    }
+  };
+
   const handleSubmit = () => {
     if (isName) {
       storeName(name);

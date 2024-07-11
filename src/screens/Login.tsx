@@ -233,7 +233,7 @@ export default function Login({ navigation }) {
       {/* 화면 구성을 위한 변경 Register -> PasswordReset */}
       <EmailRegister
         onPress={() => {
-          navigation.navigate('Settings');
+          navigation.navigate('Greeting');
         }}
       >
         <EmailRegisterText>이메일로 회원가입</EmailRegisterText>
