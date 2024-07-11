@@ -1,9 +1,8 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useEffect } from 'react';
-import { useRecoilValue } from 'recoil';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import AskDataboxPng from '../assets/images/img-ask1-databox.png';
-import { userNameState } from '../recoil/userInitInfoRecoil';
 import { MAIN_COLOR } from '../styles/color';
 
 const Wrapper = styled.View`
@@ -36,10 +35,42 @@ const Bold = styled.Text`
 `;
 
 const AskIntro = () => {
-  const name = useRecoilValue(userNameState);
+  const [name, setName] = useState('');
   const navigation = useNavigation();
 
   useEffect(() => {
+    const fetchUserName = async () => {
+      try {
+        const accessToken = await AsyncStorage.getItem('accessToken');
+        if (!accessToken) {
+          console.log('No access token found');
+          return;
+        }
+
+        const response = await fetch(
+          'https://waither.shop/user/setting/mypage',
+          {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          },
+        );
+
+        const data = await response.json();
+
+        if (data.code === '200') {
+          setName(data.result.nickname);
+        } else {
+          console.log('Failed to fetch user settings:', data.message);
+        }
+      } catch (error) {
+        console.log('Error fetching user settings:', error);
+      }
+    };
+
+    fetchUserName();
+
     const timer = setTimeout(() => {
       navigation.navigate('AskWeather');
     }, 3000);

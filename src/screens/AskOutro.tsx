@@ -1,14 +1,7 @@
-import React, { useEffect } from 'react';
-import { useRecoilState, useSetRecoilState } from 'recoil';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AskDataboxPng from '../assets/images/img-ask1-databox-check.png';
-import {
-  userFeelingTimeZoneState,
-  userFeelingWeatherState,
-  userNameState,
-  userNotificationTimeState,
-} from '../recoil/userInitInfoRecoil';
 import { MAIN_COLOR } from '../styles/color';
 
 const Wrapper = styled.View`
@@ -41,10 +34,7 @@ const Bold = styled.Text`
 `;
 
 const AskOutro = () => {
-  const [name, setName] = useRecoilState(userNameState);
-  const feelingWeather = useRecoilState(userFeelingWeatherState);
-  const feelingTimeZone = useRecoilState(userFeelingTimeZoneState);
-  const notificationTime = useRecoilState(userNotificationTimeState);
+  const [name, setName] = useState('');
 
   useEffect(() => {
     const fetchUserSettings = async () => {
@@ -69,6 +59,7 @@ const AskOutro = () => {
 
         if (data.code === '200') {
           setName(data.result.nickname);
+          console.log(data);
         } else {
           console.log('Failed to fetch user settings:', data.message);
         }
@@ -78,7 +69,7 @@ const AskOutro = () => {
     };
 
     fetchUserSettings();
-  }, [setName]);
+  }, []);
 
   return (
     <Wrapper>
