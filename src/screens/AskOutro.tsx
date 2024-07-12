@@ -137,9 +137,10 @@ const AskOutro = () => {
           parseInt(notificationTime.slice(2, 4), 10),
         );
         const notificationFormatted = `${notificationHour}:${notificationMinute}:00`;
+        console.log(notificationFormatted);
 
         const notificationResponse = await fetch(
-          'https://waither.shop/setting/noti/out-alert-set',
+          'https://waither.shop/user/setting/noti/out-alert-set',
           {
             method: 'PUT',
             headers: {
@@ -147,21 +148,14 @@ const AskOutro = () => {
               Authorization: `Bearer ${accessToken}`,
             },
             body: JSON.stringify({
-              days: [
-                'Monday',
-                'Tuesday',
-                'Wednesday',
-                'Thursday',
-                'Friday',
-                'Saturday',
-                'Sunday',
-              ],
+              days: ['Monday', 'Tuesday'],
               outTime: notificationFormatted,
             }),
           },
         );
 
         if (!notificationResponse.ok) {
+          console.log(notificationResponse);
           console.log(
             'Failed to set notification:',
             notificationResponse.statusText,
