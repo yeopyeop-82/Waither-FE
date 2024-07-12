@@ -175,13 +175,13 @@ const CompanyLocationTitle = styled.Text`
 `;
 
 const CompanySetting = () => {
-  const [isCompanyReportToggleEnabled, setIsCompanyReportToggleEnabled] =
-    useState();
   const [isCompanyReportEnabled, setIsCompanyReportEnabled] = useState();
   const [searchedLocation, setsearchedLocation] = useState('');
   const [companyLocationList, setCompanyLocationList] = useState([]);
   const [userPresentCompanyLocation, setUserPresentCompanyLocation] =
     useState(null);
+
+  const [isLoading, setIsLoading] = useState(false);
 
   //=================================================================================
 
@@ -193,14 +193,22 @@ const CompanySetting = () => {
     useState(null);
 
   const toggleSwitch = () => {
-    setIsCompanyReportToggleEnabled((previousState) => !previousState);
-    setIsCompanyReportEnabled(isCompanyReportToggleEnabled);
+    setIsCompanyReportEnabled((previousState) => !previousState);
   };
 
   const onChangeCompanyLocation = (text) => {
     setsearchedLocation(text);
   };
 
+  useEffect(() => {
+    setSelectedLocation;
+    onChangeCompanyLocation;
+    if (isLoading) {
+      companyLocationGet();
+    }
+  }, [searchedLocation]);
+
+  console.log(searchedLocation);
   const onPressSelectedLocation = (value) => {
     setSelectedLocation(value);
   };
@@ -213,8 +221,11 @@ const CompanySetting = () => {
   };
 
   useEffect(() => {
-    setIsCompanyReportEnabled(isCompanyReportToggleEnabled);
-  }, [setIsCompanyReportEnabled, isCompanyReportToggleEnabled]);
+    setIsCompanyReportEnabled;
+    if (isLoading) {
+      companyReportPut();
+    }
+  }, [isCompanyReportEnabled]);
 
   // ===============================================================
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -248,7 +259,6 @@ const CompanySetting = () => {
       }
       const data = await response.json();
       setCompanyLocationList(data.documents);
-      // console.log(data);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -327,13 +337,17 @@ const CompanySetting = () => {
       const data = await response.json();
 
       setUserPresentCompanyLocation(data.result.regionName);
-      console.log(data.result.regionName);
+      setIsCompanyReportEnabled(data.result.regionReport);
+      setIsLoading(true);
+      console.log(data);
     } catch (error) {
       console.log('Error fetching data: 현재 작장 지역 Get');
     }
   };
 
-  presentCompanyLocationGet();
+  useEffect(() => {
+    presentCompanyLocationGet();
+  }, []);
 
   //===============================================================
 
@@ -360,9 +374,8 @@ const CompanySetting = () => {
           </CustomServiceSubTitle>
         </CustomServiceTitleView>
         <ToggleSwitch
-          value={isCompanyReportToggleEnabled}
+          value={isCompanyReportEnabled}
           onValueChange={toggleSwitch}
-          onTouchStart={companyReportPut}
           //toggle 활성화 여부에 따른 색상 설정
           trackColor={{ false: '#767577', true: `${MAIN_COLOR}` }}
         ></ToggleSwitch>
@@ -401,7 +414,6 @@ const CompanySetting = () => {
                 <Pngwing width={25} height={25} style={{ zIndex: 1 }}></Pngwing>
                 <SearchedLocationTextInput
                   onChangeText={onChangeCompanyLocation}
-                  onChange={companyLocationGet}
                   value={searchedLocation}
                 ></SearchedLocationTextInput>
                 <SearchCompanyCancleBtn onPress={handleDismissModalPress}>
