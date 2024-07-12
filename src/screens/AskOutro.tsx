@@ -1,6 +1,7 @@
-import React from 'react';
-import { useRecoilValue } from 'recoil';
+import React, { useEffect } from 'react';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import styled from 'styled-components/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import AskDataboxPng from '../assets/images/img-ask1-databox-check.png';
 import {
   userFeelingTimeZoneState,
@@ -40,10 +41,136 @@ const Bold = styled.Text`
 `;
 
 const AskOutro = () => {
-  const name = useRecoilValue(userNameState);
+  const [name, setName] = useRecoilState(userNameState);
   const feelingWeather = useRecoilValue(userFeelingWeatherState);
   const feelingTimeZone = useRecoilValue(userFeelingTimeZoneState);
   const notificationTime = useRecoilValue(userNotificationTimeState);
+
+  useEffect(() => {
+    const fetchUserSettings = async () => {
+      try {
+        const accessToken = await AsyncStorage.getItem('accessToken');
+        if (!accessToken) {
+          console.log('No access token found');
+          return;
+        }
+
+        const response = await fetch(
+          'https://waither.shop/user/setting/mypage',
+          {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          },
+        );
+
+        const data = await response.json();
+
+        if (data.code === '200') {
+          setName(data.result.nickname);
+        } else {
+          console.log('Failed to fetch user settings:', data.message);
+        }
+      } catch (error) {
+        console.log('Error fetching user settings:', error);
+      }
+    };
+
+    fetchUserSettings();
+  }, [setName]);
+
+  useEffect(() => {
+    const submitSurvey = async () => {
+      try {
+        const accessToken = await AsyncStorage.getItem('accessToken');
+        if (!accessToken) {
+          console.log('No access token found');
+          return;
+        }
+
+        const padToTwoDigits = (num) => num.toString().padStart(2, '0');
+
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const date = yesterday.toISOString().split('T')[0];
+        const timeHour = padToTwoDigits(parseInt(feelingTimeZone, 10));
+        const time = `${timeHour}:00:00`;
+
+        const surveyResponse = await fetch(
+          'https://waither.shop/user/survey/submit',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({
+              ans: parseInt(feelingWeather, 10),
+              time: `${date}T${time}`,
+            }),
+          },
+        );
+
+        if (!surveyResponse.ok) {
+          console.log('Failed to submit survey:', surveyResponse.statusText);
+        }
+      } catch (error) {
+        console.log('Error submitting survey:', error);
+      }
+    };
+
+    const setNotification = async () => {
+      try {
+        const accessToken = await AsyncStorage.getItem('accessToken');
+        if (!accessToken) {
+          console.log('No access token found');
+          return;
+        }
+
+        const padToTwoDigits = (num) => num.toString().padStart(2, '0');
+
+        const notificationHour = padToTwoDigits(
+          parseInt(notificationTime.slice(0, 2), 10),
+        );
+        const notificationMinute = padToTwoDigits(
+          parseInt(notificationTime.slice(2, 4), 10),
+        );
+        const notificationFormatted = `${notificationHour}:${notificationMinute}:00`;
+        console.log(notificationFormatted);
+
+        const notificationResponse = await fetch(
+          'https://waither.shop/user/setting/noti/out-alert-set',
+          {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({
+              days: ['Monday', 'Tuesday'],
+              outTime: notificationFormatted,
+            }),
+          },
+        );
+
+        if (!notificationResponse.ok) {
+          console.log(notificationResponse);
+          console.log(
+            'Failed to set notification:',
+            notificationResponse.statusText,
+          );
+        }
+      } catch (error) {
+        console.log('Error setting notification:', error);
+      }
+    };
+
+    if (feelingWeather && feelingTimeZone && notificationTime) {
+      submitSurvey();
+      setNotification();
+    }
+  }, [feelingWeather, feelingTimeZone, notificationTime]);
 
   return (
     <Wrapper>

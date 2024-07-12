@@ -188,7 +188,6 @@ const EmailLogin = ({ navigation }) => {
   const handleLogin = async () => {
     try {
       const response = await fetch('https://waither.shop/user/login', {
-        // 실제 API 엔드포인트 URL 사용
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -214,6 +213,7 @@ const EmailLogin = ({ navigation }) => {
           await AsyncStorage.setItem('accessToken', accessToken);
           await AsyncStorage.setItem('refreshToken', refreshToken);
 
+          console.log(accessToken);
           navigation.navigate('MainScreen');
         } else {
           console.error('Invalid response structure:', data);
