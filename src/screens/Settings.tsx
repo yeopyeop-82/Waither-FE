@@ -284,6 +284,7 @@ const Settings = () => {
         body: body,
       });
       if (!response.ok) {
+        console.log(response);
         throw new Error('Network response was not ok');
       }
       const res = await response.json();
