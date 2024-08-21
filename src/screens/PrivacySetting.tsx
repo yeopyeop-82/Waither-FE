@@ -286,6 +286,31 @@ const PrivacySetting = () => {
     }
   };
 
+  //회원탈퇴 호출
+  const WithdrawUserDelete = async () => {
+    const url = 'https://waither.shop/user/delete';
+
+    const headers = {
+      Authorization: authTokens.accessToken,
+      'Content-Type': 'application/json',
+    };
+
+    try {
+      const response = await fetch(url, {
+        method: 'DELETE',
+        headers: headers,
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      console.log('로그아웃 성공 status code:', response.status);
+    } catch (error) {
+      console.error('로그아웃 에러', error);
+    }
+  };
+
   //===============================================================
   return (
     <Wrapper>
@@ -362,17 +387,27 @@ const PrivacySetting = () => {
 
       <SettingsView>
         {[
-          { title: '비밀번호 재설정', navigate: 'PasswordReset' },
+          {
+            title: '비밀번호 재설정',
+            navigateToPasswordReset: 'PasswordReset',
+          },
           { title: '로그아웃', logout: onPressLogout },
-          { title: '회원탈퇴' },
+          {
+            title: '회원탈퇴',
+            withdraw: WithdrawUserDelete,
+            navigateToLogin: 'Login',
+          },
         ].map((setting, index) => (
           <SettingContainer key={index}>
             <SettingBtn
               onPress={() => {
                 if (index == 0) {
-                  navigation.navigate(setting.navigate);
+                  navigation.navigate(setting.navigateToPasswordReset);
                 } else if (index == 1) {
                   setting.logout();
+                } else {
+                  setting.withdraw();
+                  navigation.navigate(setting.navigateToLogin);
                 }
               }}
             >
