@@ -5,7 +5,7 @@ import settingBtn from '../assets/images/VectorArrow.png';
 import Databox from '../assets/images/ic-ask-databox.svg';
 import { useNavigation } from '@react-navigation/native';
 import Modal from 'react-native-modal';
-import authTokens from '../utils/authTokens';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Wrapper = styled.View`
   display: flex;
@@ -267,9 +267,11 @@ const Settings = () => {
   //사용자 맞춤형 서비스 제공 여부 호출
   const customServiceEnabledPut = async () => {
     const url = 'https://waither.shop/user/setting/custom';
+    const token = await AsyncStorage.getItem('accessToken');
+    const accessToken = 'Bearer ' + token;
 
     const headers = {
-      Authorization: authTokens.accessToken,
+      Authorization: accessToken,
       'Content-Type': 'application/json',
     };
 
@@ -296,9 +298,12 @@ const Settings = () => {
 
   const customServiceEnabledGet = async () => {
     const url = 'https://waither.shop/user/setting/custom';
+    const token = await AsyncStorage.getItem('accessToken');
+    console.log('토큰', token);
+    const accessToken = 'Bearer ' + token;
 
     const headers = {
-      Authorization: authTokens.accessToken,
+      Authorization: accessToken,
       'Content-Type': 'application/json',
     };
 
@@ -311,6 +316,7 @@ const Settings = () => {
         throw new Error('Network response was not ok');
       }
       const res = await response.json();
+
       setIsCustomServiceEnabled(res.result.custom);
       setIsLoading(true);
       console.log('Get 함수', res.result.custom);
