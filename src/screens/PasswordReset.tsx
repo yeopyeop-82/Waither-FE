@@ -8,6 +8,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { Alert } from 'react-native';
 import authTokens from '../utils/authTokens';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const Wrapper = styled.View`
   flex-direction: column;
   align-items: center;
@@ -123,7 +124,7 @@ const ReSettingBtnTitle = styled.Text`
   font-size: 17px;
 `;
 
-const TestPassword = 'test1111!';
+const TestPassword = 'test1234!';
 const PasswordReset = () => {
   const navigation = useNavigation();
   //현재 비밀번호 확인 버튼이 눌렸는지
@@ -228,9 +229,10 @@ const PasswordReset = () => {
   //비밀번호 변경 호출
   const changePasswordPut = async () => {
     const url = 'https://waither.shop/user/password';
-
+    const token = await AsyncStorage.getItem('accessToken');
+    const accessToken = 'Bearer ' + token;
     const headers = {
-      Authorization: authTokens.accessToken,
+      Authorization: accessToken,
       'Content-Type': 'application/json',
     };
 

@@ -299,7 +299,6 @@ const Settings = () => {
   const customServiceEnabledGet = async () => {
     const url = 'https://waither.shop/user/setting/custom';
     const token = await AsyncStorage.getItem('accessToken');
-    console.log('토큰', token);
     const accessToken = 'Bearer ' + token;
 
     const headers = {

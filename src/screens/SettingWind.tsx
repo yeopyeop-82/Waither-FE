@@ -8,6 +8,7 @@ import WindGroup from '../assets/images/wind_group.svg';
 import WindPowerImage from '../assets/images/wind_power.svg';
 import Slider from '@react-native-community/slider';
 import authTokens from '../utils/authTokens.js';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -109,17 +110,13 @@ const SettingWind = () => {
   }, [isCustomServiceEnabled, userWind]);
 
   //===============================================================
-
-  //Bearer 토큰
-  const authorization =
-    'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOlsiUk9MRV9VU0VSIl0sImlhdCI6MTcxOTgzMTYwMCwiZXhwIjozMzEzNDc0NTYwMH0.getDuds1kSPZ5SeiGtWukiq5qgLrKQiNnpZAX0f4-Ho';
-
   //바람 세기 호출
   const windPut = async () => {
     const url = 'https://waither.shop/user/setting/noti/wind';
-
+    const token = await AsyncStorage.getItem('accessToken');
+    const accessToken = 'Bearer ' + token;
     const headers = {
-      Authorization: authTokens.accessToken,
+      Authorization: accessToken,
       'Content-Type': 'application/json',
     };
 
@@ -146,9 +143,10 @@ const SettingWind = () => {
 
   const windGet = async () => {
     const url = 'https://waither.shop/user/setting/noti/wind';
-
+    const token = await AsyncStorage.getItem('accessToken');
+    const accessToken = 'Bearer ' + token;
     const headers = {
-      Authorization: authTokens.accessToken,
+      Authorization: accessToken,
       'Content-Type': 'application/json',
     };
 

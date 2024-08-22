@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
 import { MAIN_COLOR } from '../styles/color';
 import authTokens from '../utils/authTokens';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Wrapper = styled.View`
   display: flex;
@@ -87,9 +88,10 @@ const MainScreenSetting = () => {
   //사용자 메인화면 커스텀 호출
   const userDisplayCustomPatch = async () => {
     const url = 'https://waither.shop/user/setting/display';
-
+    const token = await AsyncStorage.getItem('accessToken');
+    const accessToken = 'Bearer ' + token;
     const headers = {
-      Authorization: authTokens.accessToken,
+      Authorization: accessToken,
       'Content-Type': 'application/json',
     };
 
@@ -118,9 +120,10 @@ const MainScreenSetting = () => {
   //사용자 메인화면 커스텀 호출
   const userDisplayCustomGet = async () => {
     const url = 'https://waither.shop/user/setting/display';
-
+    const token = await AsyncStorage.getItem('accessToken');
+    const accessToken = 'Bearer ' + token;
     const headers = {
-      Authorization: authTokens.accessToken,
+      Authorization: accessToken,
       'Content-Type': 'application/json',
     };
 

@@ -9,6 +9,7 @@ import { ERROR_COLOR, GREY_COLOR, MAIN_COLOR } from '../styles/color';
 import Error from '../assets/images/Error.png';
 import NotError from '../assets/images/notError.png';
 import authTokens from '../utils/authTokens';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -201,9 +202,10 @@ const PrivacySetting = () => {
   //사용자 정보 호출
   const userInfoGet = async () => {
     const url = 'https://waither.shop/user/setting/mypage';
-
+    const token = await AsyncStorage.getItem('accessToken');
+    const accessToken = 'Bearer ' + token;
     const headers = {
-      Authorization: authTokens.accessToken,
+      Authorization: accessToken,
       'Content-Type': 'application/json',
     };
 
@@ -233,9 +235,10 @@ const PrivacySetting = () => {
   //닉네임 변경 호출
   const nicknamePut = async () => {
     const url = 'https://waither.shop/user/nickname';
-
+    const token = await AsyncStorage.getItem('accessToken');
+    const accessToken = 'Bearer ' + token;
     const headers = {
-      Authorization: authTokens.accessToken,
+      Authorization: accessToken,
       'Content-Type': 'application/json',
     };
 
@@ -264,9 +267,10 @@ const PrivacySetting = () => {
   //로그아웃 호출
   const LogoutPost = async () => {
     const url = 'https://waither.shop/user/logout';
-
+    const token = await AsyncStorage.getItem('accessToken');
+    const accessToken = 'Bearer ' + token;
     const headers = {
-      Authorization: authTokens.accessToken,
+      Authorization: accessToken,
       'Content-Type': 'application/json',
     };
 
@@ -289,9 +293,10 @@ const PrivacySetting = () => {
   //회원탈퇴 호출
   const WithdrawUserDelete = async () => {
     const url = 'https://waither.shop/user/delete';
-
+    const token = await AsyncStorage.getItem('accessToken');
+    const accessToken = 'Bearer ' + token;
     const headers = {
-      Authorization: authTokens.accessToken,
+      Authorization: accessToken,
       'Content-Type': 'application/json',
     };
 
