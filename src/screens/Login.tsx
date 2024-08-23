@@ -9,7 +9,16 @@ import {
   KAKAO_LOGIN_COLOR,
   MAIN_COLOR,
 } from '../styles/color.js';
-import MainScreen from './MainScreen';
+
+import {
+  login,
+  logout,
+  getProfile as getKakaoProfile,
+  shippingAddresses as getKakaoShippingAddresses,
+  serviceTerms as getKakaoServiceTerms,
+  unlink,
+  KakaoOAuthToken,
+} from '@react-native-seoul/kakao-login';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -177,15 +186,32 @@ const LoginPopupGoodText = styled.Text`
 export default function Login({ navigation }) {
   const [isModalVisible, setModalVisible] = useState(false);
 
+  const [profile, setProfile] = useState('');
+
   const withOutLoginOnPress = () => {
     setModalVisible(!isModalVisible);
   };
 
+  const signInWithKakao = async (): Promise<void> => {
+    const result: KakaoOAuthToken = await login();
+    getProfile();
+    console.log('로그인 결과', result);
+  };
+  const getProfile = async (): Promise<void> => {
+    try {
+      const profile = await getKakaoProfile();
+      setProfile(JSON.stringify(profile));
+
+      console.log('프로필 조회', profile);
+    } catch (err) {
+      console.error('signOut error', err);
+    }
+  };
   return (
     <Wrapper>
       <Logo source={waitherLogo} />
       <LoginTitle>로그인</LoginTitle>
-      <KakaoLoginBtn onPress={() => navigation.navigate('Web')}>
+      <KakaoLoginBtn onPress={signInWithKakao}>
         <KakaoImage source={KakaoLogo} />
         <KaKaoLoginTitle>Kakao로 계속하기</KaKaoLoginTitle>
       </KakaoLoginBtn>

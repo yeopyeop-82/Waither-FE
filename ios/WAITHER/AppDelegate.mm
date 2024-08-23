@@ -3,6 +3,7 @@
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTLinkingManager.h>
 #import "RNSplashScreen.h"
+#import <RNKakaoLogins.h>
 
 @implementation AppDelegate
 
@@ -46,6 +47,7 @@
   return [super application:application continueUserActivity:userActivity restorationHandler:restorationHandler] || result;
 }
 
+
 // Explicitly define remote notification delegates to ensure compatibility with some third-party libraries
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
 {
@@ -63,5 +65,6 @@
 {
   return [super application:application didReceiveRemoteNotification:userInfo fetchCompletionHandler:completionHandler];
 }
+
 
 @end
