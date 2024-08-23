@@ -19,7 +19,9 @@
   [super application:application didFinishLaunchingWithOptions:launchOptions];
   //SplashScreen
   [RNSplashScreen show];  // 추가
-  return YES; // 추가 
+  // [RNBackgroundFetch configure];
+//  [RNBackgroundFetch setDelegate:self];
+  return YES; // 추가
 }
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
@@ -66,19 +68,12 @@
   return [super application:application didReceiveRemoteNotification:userInfo fetchCompletionHandler:completionHandler];
 }
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-{
-  // [RNBackgroundFetch configure];
-  [RNBackgroundFetch setDelegate:self];
 
-  return YES;
-}
-
-// Optional: method for handling background fetch events
-- (void)performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
-{
-  [RNBackgroundFetch performFetchWithCompletionHandler:completionHandler];
-}
+//// Optional: method for handling background fetch events
+//- (void)performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
+//{
+//  [RNBackgroundFetch performFetchWithCompletionHandler:completionHandler];
+//}
 
 
 @end

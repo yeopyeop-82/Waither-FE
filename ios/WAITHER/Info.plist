@@ -36,7 +36,14 @@
       
     <key>KAKAO_APP_KEY</key>
     <string>e4d22841db9ebef546c5e7b36489e737</string>
-      
+
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>서비스 동작을 위해 위치 정보가 필요합니다</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>서비스 동작을 위해 위치 정보가 필요합니다</string>
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>서비스 동작을 위해 위치 정보가 필요합니다</string>
+     
     <key>LSRequiresIPhoneOS</key>
     <true/>
     <key>NSAppTransportSecurity</key>

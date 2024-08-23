@@ -1,6 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import SplashScreen from 'react-native-splash-screen';
 import Toast from 'react-native-toast-message';
 import { RecoilRoot } from 'recoil';
@@ -28,17 +28,97 @@ import PrivacySetting from './src/screens/PrivacySetting';
 import MainScreen from './src/screens/MainScreen';
 import Notifications from './src/screens/Notifications';
 import Report from './src/screens/Report';
-import WebView from 'react-native-webview';
 import Web from './src/screens/Web';
+import BackgroundFetch from 'react-native-background-fetch';
+import Geolocation from 'react-native-geolocation-service';
+import { Platform } from 'react-native';
+
+async function requestPermission() {
+  try {
+    if (Platform.OS === 'ios') {
+      return await Geolocation.requestAuthorization('always');
+    }
+  } catch (e) {
+    console.log(e);
+  }
+}
 
 export default function App() {
   const Stack = createNativeStackNavigator();
+  const [location, setLocation] = useState({
+    latitude: null,
+    longtitude: null,
+  });
   useEffect(() => {
     if (SplashScreen) {
       SplashScreen.hide();
     }
+    backgroundStart();
   }, []);
 
+  //-----------------------------------------
+  const backgroundStart = () => {
+    BackgroundFetch.configure(
+      {
+        //백그라운드 실행시간
+        minimumFetchInterval: 15,
+        forceAlarmManager: false,
+        stopOnTerminate: false,
+        startOnBoot: true,
+        requiredNetworkType: BackgroundFetch.NETWORK_TYPE_NONE,
+        requiresCharging: false,
+        requiresDeviceIdle: false,
+        requiresBatteryNotLow: false,
+        requiresStorageNotLow: false,
+      },
+
+      async (taskId) => {
+        // BackgroundFetch.start();
+        console.log('[js] 백그라운드 페치 이벤트 수신:', taskId);
+        BackgroundFetch.finish(taskId);
+      },
+      (error) => {
+        console.log('[js ] RNBackgroundFetch 를 시작하지 못했습니다');
+      },
+    );
+    BackgroundFetch.status((status) => {
+      switch (status) {
+        case BackgroundFetch.STATUS_RESTRICTED:
+          console.log('BackgroundFetch가 제한됨');
+          break;
+        case BackgroundFetch.STATUS_DENIED:
+          console.log('BackgroundFetch가 거부됨');
+          break;
+        case BackgroundFetch.STATUS_AVAILABLE:
+          console.log('BackgroundFetch가 활성화되었습니다');
+          break;
+      }
+    });
+    requestPermission().then((result) => {
+      if (result === 'granted') {
+        Geolocation.getCurrentPosition(
+          (pos) => {
+            console.log(pos);
+            setLocation({
+              latitude: pos.coords.latitude,
+              longtitude: pos.coords.longitude,
+            });
+            console.log(location);
+          },
+          (error) => {
+            console.log(error);
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 3600,
+            maximumAge: 3600,
+          },
+        );
+      }
+    });
+  };
+
+  //==========================================================
   return (
     <RecoilRoot>
       <NavigationContainer>
