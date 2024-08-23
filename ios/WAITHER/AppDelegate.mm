@@ -4,7 +4,7 @@
 #import <React/RCTLinkingManager.h>
 #import "RNSplashScreen.h"
 #import <RNKakaoLogins.h>
-
+#import "RNBackgroundFetch.h"
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -64,6 +64,20 @@
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
 {
   return [super application:application didReceiveRemoteNotification:userInfo fetchCompletionHandler:completionHandler];
+}
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+{
+  // [RNBackgroundFetch configure];
+  [RNBackgroundFetch setDelegate:self];
+
+  return YES;
+}
+
+// Optional: method for handling background fetch events
+- (void)performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
+{
+  [RNBackgroundFetch performFetchWithCompletionHandler:completionHandler];
 }
 
 
