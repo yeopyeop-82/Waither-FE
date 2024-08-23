@@ -7,6 +7,7 @@ import { useRecoilValue } from 'recoil';
 import Slider from '@react-native-community/slider';
 import { useNavigation } from '@react-navigation/native';
 import authTokens from '../utils/authTokens';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Wrapper = styled.View`
   display: flex;
@@ -186,9 +187,10 @@ const UserDataSetting = () => {
   //사용자 온도 민감도 호출
   const userWeightPut = async () => {
     const url = 'https://waither.shop/user/setting/user-weight';
-
+    const token = await AsyncStorage.getItem('accessToken');
+    const accessToken = 'Bearer ' + token;
     const headers = {
-      Authorization: authTokens.accessToken,
+      Authorization: accessToken,
       'Content-Type': 'application/json',
     };
 
@@ -217,9 +219,10 @@ const UserDataSetting = () => {
   //외출 요일 및 외출 시간대 호출
   const userWeightGet = async () => {
     const url = 'https://waither.shop/user/setting/user-weight';
-
+    const token = await AsyncStorage.getItem('accessToken');
+    const accessToken = 'Bearer ' + token;
     const headers = {
-      Authorization: authTokens.accessToken,
+      Authorization: accessToken,
       'Content-Type': 'application/json',
     };
 

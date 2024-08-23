@@ -17,6 +17,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { USER_WIDTH } from '../styles/dimension';
 import Pngwing from '../assets/images/pngwing.svg';
 import authTokens from '../utils/authTokens';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Wrapper = styled.View`
   display: flex;
@@ -267,9 +268,11 @@ const CompanySetting = () => {
   //직장 지역명, 위도, 경도 호출
   const companyLocationPut = async () => {
     const url = 'https://waither.shop/user/setting/region';
+    const token = await AsyncStorage.getItem('accessToken');
+    const accessToken = 'Bearer ' + token;
 
     const headers = {
-      Authorization: authTokens.accessToken,
+      Authorization: accessToken,
       'Content-Type': 'application/json',
     };
 
@@ -298,9 +301,10 @@ const CompanySetting = () => {
   //직장 지역 레포트 허용 여부 호출
   const companyReportPut = async () => {
     const url = 'https://waither.shop/user/setting/region-report';
-
+    const token = await AsyncStorage.getItem('accessToken');
+    const accessToken = 'Bearer ' + token;
     const headers = {
-      Authorization: authTokens.accessToken,
+      Authorization: accessToken,
       'Content-Type': 'application/json',
     };
 
@@ -325,8 +329,10 @@ const CompanySetting = () => {
   // 현재 직장 지역 호출
   const presentCompanyLocationGet = async () => {
     const url = 'https://waither.shop/user/setting/region';
+    const token = await AsyncStorage.getItem('accessToken');
+    const accessToken = 'Bearer ' + token;
     const headers = {
-      Authorization: authTokens.accessToken,
+      Authorization: accessToken,
     };
     try {
       const response = await fetch(url, {
@@ -337,7 +343,7 @@ const CompanySetting = () => {
       const data = await response.json();
 
       setUserPresentCompanyLocation(data.result.regionName);
-      setIsCompanyReportEnabled(data.result.regionReport);
+      setIsCompanyReportEnabled(data.result.region_Report);
       setIsLoading(true);
       console.log(data);
     } catch (error) {

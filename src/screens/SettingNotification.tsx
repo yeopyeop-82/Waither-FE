@@ -24,6 +24,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { USER_WIDTH } from '../styles/dimension';
 import { Picker } from '@react-native-picker/picker';
 import authTokens from '../utils/authTokens';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Wrapper = styled.View`
   display: flex;
@@ -421,9 +422,10 @@ const SettingNotification = () => {
   //외출 요일 및 외출 시간대 호출
   const notificationTimeZonePut = async () => {
     const url = 'https://waither.shop/user/setting/noti/out-alert-set';
-
+    const token = await AsyncStorage.getItem('accessToken');
+    const accessToken = 'Bearer ' + token;
     const headers = {
-      Authorization: authTokens.accessToken,
+      Authorization: accessToken,
       'Content-Type': 'application/json',
     };
 
@@ -451,9 +453,10 @@ const SettingNotification = () => {
   //외출 시간 알림 여부 호출
   const outAlertPut = async () => {
     const url = 'https://waither.shop/user/setting/noti/out-alert';
-
+    const token = await AsyncStorage.getItem('accessToken');
+    const accessToken = 'Bearer ' + token;
     const headers = {
-      Authorization: authTokens.accessToken,
+      Authorization: accessToken,
       'Content-Type': 'application/json',
     };
 
@@ -480,9 +483,10 @@ const SettingNotification = () => {
   //기상 특보 알림 여부 호출
   const climateAlertPut = async () => {
     const url = 'https://waither.shop/user/setting/noti/climate-alert';
-
+    const token = await AsyncStorage.getItem('accessToken');
+    const accessToken = 'Bearer ' + token;
     const headers = {
-      Authorization: authTokens.accessToken,
+      Authorization: accessToken,
       'Content-Type': 'application/json',
     };
 
@@ -509,9 +513,10 @@ const SettingNotification = () => {
   //사용자 맞춤 예보 여부 호출
   const userAlertPut = async () => {
     const url = 'https://waither.shop/user/setting/noti/user-alert';
-
+    const token = await AsyncStorage.getItem('accessToken');
+    const accessToken = 'Bearer ' + token;
     const headers = {
-      Authorization: authTokens.accessToken,
+      Authorization: accessToken,
       'Content-Type': 'application/json',
     };
 
@@ -538,9 +543,10 @@ const SettingNotification = () => {
   //강설 정보 여부 호출
   const snowAlertPut = async () => {
     const url = 'https://waither.shop/user/setting/noti/snow-alert';
-
+    const token = await AsyncStorage.getItem('accessToken');
+    const accessToken = 'Bearer ' + token;
     const headers = {
-      Authorization: authTokens.accessToken,
+      Authorization: accessToken,
       'Content-Type': 'application/json',
     };
 
@@ -567,9 +573,10 @@ const SettingNotification = () => {
   //알림 설정 정보 호출
   const userNotiSettingsGet = async () => {
     const url = 'https://waither.shop/user/setting/noti';
-
+    const token = await AsyncStorage.getItem('accessToken');
+    const accessToken = 'Bearer ' + token;
     const headers = {
-      Authorization: authTokens.accessToken,
+      Authorization: accessToken,
       'Content-Type': 'application/json',
     };
 
