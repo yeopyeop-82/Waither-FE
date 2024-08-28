@@ -32,6 +32,7 @@ import Web from './src/screens/Web';
 import BackgroundFetch from 'react-native-background-fetch';
 import Geolocation from 'react-native-geolocation-service';
 import { Platform } from 'react-native';
+import { AppState } from 'react-native';
 
 async function requestPermission() {
   try {
@@ -45,22 +46,37 @@ async function requestPermission() {
 
 export default function App() {
   const Stack = createNativeStackNavigator();
+  const [appState, setAppState] = useState(AppState.currentState);
   const [location, setLocation] = useState({
     latitude: null,
     longtitude: null,
   });
+
+  //-----------------------------------------
   useEffect(() => {
     if (SplashScreen) {
       SplashScreen.hide();
     }
     backgroundStart();
+    const subscription = AppState.addEventListener(
+      'change',
+      handleAppStateChange,
+    );
+    return () => {
+      subscription.remove();
+    };
   }, []);
 
+  //-----------------------------------------
+
+  const handleAppStateChange = (nextAppState) => {
+    console.log('현재 앱 상태:', nextAppState);
+    setAppState(nextAppState);
+  };
   //-----------------------------------------
   const backgroundStart = () => {
     BackgroundFetch.configure(
       {
-        //백그라운드 실행시간
         minimumFetchInterval: 15,
         forceAlarmManager: false,
         stopOnTerminate: false,
@@ -73,14 +89,51 @@ export default function App() {
       },
 
       async (taskId) => {
-        // BackgroundFetch.start();
         console.log('[js] 백그라운드 페치 이벤트 수신:', taskId);
+        requestPermission().then((result) => {
+          if (result === 'granted') {
+            Geolocation.getCurrentPosition(
+              async (pos) => {
+                setLocation({
+                  latitude: pos.coords.latitude,
+                  longtitude: pos.coords.longitude,
+                });
+                console.log('백그라운드 실행 시 위치 출력: ', location);
+              },
+              (error) => {
+                console.log(error);
+              },
+              {
+                enableHighAccuracy: true,
+                timeout: 3600,
+                maximumAge: 3600,
+              },
+            );
+          }
+        });
+        //-----------------------------------------
+        // switch (taskId) {
+        //   case 'putLocation':
+        //     console.log('사용자 위치 전송');
+        //     console.log('백그라운드 위치 출력', location);
+        //     break;
+        //   default:
+        //     console.log('기본 페치 작업');
+        //     break;
+        // }
         BackgroundFetch.finish(taskId);
       },
       (error) => {
-        console.log('[js ] RNBackgroundFetch 를 시작하지 못했습니다');
+        console.log('[js] RNBackgroundFetch를 시작하지 못했습니다:', error);
       },
     );
+    //-----------------------------------------
+    // BackgroundFetch.scheduleTask({
+    //   taskId: ' putLocation',
+    //   forceAlarmManager: true,
+    //   delay: 1000,
+    // });
+    //-----------------------------------------
     BackgroundFetch.status((status) => {
       switch (status) {
         case BackgroundFetch.STATUS_RESTRICTED:
@@ -91,29 +144,8 @@ export default function App() {
           break;
         case BackgroundFetch.STATUS_AVAILABLE:
           console.log('BackgroundFetch가 활성화되었습니다');
+
           break;
-      }
-    });
-    requestPermission().then((result) => {
-      if (result === 'granted') {
-        Geolocation.getCurrentPosition(
-          (pos) => {
-            console.log(pos);
-            setLocation({
-              latitude: pos.coords.latitude,
-              longtitude: pos.coords.longitude,
-            });
-            console.log(location);
-          },
-          (error) => {
-            console.log(error);
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 3600,
-            maximumAge: 3600,
-          },
-        );
       }
     });
   };
