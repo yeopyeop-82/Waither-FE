@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import styled from 'styled-components/native';
 import NotificationIcon from '../assets/images/ic-main-noti-unread.svg';
@@ -14,7 +14,9 @@ import FineDustIcon from '../assets/images/ic_finedust.svg';
 import ShowerIcon from '../assets/images/ic-shower.svg';
 import CloudyIcon from '../assets/images/ic-cloudy.svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, NavigationProp } from '@react-navigation/native';
+import { useRecoilState } from 'recoil';
+import { userNameState } from '../recoil/userInitInfoRecoil';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -257,10 +259,15 @@ const MainWeatherByHourTemperature = styled.Text`
   margin-top: 7px;
 `;
 
-const MainScreen = ({ navigation }) => {
+type Props = {
+  navigation: NavigationProp<any>;
+};
+
+const MainScreen: React.FC<Props> = ({ navigation }) => {
   const [showWind, setShowWind] = useState(false);
   const [showPrecipitation, setShowPrecipitation] = useState(false);
   const [showDust, setShowDust] = useState(false);
+  const [name, setName] = useRecoilState(userNameState);
 
   const hourlyWeatherData = [
     {
@@ -340,6 +347,23 @@ const MainScreen = ({ navigation }) => {
     } catch (error) {
       console.error('Error fetching settings:', error);
     }
+
+    try {
+      const response = await fetch('https://waither.shop/user/setting/mypage', {
+        method: 'GET',
+        headers: {
+          accept: '*/*',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const result = await response.json();
+      if (result.code === '200') {
+        setName(result.result.nickname);
+      }
+    } catch (error) {
+      console.error('Error fetching userName: ', error);
+    }
   };
 
   useFocusEffect(
@@ -394,7 +418,9 @@ const MainScreen = ({ navigation }) => {
               <WaitherIcon height={50} width={50} />
             </MainAccentIcon>
             <MainAccentTextView>
-              <MainAccentTitle>OO님이 춥다고 답변하셨던 날씨</MainAccentTitle>
+              <MainAccentTitle>
+                {name}님이 춥다고 답변하셨던 날씨
+              </MainAccentTitle>
               <MainAccentText>오늘은 따뜻하게 입으세요 !</MainAccentText>
             </MainAccentTextView>
           </MainAccentView>
