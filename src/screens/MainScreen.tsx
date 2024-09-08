@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import styled from 'styled-components/native';
 import NotificationIcon from '../assets/images/ic-main-noti-unread.svg';
@@ -14,6 +14,7 @@ import FineDustIcon from '../assets/images/ic_finedust.svg';
 import ShowerIcon from '../assets/images/ic-shower.svg';
 import CloudyIcon from '../assets/images/ic-cloudy.svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -314,37 +315,38 @@ const MainScreen = ({ navigation }) => {
     },
   ];
 
-  useEffect(() => {
-    const fetchUserSettings = async () => {
-      const token = await AsyncStorage.getItem('accessToken'); // 토큰 가져오기
+  const fetchUserSettings = async () => {
+    const token = await AsyncStorage.getItem('accessToken'); // 토큰 가져오기
 
-      try {
-        const response = await fetch(
-          'https://waither.shop/user/setting/display',
-          {
-            method: 'GET',
-            headers: {
-              accept: '*/*',
-              Authorization: `Bearer ${token}`,
-            },
+    try {
+      const response = await fetch(
+        'https://waither.shop/user/setting/display',
+        {
+          method: 'GET',
+          headers: {
+            accept: '*/*',
+            Authorization: `Bearer ${token}`,
           },
-        );
+        },
+      );
 
-        const result = await response.json();
-        if (result.code === '200') {
-          const { wind, precipitation, dust } = result.result;
-          setShowWind(wind);
-          setShowPrecipitation(precipitation);
-          setShowDust(dust);
-          console.log(result);
-        }
-      } catch (error) {
-        console.error('Error fetching settings:', error);
+      const result = await response.json();
+      if (result.code === '200') {
+        const { wind, precipitation, dust } = result.result;
+        setShowWind(wind);
+        setShowPrecipitation(precipitation);
+        setShowDust(dust);
       }
-    };
+    } catch (error) {
+      console.error('Error fetching settings:', error);
+    }
+  };
 
-    fetchUserSettings();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchUserSettings(); // 화면이 포커스를 받을 때마다 설정값을 새로 가져옴
+    }, []),
+  );
 
   return (
     <Wrapper>
@@ -417,45 +419,50 @@ const MainScreen = ({ navigation }) => {
               <RainWithCloudIcon />
             </MainWeatherIconView>
           </MainWeatherView>
-          <MainExtraWeatherView>
-            {showWind && (
-              <MainExtraWeatherViewColumn>
-                <MainExtraWeatherTitleView>
-                  <MainExtraWeatherTitle>풍향/풍속</MainExtraWeatherTitle>
-                </MainExtraWeatherTitleView>
-                <WindIcon />
-                <MainExtraWeatherInfoView>
-                  <MainExtraWeatherInfoText>남동</MainExtraWeatherInfoText>
-                  <MainExtraWeatherTextDivider />
-                  <MainExtraWeatherInfoText>2m/s~4m/s</MainExtraWeatherInfoText>
-                </MainExtraWeatherInfoView>
-              </MainExtraWeatherViewColumn>
-            )}
-            {showPrecipitation && (
-              <MainExtraWeatherViewColumn>
-                <MainExtraWeatherTitleView>
-                  <MainExtraWeatherTitle>강수량</MainExtraWeatherTitle>
-                </MainExtraWeatherTitleView>
-                <CloudIcon />
-                <MainExtraWeatherInfoView>
-                  <MainExtraWeatherInfoText>1~3mm</MainExtraWeatherInfoText>
-                </MainExtraWeatherInfoView>
-              </MainExtraWeatherViewColumn>
-            )}
-            {showDust && (
-              <MainExtraWeatherViewColumn>
-                <MainExtraWeatherTitleView>
-                  <MainExtraWeatherTitle>미세먼지</MainExtraWeatherTitle>
-                </MainExtraWeatherTitleView>
-                <FineDustIcon />
-                <MainExtraWeatherInfoView>
-                  <MainExtraWeatherInfoText>좋음</MainExtraWeatherInfoText>
-                  <MainExtraWeatherTextDivider />
-                  <MainExtraWeatherInfoText>20㎍/m³</MainExtraWeatherInfoText>
-                </MainExtraWeatherInfoView>
-              </MainExtraWeatherViewColumn>
-            )}
-          </MainExtraWeatherView>
+          {/* 조건부 렌더링: 세 가지 설정이 모두 false일 때 MainExtraWeatherView를 숨깁니다. */}
+          {(showWind || showPrecipitation || showDust) && (
+            <MainExtraWeatherView>
+              {showWind && (
+                <MainExtraWeatherViewColumn>
+                  <MainExtraWeatherTitleView>
+                    <MainExtraWeatherTitle>풍향/풍속</MainExtraWeatherTitle>
+                  </MainExtraWeatherTitleView>
+                  <WindIcon />
+                  <MainExtraWeatherInfoView>
+                    <MainExtraWeatherInfoText>남동</MainExtraWeatherInfoText>
+                    <MainExtraWeatherTextDivider />
+                    <MainExtraWeatherInfoText>
+                      2m/s~4m/s
+                    </MainExtraWeatherInfoText>
+                  </MainExtraWeatherInfoView>
+                </MainExtraWeatherViewColumn>
+              )}
+              {showPrecipitation && (
+                <MainExtraWeatherViewColumn>
+                  <MainExtraWeatherTitleView>
+                    <MainExtraWeatherTitle>강수량</MainExtraWeatherTitle>
+                  </MainExtraWeatherTitleView>
+                  <CloudIcon />
+                  <MainExtraWeatherInfoView>
+                    <MainExtraWeatherInfoText>1~3mm</MainExtraWeatherInfoText>
+                  </MainExtraWeatherInfoView>
+                </MainExtraWeatherViewColumn>
+              )}
+              {showDust && (
+                <MainExtraWeatherViewColumn>
+                  <MainExtraWeatherTitleView>
+                    <MainExtraWeatherTitle>미세먼지</MainExtraWeatherTitle>
+                  </MainExtraWeatherTitleView>
+                  <FineDustIcon />
+                  <MainExtraWeatherInfoView>
+                    <MainExtraWeatherInfoText>좋음</MainExtraWeatherInfoText>
+                    <MainExtraWeatherTextDivider />
+                    <MainExtraWeatherInfoText>20㎍/m³</MainExtraWeatherInfoText>
+                  </MainExtraWeatherInfoView>
+                </MainExtraWeatherViewColumn>
+              )}
+            </MainExtraWeatherView>
+          )}
           <MainWeatherByHourScrollView
             horizontal={true}
             showsHorizontalScrollIndicator={false}
