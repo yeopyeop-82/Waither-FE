@@ -67,6 +67,11 @@ export default function App() {
     };
   }, []);
 
+  useEffect(() => {
+    if (location.latitude && location.longtitude) {
+      console.log('위치 업데이트됨:', location);
+    }
+  }, [location]);
   //-----------------------------------------
 
   const handleAppStateChange = (nextAppState) => {
@@ -78,7 +83,7 @@ export default function App() {
     BackgroundFetch.configure(
       {
         minimumFetchInterval: 15,
-        forceAlarmManager: false,
+        forceAlarmManager: true,
         stopOnTerminate: false,
         startOnBoot: true,
         requiredNetworkType: BackgroundFetch.NETWORK_TYPE_NONE,
@@ -87,40 +92,39 @@ export default function App() {
         requiresBatteryNotLow: false,
         requiresStorageNotLow: false,
       },
-
       async (taskId) => {
         console.log('[js] 백그라운드 페치 이벤트 수신:', taskId);
-        requestPermission().then((result) => {
-          if (result === 'granted') {
-            Geolocation.getCurrentPosition(
-              async (pos) => {
-                setLocation({
-                  latitude: pos.coords.latitude,
-                  longtitude: pos.coords.longitude,
-                });
-                console.log('백그라운드 실행 시 위치 출력: ', location);
-              },
-              (error) => {
-                console.log(error);
-              },
-              {
-                enableHighAccuracy: true,
-                timeout: 3600,
-                maximumAge: 3600,
-              },
-            );
-          }
-        });
         //-----------------------------------------
-        // switch (taskId) {
-        //   case 'putLocation':
-        //     console.log('사용자 위치 전송');
-        //     console.log('백그라운드 위치 출력', location);
-        //     break;
-        //   default:
-        //     console.log('기본 페치 작업');
-        //     break;
-        // }
+        switch (taskId) {
+          case 'com.transistorsoft.fetch':
+            requestPermission().then((result) => {
+              if (result === 'granted') {
+                Geolocation.getCurrentPosition(
+                  async (pos) => {
+                    setLocation({
+                      latitude: pos.coords.latitude,
+                      longtitude: pos.coords.longitude,
+                    });
+                    console.log('스케줄 함수 속 위치 불러오가: ', location);
+                  },
+                  (error) => {
+                    console.log(error);
+                  },
+                  {
+                    enableHighAccuracy: true,
+                    timeout: 3600,
+                    maximumAge: 3600,
+                  },
+                );
+              }
+            });
+            console.log('사용자 위치 전송, 백그라운드 성공');
+            console.log('스케쥴 성공 후 위치 출력', location);
+            break;
+          default:
+            console.log('기본 페치 작업');
+            break;
+        }
         BackgroundFetch.finish(taskId);
       },
       (error) => {
@@ -128,11 +132,14 @@ export default function App() {
       },
     );
     //-----------------------------------------
-    // BackgroundFetch.scheduleTask({
-    //   taskId: ' putLocation',
-    //   forceAlarmManager: true,
-    //   delay: 1000,
-    // });
+    BackgroundFetch.scheduleTask({
+      taskId: 'com.transistorsoft.fetch',
+      forceAlarmManager: true,
+      delay: 1000,
+      periodic: true,
+    });
+
+    console.log('백그라운드 작업 예약 완료');
     //-----------------------------------------
     BackgroundFetch.status((status) => {
       switch (status) {
@@ -144,7 +151,6 @@ export default function App() {
           break;
         case BackgroundFetch.STATUS_AVAILABLE:
           console.log('BackgroundFetch가 활성화되었습니다');
-
           break;
       }
     });
