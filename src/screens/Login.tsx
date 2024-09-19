@@ -206,7 +206,7 @@ export default function Login({ navigation }) {
     const result: KakaoOAuthToken = await login();
     getProfile();
     setAccessToken(result.accessToken);
-    console.log('로그인 결과', result);
+    // console.log('로그인 결과', result);
     KakaoLoginPost();
   };
   //--------------------------------------------------
@@ -218,7 +218,7 @@ export default function Login({ navigation }) {
       setNickname(profile.nickname);
       setId(profile.id);
 
-      console.log('프로필 조회', profile);
+      // console.log('프로필 조회', profile);
     } catch (err) {
       console.error('signOut error', err);
     }
@@ -245,18 +245,23 @@ export default function Login({ navigation }) {
 
       if (!response.ok) {
         console.log(response.status);
-        throw new Error('Network response was not ok');
+        // throw new Error('Network response was not ok');
       }
+
       const res = await response.json();
+
+      //-------------------------------------------------------------------------------
       if (res.result && res.result.accessToken && res.result.refreshToken) {
         const { accessToken, refreshToken } = res.result;
 
         await AsyncStorage.setItem('accessToken', accessToken);
         await AsyncStorage.setItem('refreshToken', refreshToken);
-
         console.log(accessToken);
         navigation.navigate('MainScreen');
+      } else {
+        console.error('Invalid response structure:', res);
       }
+      //-------------------------------------------------------------------------------
 
       console.log('카카오 로그인', res);
     } catch (error) {
