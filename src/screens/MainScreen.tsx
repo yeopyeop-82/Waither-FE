@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import styled from 'styled-components/native';
 import NotificationIcon from '../assets/images/ic-main-noti-unread.svg';
@@ -13,6 +13,10 @@ import CloudIcon from '../assets/images/ic_cloud.svg';
 import FineDustIcon from '../assets/images/ic_finedust.svg';
 import ShowerIcon from '../assets/images/ic-shower.svg';
 import CloudyIcon from '../assets/images/ic-cloudy.svg';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect, NavigationProp } from '@react-navigation/native';
+import { useRecoilState } from 'recoil';
+import { userNameState } from '../recoil/userInitInfoRecoil';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -255,7 +259,16 @@ const MainWeatherByHourTemperature = styled.Text`
   margin-top: 7px;
 `;
 
-const MainScreen = ({ navigation }) => {
+type Props = {
+  navigation: NavigationProp<any>;
+};
+
+const MainScreen: React.FC<Props> = ({ navigation }) => {
+  const [showWind, setShowWind] = useState(false);
+  const [showPrecipitation, setShowPrecipitation] = useState(false);
+  const [showDust, setShowDust] = useState(false);
+  const [name, setName] = useRecoilState(userNameState);
+
   const hourlyWeatherData = [
     {
       time: '16시',
@@ -309,6 +322,56 @@ const MainScreen = ({ navigation }) => {
     },
   ];
 
+  const fetchUserSettings = async () => {
+    const token = await AsyncStorage.getItem('accessToken'); // 토큰 가져오기
+
+    try {
+      const response = await fetch(
+        'https://waither.shop/user/setting/display',
+        {
+          method: 'GET',
+          headers: {
+            accept: '*/*',
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const result = await response.json();
+      if (result.code === '200') {
+        const { wind, precipitation, dust } = result.result;
+        setShowWind(wind);
+        setShowPrecipitation(precipitation);
+        setShowDust(dust);
+      }
+    } catch (error) {
+      console.error('Error fetching settings:', error);
+    }
+
+    try {
+      const response = await fetch('https://waither.shop/user/setting/mypage', {
+        method: 'GET',
+        headers: {
+          accept: '*/*',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const result = await response.json();
+      if (result.code === '200') {
+        setName(result.result.nickname);
+      }
+    } catch (error) {
+      console.error('Error fetching userName: ', error);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchUserSettings(); // 화면이 포커스를 받을 때마다 설정값을 새로 가져옴
+    }, []),
+  );
+
   return (
     <Wrapper>
       <LinearGradient
@@ -355,7 +418,9 @@ const MainScreen = ({ navigation }) => {
               <WaitherIcon height={50} width={50} />
             </MainAccentIcon>
             <MainAccentTextView>
-              <MainAccentTitle>OO님이 춥다고 답변하셨던 날씨</MainAccentTitle>
+              <MainAccentTitle>
+                {name}님이 춥다고 답변하셨던 날씨
+              </MainAccentTitle>
               <MainAccentText>오늘은 따뜻하게 입으세요 !</MainAccentText>
             </MainAccentTextView>
           </MainAccentView>
@@ -380,39 +445,50 @@ const MainScreen = ({ navigation }) => {
               <RainWithCloudIcon />
             </MainWeatherIconView>
           </MainWeatherView>
-          <MainExtraWeatherView>
-            <MainExtraWeatherViewColumn>
-              <MainExtraWeatherTitleView>
-                <MainExtraWeatherTitle>풍향/풍속</MainExtraWeatherTitle>
-              </MainExtraWeatherTitleView>
-              <WindIcon />
-              <MainExtraWeatherInfoView>
-                <MainExtraWeatherInfoText>남동</MainExtraWeatherInfoText>
-                <MainExtraWeatherTextDivider />
-                <MainExtraWeatherInfoText>2m/s~4m/s</MainExtraWeatherInfoText>
-              </MainExtraWeatherInfoView>
-            </MainExtraWeatherViewColumn>
-            <MainExtraWeatherViewColumn>
-              <MainExtraWeatherTitleView>
-                <MainExtraWeatherTitle>강수량</MainExtraWeatherTitle>
-              </MainExtraWeatherTitleView>
-              <CloudIcon />
-              <MainExtraWeatherInfoView>
-                <MainExtraWeatherInfoText>1~3mm</MainExtraWeatherInfoText>
-              </MainExtraWeatherInfoView>
-            </MainExtraWeatherViewColumn>
-            <MainExtraWeatherViewColumn>
-              <MainExtraWeatherTitleView>
-                <MainExtraWeatherTitle>풍향/풍속</MainExtraWeatherTitle>
-              </MainExtraWeatherTitleView>
-              <FineDustIcon />
-              <MainExtraWeatherInfoView>
-                <MainExtraWeatherInfoText>좋음</MainExtraWeatherInfoText>
-                <MainExtraWeatherTextDivider />
-                <MainExtraWeatherInfoText>20㎍/m³</MainExtraWeatherInfoText>
-              </MainExtraWeatherInfoView>
-            </MainExtraWeatherViewColumn>
-          </MainExtraWeatherView>
+          {/* 조건부 렌더링: 세 가지 설정이 모두 false일 때 MainExtraWeatherView를 숨깁니다. */}
+          {(showWind || showPrecipitation || showDust) && (
+            <MainExtraWeatherView>
+              {showWind && (
+                <MainExtraWeatherViewColumn>
+                  <MainExtraWeatherTitleView>
+                    <MainExtraWeatherTitle>풍향/풍속</MainExtraWeatherTitle>
+                  </MainExtraWeatherTitleView>
+                  <WindIcon />
+                  <MainExtraWeatherInfoView>
+                    <MainExtraWeatherInfoText>남동</MainExtraWeatherInfoText>
+                    <MainExtraWeatherTextDivider />
+                    <MainExtraWeatherInfoText>
+                      2m/s~4m/s
+                    </MainExtraWeatherInfoText>
+                  </MainExtraWeatherInfoView>
+                </MainExtraWeatherViewColumn>
+              )}
+              {showPrecipitation && (
+                <MainExtraWeatherViewColumn>
+                  <MainExtraWeatherTitleView>
+                    <MainExtraWeatherTitle>강수량</MainExtraWeatherTitle>
+                  </MainExtraWeatherTitleView>
+                  <CloudIcon />
+                  <MainExtraWeatherInfoView>
+                    <MainExtraWeatherInfoText>1~3mm</MainExtraWeatherInfoText>
+                  </MainExtraWeatherInfoView>
+                </MainExtraWeatherViewColumn>
+              )}
+              {showDust && (
+                <MainExtraWeatherViewColumn>
+                  <MainExtraWeatherTitleView>
+                    <MainExtraWeatherTitle>미세먼지</MainExtraWeatherTitle>
+                  </MainExtraWeatherTitleView>
+                  <FineDustIcon />
+                  <MainExtraWeatherInfoView>
+                    <MainExtraWeatherInfoText>좋음</MainExtraWeatherInfoText>
+                    <MainExtraWeatherTextDivider />
+                    <MainExtraWeatherInfoText>20㎍/m³</MainExtraWeatherInfoText>
+                  </MainExtraWeatherInfoView>
+                </MainExtraWeatherViewColumn>
+              )}
+            </MainExtraWeatherView>
+          )}
           <MainWeatherByHourScrollView
             horizontal={true}
             showsHorizontalScrollIndicator={false}
