@@ -343,7 +343,8 @@ const CompanySetting = () => {
       const data = await response.json();
 
       setUserPresentCompanyLocation(data.result.regionName);
-      setIsCompanyReportEnabled(data.result.region_Report);
+      setIsCompanyReportEnabled(data.result.regionReport);
+
       setIsLoading(true);
       console.log(data);
     } catch (error) {
