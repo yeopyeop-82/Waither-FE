@@ -1,5 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
 import AskDataboxIcon from '../assets/images/img-ask1-databox-shadow.svg';
 import NavBackIcon from '../assets/images/ic-nav-back.svg';
@@ -16,6 +16,8 @@ import CautionIcon from '../assets/images/caution.svg';
 import { GREY_COLOR, MAIN_COLOR } from '../styles/color';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useQuery } from '@tanstack/react-query';
+import { reportGet } from '../api';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -276,10 +278,15 @@ const PollenSubTextView = styled.View`
 
 const Report = () => {
   const navigation = useNavigation();
-
-  
+  // const { isPending, error, data, isFetching } = useQuery({
+  //   queryKey: ['reportData'],
+  //   queryFn: reportGet,
+  // });
+  // console.log(data);
+  const [date, setDate] = useState('');
   const reportGet = async () => {
-    const url = 'https://waither.shop/user/setting/user-weight';
+    const url =
+      'https://waither.shop/weather/report?latitude=37&longtitude=126';
     const token = await AsyncStorage.getItem('accessToken');
     const accessToken = 'Bearer ' + token;
     const headers = {
@@ -293,22 +300,20 @@ const Report = () => {
         headers: headers,
       });
       if (!response.ok) {
+        console.log(response);
         throw new Error('Network response was not ok');
       }
       const res = await response.json();
-      
-
-      console.log();
-
+      setDate(res.result.date);
       console.log('사용자 온도 민감도', res);
     } catch (error) {
       console.error('사용자 온도 민감도', error);
     }
   };
 
-  useEffect(()=> {
-    reportGet()
-  },[])
+  useEffect(() => {
+    reportGet();
+  }, []);
 
   return (
     <Wrapper>
@@ -333,7 +338,7 @@ const Report = () => {
             <DownLoadIcon style={{ marginRight: 13, marginTop: 4 }} />
           </HeaderBtn>
         </HeaderView>
-        <Date>2024년 8월 23일 (목)</Date>
+        <Date></Date>
         <ReportView>
           <ReportScrollView>
             <MessageView>

@@ -1,12 +1,11 @@
 export const BASE_URL = 'https://waither.shop';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { canBeUsed } from '../node_modules/broadcast-channel/dist/es/methods/indexed-db';
 const token = AsyncStorage.getItem('accessToken');
 const accessToken = `Bearer ${token}`;
 
 //레포트 호출
 export const reportGet = async () => {
-  const url = `${BASE_URL}/weather/report?latitude=433&longtitude=132`;
+  const url = `${BASE_URL}/weather/report?latitude=37.5984434503798&longtitude=126.946053090715`;
   const headers = {
     Authorization: accessToken,
     'Content-Type': 'application/json',
