@@ -392,7 +392,7 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
           </MainHeaderCenter>
           <MainHearderRight>
             <MainHeaderRightIconView
-              onPress={() => navigation.navigate('Notifications')}
+              onPress={() => navigation.navigate('Report')}
             >
               <NotificationIcon height={44} />
             </MainHeaderRightIconView>

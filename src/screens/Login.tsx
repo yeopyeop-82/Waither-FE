@@ -203,11 +203,17 @@ export default function Login({ navigation }) {
   }, [email, id, nickname]);
 
   const signInWithKakao = async (): Promise<void> => {
-    const result: KakaoOAuthToken = await login();
-    getProfile();
-    setAccessToken(result.accessToken);
-    // console.log('로그인 결과', result);
-    KakaoLoginPost();
+    try {
+      const result: KakaoOAuthToken = await login();
+      getProfile();
+      setAccessToken(result.accessToken);
+      // console.log('로그인 결과', result);
+      KakaoLoginPost();
+    }
+    catch(err) {
+      console.log('카카오 로그인 에러', err)
+    }
+    
   };
   //--------------------------------------------------
   const getProfile = async (): Promise<void> => {
@@ -320,7 +326,7 @@ export default function Login({ navigation }) {
       {/* 화면 구성을 위한 변경 Register -> PasswordReset */}
       <EmailRegister
         onPress={() => {
-          navigation.navigate('Greeting');
+          navigation.navigate('Register');
         }}
       >
         <EmailRegisterText>이메일로 회원가입</EmailRegisterText>

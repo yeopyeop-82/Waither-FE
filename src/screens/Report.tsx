@@ -1,5 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components/native';
 import AskDataboxIcon from '../assets/images/img-ask1-databox-shadow.svg';
 import NavBackIcon from '../assets/images/ic-nav-back.svg';
@@ -15,6 +15,7 @@ import PollenIcon from '../assets/images/ic-pollen.svg';
 import CautionIcon from '../assets/images/caution.svg';
 import { GREY_COLOR, MAIN_COLOR } from '../styles/color';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -243,7 +244,7 @@ const CustomWrapper = styled.View`
   height: 138px;
   margin-top: 15px;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: flex-start;
 `;
 
 const CustomBox = styled.View`
@@ -254,6 +255,7 @@ const CustomBox = styled.View`
   border: 0.4px solid white;
   align-items: center;
   justify-content: center;
+  margin-right: 10px;
 `;
 
 const CustomMainText = styled.Text`
@@ -274,6 +276,40 @@ const PollenSubTextView = styled.View`
 
 const Report = () => {
   const navigation = useNavigation();
+
+  
+  const reportGet = async () => {
+    const url = 'https://waither.shop/user/setting/user-weight';
+    const token = await AsyncStorage.getItem('accessToken');
+    const accessToken = 'Bearer ' + token;
+    const headers = {
+      Authorization: accessToken,
+      'Content-Type': 'application/json',
+    };
+
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: headers,
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const res = await response.json();
+      
+
+      console.log();
+
+      console.log('사용자 온도 민감도', res);
+    } catch (error) {
+      console.error('사용자 온도 민감도', error);
+    }
+  };
+
+  useEffect(()=> {
+    reportGet()
+  },[])
+
   return (
     <Wrapper>
       <LinearGradient
@@ -370,9 +406,9 @@ const Report = () => {
               <TempRainWrapper>
                 <TempRainBox style={{ marginRight: 18 }}>
                   <TempRainMainText>평균 온도</TempRainMainText>
-                  <Temp>5'c</Temp>
+                  <Temp>15'c</Temp>
                   <TempRainSubText>
-                    최고: {'            '}최저:{' '}
+                    최고: {'18           '}최저:{'12'}
                   </TempRainSubText>
                 </TempRainBox>
                 <TempRainBox>
@@ -416,9 +452,9 @@ const Report = () => {
                     <CustomSubText>높음</CustomSubText>
                   </PollenSubTextView>
                 </CustomBox>
-                <CustomBox>
+                {/* <CustomBox>
                   <CustomMainText>예시 테스트</CustomMainText>
-                </CustomBox>
+                </CustomBox> */}
               </CustomWrapper>
             </WeatherDetailWrapper>
           </ReportScrollView>
