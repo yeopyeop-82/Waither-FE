@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import styled from 'styled-components/native';
 import NotificationIcon from '../assets/images/ic-main-noti-unread.svg';
@@ -17,6 +17,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect, NavigationProp } from '@react-navigation/native';
 import { useRecoilState } from 'recoil';
 import { userNameState } from '../recoil/userInitInfoRecoil';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { mainWeatherGet } from '../api';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -231,7 +233,7 @@ const MainWeatherByHourScrollView = styled.ScrollView`
 `;
 
 const MainWeatherByHourView = styled.View`
-  width: 670px;
+  width: 105%;
   height: 127px;
   background-color: rgba(255, 255, 255, 0.2);
   border-radius: 16px;
@@ -267,60 +269,86 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
   const [showWind, setShowWind] = useState(false);
   const [showPrecipitation, setShowPrecipitation] = useState(false);
   const [showDust, setShowDust] = useState(false);
+  const [wDirection, setWDirection] = useState('');
   const [name, setName] = useRecoilState(userNameState);
+  const time = new Date();
+  //-------------------------------------------------
+  const { isPending, error, data, isFetching, isLoading } = useSuspenseQuery({
+    queryKey: ['mainData'],
+    queryFn: mainWeatherGet,
+    staleTime: Infinity,
+  });
 
+  console.log('data:', data);
+  console.log('error:', error);
+  console.log('isFetching:', isFetching);
+  console.log('isPending:', isPending);
+  console.log('isLoading', isLoading);
+  console.log(data.tempMin);
+  console.log(time.getHours());
+
+  //-------------------------------------------------
   const hourlyWeatherData = [
     {
-      time: '16시',
+      time: ((time.getHours() + 1) % 24) + '시',
       icon: <ShowerIcon width={48} height={45} />,
-      temperature: '5°C',
+      temperature: data.result.expectedTemp[0] + '°C',
     },
     {
-      time: '17시',
+      time: ((time.getHours() + 2) % 24) + '시',
       icon: <CloudyIcon width={48} height={45} />,
-      temperature: '5°C',
+      temperature: data.result.expectedTemp[1] + '°C',
     },
     {
-      time: '18시',
+      time: ((time.getHours() + 3) % 24) + '시',
       icon: <CloudyIcon width={48} height={45} />,
-      temperature: '5°C',
+      temperature: data.result.expectedTemp[2] + '°C',
     },
     {
-      time: '19시',
+      time: ((time.getHours() + 4) % 24) + '시',
       icon: <CloudyIcon width={48} height={45} />,
-      temperature: '5°C',
+      temperature: data.result.expectedTemp[3] + '°C',
     },
     {
-      time: '20시',
+      time: ((time.getHours() + 5) % 24) + '시',
       icon: <CloudyIcon width={48} height={45} />,
-      temperature: '5°C',
+      temperature: data.result.expectedTemp[4] + '°C',
     },
     {
-      time: '21시',
+      time: ((time.getHours() + 6) % 24) + '시',
       icon: <CloudyIcon width={48} height={45} />,
-      temperature: '5°C',
-    },
-    {
-      time: '22시',
-      icon: <CloudyIcon width={48} height={45} />,
-      temperature: '5°C',
-    },
-    {
-      time: '23시',
-      icon: <CloudyIcon width={48} height={45} />,
-      temperature: '5°C',
-    },
-    {
-      time: '00시',
-      icon: <CloudyIcon width={48} height={45} />,
-      temperature: '5°C',
-    },
-    {
-      time: '01시',
-      icon: <CloudyIcon width={48} height={45} />,
-      temperature: '5°C',
+      temperature: data.result.expectedTemp[5] + '°C',
     },
   ];
+
+  function getWindDirection(degrees) {
+    if (
+      (degrees >= 0 && degrees < 22.5) ||
+      (degrees >= 337.5 && degrees <= 360)
+    ) {
+      return '북'; // North
+    } else if (degrees >= 22.5 && degrees < 67.5) {
+      return '북동'; // Northeast
+    } else if (degrees >= 67.5 && degrees < 112.5) {
+      return '동'; // East
+    } else if (degrees >= 112.5 && degrees < 157.5) {
+      return '남동'; // Southeast
+    } else if (degrees >= 157.5 && degrees < 202.5) {
+      return '남'; // South
+    } else if (degrees >= 202.5 && degrees < 247.5) {
+      return '남서'; // Southwest
+    } else if (degrees >= 247.5 && degrees < 292.5) {
+      return '서'; // West
+    } else if (degrees >= 292.5 && degrees < 337.5) {
+      return '북서'; // Northwest
+    } else {
+      return '잘못된 각도'; // Invalid angle
+    }
+  }
+
+  useEffect(() => {
+    setWDirection(getWindDirection(data.result.windVector));
+  }, []);
 
   const fetchUserSettings = async () => {
     const token = await AsyncStorage.getItem('accessToken'); // 토큰 가져오기
@@ -371,6 +399,38 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
       fetchUserSettings(); // 화면이 포커스를 받을 때마다 설정값을 새로 가져옴
     }, []),
   );
+  //=================================================================
+  // const mainWeatherGet = async () => {
+  //   const url =
+  //     'https://waither.shop/weather/main?latitude=37.5984434503798&longitude=126.946053090715';
+  //   const token = await AsyncStorage.getItem('accessToken');
+  //   const accessToken = 'Bearer ' + token;
+  //   const headers = {
+  //     Authorization: accessToken,
+  //     'Content-Type': 'application/json',
+  //   };
+
+  //   try {
+  //     const response = await fetch(url, {
+  //       method: 'GET',
+  //       headers: headers,
+  //     });
+  //     if (!response.ok) {
+  //       console.log(response);
+  //       throw new Error('Network response was not ok');
+  //     }
+  //     const res = await response.json();
+  //     console.log('메인화면 호출 결과', res);
+  //   } catch (error) {
+  //     console.error('메인화면 호출 결과', error);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   mainWeatherGet();
+  // }, []);
+
+  //---------------------------------------------------
 
   return (
     <Wrapper>
@@ -421,7 +481,7 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
               <MainAccentTitle>
                 {name}님이 춥다고 답변하셨던 날씨
               </MainAccentTitle>
-              <MainAccentText>오늘은 따뜻하게 입으세요 !</MainAccentText>
+              <MainAccentText>{}</MainAccentText>
             </MainAccentTextView>
           </MainAccentView>
           <MainWeatherView>
@@ -431,14 +491,21 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
                 <MainWeatherLocation>경기도 용인시 기흥구</MainWeatherLocation>
               </MainWeatherLocationView>
               <MainWeatherTemView>
-                <MainWeatherTem>5</MainWeatherTem>
+                {/*  */}
+                <MainWeatherTem>{data.result.temp}</MainWeatherTem>
                 <MainWeatherTemDegree>°C</MainWeatherTemDegree>
               </MainWeatherTemView>
               <MainWeatherMaxMinView>
                 <TemIcon height={20} width={13} style={{ marginRight: 5 }} />
-                <MainWeatherMaxMinText>최저 0°C</MainWeatherMaxMinText>
+                <MainWeatherMaxMinText>
+                  {/*  */}
+                  최저 {data.result.tempMin}°C
+                </MainWeatherMaxMinText>
                 <Divider />
-                <MainWeatherMaxMinText>최고 7°C</MainWeatherMaxMinText>
+                <MainWeatherMaxMinText>
+                  {/*  */}
+                  최고 {data.result.tempMax}°C
+                </MainWeatherMaxMinText>
               </MainWeatherMaxMinView>
             </MainWeatherInfoView>
             <MainWeatherIconView>
@@ -455,10 +522,12 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
                   </MainExtraWeatherTitleView>
                   <WindIcon />
                   <MainExtraWeatherInfoView>
-                    <MainExtraWeatherInfoText>남동</MainExtraWeatherInfoText>
+                    <MainExtraWeatherInfoText>
+                      {wDirection}
+                    </MainExtraWeatherInfoText>
                     <MainExtraWeatherTextDivider />
                     <MainExtraWeatherInfoText>
-                      2m/s~4m/s
+                      {data.result.windDegree}m/s
                     </MainExtraWeatherInfoText>
                   </MainExtraWeatherInfoView>
                 </MainExtraWeatherViewColumn>
@@ -470,7 +539,9 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
                   </MainExtraWeatherTitleView>
                   <CloudIcon />
                   <MainExtraWeatherInfoView>
-                    <MainExtraWeatherInfoText>1~3mm</MainExtraWeatherInfoText>
+                    <MainExtraWeatherInfoText>
+                      {data.result.expectedRain[0]}
+                    </MainExtraWeatherInfoText>
                   </MainExtraWeatherInfoView>
                 </MainExtraWeatherViewColumn>
               )}

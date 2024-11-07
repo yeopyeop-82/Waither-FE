@@ -286,7 +286,7 @@ const Report = () => {
   const [date, setDate] = useState('');
   const reportGet = async () => {
     const url =
-      'https://waither.shop/weather/report?latitude=37&longtitude=126';
+      'https://waither.shop/weather/report?latitude=37.5984434503798&longtitude=126.946053090715';
     const token = await AsyncStorage.getItem('accessToken');
     const accessToken = 'Bearer ' + token;
     const headers = {
