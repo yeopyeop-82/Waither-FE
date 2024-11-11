@@ -59,3 +59,29 @@ export const mainWeatherGet = async () => {
 //   queryFn: customServiceEnabledGet,
 //   staleTime: Infinity,
 // });
+
+//kakao REST API
+//X 경도
+//Y 위도
+export const currentLocationGet = async () => {
+  const url = `https://dapi.kakao.com/v2/local/geo/coord2address.json?x=126.946053090715&y=37.5984434503798&input_coord=WGS84`;
+
+  const headers = {
+    Authorization: 'KakaoAK d123b0e487f515ba55f26453d6537fbc',
+    'Content-Type': 'application/json;charset=UTF-8',
+  };
+
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: headers,
+    });
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    const res = await response.json();
+    return res;
+  } catch (error) {
+    console.error('Error fetching res:', error);
+  }
+};

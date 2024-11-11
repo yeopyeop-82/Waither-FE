@@ -18,7 +18,7 @@ import { useFocusEffect, NavigationProp } from '@react-navigation/native';
 import { useRecoilState } from 'recoil';
 import { userNameState } from '../recoil/userInitInfoRecoil';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
-import { mainWeatherGet } from '../api';
+import { currentLocationGet, mainWeatherGet } from '../api';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -118,7 +118,7 @@ const MainWeatherView = styled.View`
 
 const MainWeatherInfoView = styled.View`
   flex-direction: column;
-  margin-left: 37px;
+  margin-left: 25px;
 `;
 
 const MainWeatherLocationView = styled.View`
@@ -272,52 +272,61 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
   const [wDirection, setWDirection] = useState('');
   const [name, setName] = useRecoilState(userNameState);
   const time = new Date();
-  //-------------------------------------------------
-  const { isPending, error, data, isFetching, isLoading } = useSuspenseQuery({
+  //----------------React Query-----------------
+  const {
+    isPending: isMainDataPending,
+    error: mainDataError,
+    data: mainData,
+    isFetching: isMainDataFetching,
+    isLoading: isMainDataLoading,
+  } = useSuspenseQuery({
     queryKey: ['mainData'],
     queryFn: mainWeatherGet,
     staleTime: Infinity,
   });
 
-  console.log('data:', data);
-  console.log('error:', error);
-  console.log('isFetching:', isFetching);
-  console.log('isPending:', isPending);
-  console.log('isLoading', isLoading);
-  console.log(data.tempMin);
-  console.log(time.getHours());
+  const {
+    isPending: isLocationDataPending,
+    error: locationDataError,
+    data: locationData,
+    isFetching: isLocationDataFetching,
+  } = useSuspenseQuery({
+    queryKey: ['currentLocationData'],
+    queryFn: currentLocationGet,
+    staleTime: Infinity,
+  });
 
   //-------------------------------------------------
   const hourlyWeatherData = [
     {
       time: ((time.getHours() + 1) % 24) + '시',
       icon: <ShowerIcon width={48} height={45} />,
-      temperature: data.result.expectedTemp[0] + '°C',
+      temperature: mainData.result.expectedTemp[0] + '°C',
     },
     {
       time: ((time.getHours() + 2) % 24) + '시',
       icon: <CloudyIcon width={48} height={45} />,
-      temperature: data.result.expectedTemp[1] + '°C',
+      temperature: mainData.result.expectedTemp[1] + '°C',
     },
     {
       time: ((time.getHours() + 3) % 24) + '시',
       icon: <CloudyIcon width={48} height={45} />,
-      temperature: data.result.expectedTemp[2] + '°C',
+      temperature: mainData.result.expectedTemp[2] + '°C',
     },
     {
       time: ((time.getHours() + 4) % 24) + '시',
       icon: <CloudyIcon width={48} height={45} />,
-      temperature: data.result.expectedTemp[3] + '°C',
+      temperature: mainData.result.expectedTemp[3] + '°C',
     },
     {
       time: ((time.getHours() + 5) % 24) + '시',
       icon: <CloudyIcon width={48} height={45} />,
-      temperature: data.result.expectedTemp[4] + '°C',
+      temperature: mainData.result.expectedTemp[4] + '°C',
     },
     {
       time: ((time.getHours() + 6) % 24) + '시',
       icon: <CloudyIcon width={48} height={45} />,
-      temperature: data.result.expectedTemp[5] + '°C',
+      temperature: mainData.result.expectedTemp[5] + '°C',
     },
   ];
 
@@ -347,7 +356,7 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
   }
 
   useEffect(() => {
-    setWDirection(getWindDirection(data.result.windVector));
+    setWDirection(getWindDirection(mainData.result.windVector));
   }, []);
 
   const fetchUserSettings = async () => {
@@ -399,36 +408,6 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
       fetchUserSettings(); // 화면이 포커스를 받을 때마다 설정값을 새로 가져옴
     }, []),
   );
-  //=================================================================
-  // const mainWeatherGet = async () => {
-  //   const url =
-  //     'https://waither.shop/weather/main?latitude=37.5984434503798&longitude=126.946053090715';
-  //   const token = await AsyncStorage.getItem('accessToken');
-  //   const accessToken = 'Bearer ' + token;
-  //   const headers = {
-  //     Authorization: accessToken,
-  //     'Content-Type': 'application/json',
-  //   };
-
-  //   try {
-  //     const response = await fetch(url, {
-  //       method: 'GET',
-  //       headers: headers,
-  //     });
-  //     if (!response.ok) {
-  //       console.log(response);
-  //       throw new Error('Network response was not ok');
-  //     }
-  //     const res = await response.json();
-  //     console.log('메인화면 호출 결과', res);
-  //   } catch (error) {
-  //     console.error('메인화면 호출 결과', error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   mainWeatherGet();
-  // }, []);
 
   //---------------------------------------------------
 
@@ -469,6 +448,7 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
               <RainIcon height={43} width={65} />
             </MainAccentIcon>
             <MainAccentTextView>
+              {/* main API 예상 강수량 이용*/}
               <MainAccentTitle>비가 오네요. 우산 챙기세요 !</MainAccentTitle>
               <MainAccentText>15:30에 그칠 예정입니다.</MainAccentText>
             </MainAccentTextView>
@@ -481,30 +461,35 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
               <MainAccentTitle>
                 {name}님이 춥다고 답변하셨던 날씨
               </MainAccentTitle>
-              <MainAccentText>{}</MainAccentText>
+              {/* 레포트 처음으로 오는 advice */}
+              <MainAccentText>아ㄴ녕하세요~~</MainAccentText>
             </MainAccentTextView>
           </MainAccentView>
           <MainWeatherView>
             <MainWeatherInfoView>
               <MainWeatherLocationView>
                 <GpsIcon height={12} width={12} />
-                <MainWeatherLocation>경기도 용인시 기흥구</MainWeatherLocation>
+                <MainWeatherLocation>
+                  {locationData.documents[0].road_address.region_1depth_name +
+                    ' ' +
+                    locationData.documents[0].road_address.region_2depth_name}
+                </MainWeatherLocation>
               </MainWeatherLocationView>
               <MainWeatherTemView>
                 {/*  */}
-                <MainWeatherTem>{data.result.temp}</MainWeatherTem>
+                <MainWeatherTem>{mainData.result.temp}</MainWeatherTem>
                 <MainWeatherTemDegree>°C</MainWeatherTemDegree>
               </MainWeatherTemView>
               <MainWeatherMaxMinView>
                 <TemIcon height={20} width={13} style={{ marginRight: 5 }} />
                 <MainWeatherMaxMinText>
                   {/*  */}
-                  최저 {data.result.tempMin}°C
+                  최저 {mainData.result.tempMin}°C
                 </MainWeatherMaxMinText>
                 <Divider />
                 <MainWeatherMaxMinText>
                   {/*  */}
-                  최고 {data.result.tempMax}°C
+                  최고 {mainData.result.tempMax}°C
                 </MainWeatherMaxMinText>
               </MainWeatherMaxMinView>
             </MainWeatherInfoView>
@@ -527,7 +512,7 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
                     </MainExtraWeatherInfoText>
                     <MainExtraWeatherTextDivider />
                     <MainExtraWeatherInfoText>
-                      {data.result.windDegree}m/s
+                      {mainData.result.windDegree}m/s
                     </MainExtraWeatherInfoText>
                   </MainExtraWeatherInfoView>
                 </MainExtraWeatherViewColumn>
@@ -540,7 +525,10 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
                   <CloudIcon />
                   <MainExtraWeatherInfoView>
                     <MainExtraWeatherInfoText>
-                      {data.result.expectedRain[0]}
+                      {/* 1이면은 비 0이면은 맑음 */}
+                      {mainData.result.pop == 0
+                        ? '강수없음'
+                        : mainData.result.expectedRain[0] + 'mm'}
                     </MainExtraWeatherInfoText>
                   </MainExtraWeatherInfoView>
                 </MainExtraWeatherViewColumn>
