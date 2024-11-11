@@ -5,6 +5,9 @@ import NotificationIcon from '../assets/images/ic-main-noti-unread.svg';
 import SettingIcon from '../assets/images/ic-main-settings.svg';
 import RainIcon from '../assets/images/ic_rain.svg';
 import RainWithCloudIcon from '../assets/images/ic-weather-rain.svg';
+import SunnyIcon from '../assets/images/ic-weather-sunny.svg';
+import NightClearIcon from '../assets/images/ic-weather-night-clear.svg';
+import NightRainIcon from '../assets/images/ic-weather-night-rainy.svg';
 import WaitherIcon from '../assets/images/ic-ask-databox_no_shadow.svg';
 import GpsIcon from '../assets/images/ic_gps.svg';
 import TemIcon from '../assets/images/ic_tem.svg';
@@ -285,7 +288,7 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
   } = useSuspenseQuery({
     queryKey: ['mainData'],
     queryFn: mainWeatherGet,
-    staleTime: Infinity,
+    // staleTime: Infinity,
   });
 
   const {
@@ -296,7 +299,7 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
   } = useSuspenseQuery({
     queryKey: ['currentLocationData'],
     queryFn: currentLocationGet,
-    staleTime: Infinity,
+    // staleTime: Infinity,
   });
 
   const {
@@ -307,7 +310,7 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
   } = useSuspenseQuery({
     queryKey: ['reportData'],
     queryFn: reportGet,
-    staleTime: Infinity,
+    // staleTime: Infinity,
   });
 
   //--------------------------------------------------------
@@ -554,12 +557,18 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
               </MainWeatherMaxMinView>
             </MainWeatherInfoView>
             <MainWeatherIconView>
-              {mainData.result.pop > 50 ? (
-                <RainWithCloudIcon />
+              {/* 날씨가 맑으며 18시가 지났으면 night 버전 && pop이 50 이상이면 rainy */}
+              {(time.getHours() + 1) % 24 > 18 ? (
+                mainData.result.pop >= 50 ? (
+                  <NightRainIcon />
+                ) : (
+                  <NightClearIcon />
+                )
+              ) : mainData.result.pop < 50 ? (
+                <SunnyIcon />
               ) : (
-                <CloudyIcon />
+                <RainWithCloudIcon />
               )}
-              {/* <RainWithCloudIcon /> */}
             </MainWeatherIconView>
           </MainWeatherView>
           {/* 조건부 렌더링: 세 가지 설정이 모두 false일 때 MainExtraWeatherView를 숨깁니다. */}
