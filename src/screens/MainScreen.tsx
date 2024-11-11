@@ -18,7 +18,7 @@ import { useFocusEffect, NavigationProp } from '@react-navigation/native';
 import { useRecoilState } from 'recoil';
 import { userNameState } from '../recoil/userInitInfoRecoil';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
-import { currentLocationGet, mainWeatherGet } from '../api';
+import { currentLocationGet, mainWeatherGet, reportGet } from '../api';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -71,7 +71,7 @@ const MainInfoView = styled.View`
   overflow: visible;
 `;
 
-const MainAccentView = styled.View`
+const MainAccentView = styled.TouchableOpacity`
   flex-direction: row;
   align-items: center;
   margin-bottom: 12px;
@@ -91,6 +91,7 @@ const MainAccentIcon = styled.View`
 
 const MainAccentTextView = styled.View`
   flex-direction: column;
+  width: 65%;
 `;
 
 const MainAccentTitle = styled.Text`
@@ -272,6 +273,8 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
   const [wDirection, setWDirection] = useState('');
   const [name, setName] = useRecoilState(userNameState);
   const time = new Date();
+  // const token = AsyncStorage.getItem('accessToken');
+  // const accessToken = `Bearer ${token}`;
   //----------------React Query-----------------
   const {
     isPending: isMainDataPending,
@@ -296,7 +299,50 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
     staleTime: Infinity,
   });
 
-  //-------------------------------------------------
+  const {
+    isPending: isReportDataPending,
+    error: reportDataError,
+    data: reportData,
+    isFetching: isReportDataFetching,
+  } = useSuspenseQuery({
+    queryKey: ['reportData'],
+    queryFn: reportGet,
+    staleTime: Infinity,
+  });
+
+  //--------------------------------------------------------
+  const [isRainy, setIsRainy] = useState(false);
+  const [isWhenRainy, setIsWhenRainy] = useState(0);
+  const [isWhenRainyStop, setIsWhenRainyStop] = useState(0);
+
+  const expectedPty = ['1', '1', '0', '0', '1', '0'];
+  // const rainyCheck = () => {
+  //   for (let i = 0; i < mainData.result.expectedPty.length; i++) {
+  //     if (mainData.result.expectedPty[i] === '1') {
+  //       setIsRainy(true);
+  //       setIsWhenRainy(time.getHours() + i);
+  //     } else if (mainData.result.expectedPty[i] === '0') {
+  //       setIsWhenRainyStop(time.getHours() + i);
+  //     }
+  //   }
+  // };
+  const rainyCheck = () => {
+    let foundFirstRain = false;
+    let foundFirstClear = false;
+
+    for (let i = 0; i < expectedPty.length; i++) {
+      if (!foundFirstRain && expectedPty[i] === '1') {
+        setIsRainy(true);
+        setIsWhenRainy(time.getHours() + i);
+        foundFirstRain = true;
+      } else if (foundFirstRain && !foundFirstClear && expectedPty[i] === '0') {
+        setIsWhenRainyStop(time.getHours() + i);
+        foundFirstClear = true;
+        break;
+      }
+    }
+  };
+
   const hourlyWeatherData = [
     {
       time: ((time.getHours() + 1) % 24) + '시',
@@ -357,6 +403,8 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
 
   useEffect(() => {
     setWDirection(getWindDirection(mainData.result.windVector));
+    reportGet();
+    rainyCheck();
   }, []);
 
   const fetchUserSettings = async () => {
@@ -443,26 +491,38 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
           </MainHearderRight>
         </MainHeader>
         <MainInfoView>
-          <MainAccentView>
+          <MainAccentView onPress={() => navigation.navigate('Report')}>
             <MainAccentIcon>
               <RainIcon height={43} width={65} />
             </MainAccentIcon>
             <MainAccentTextView>
               {/* main API 예상 강수량 이용*/}
-              <MainAccentTitle>비가 오네요. 우산 챙기세요 !</MainAccentTitle>
-              <MainAccentText>15:30에 그칠 예정입니다.</MainAccentText>
+              <MainAccentTitle>
+                {isRainy == true
+                  ? '비가 오네요. 우산 챙기세요 !'
+                  : '오늘은 비가 오지 않을 예정입니다!'}
+              </MainAccentTitle>
+              <MainAccentText>
+                {isRainy == true
+                  ? `${isWhenRainy}시부터 비가 내려${`\n`}${isWhenRainyStop}시에 멈출 예정입니다!`
+                  : '대체적으로 맑을 예정입니다!'}
+              </MainAccentText>
             </MainAccentTextView>
           </MainAccentView>
-          <MainAccentView>
+          <MainAccentView onPress={() => navigation.navigate('Report')}>
             <MainAccentIcon>
               <WaitherIcon height={50} width={50} />
             </MainAccentIcon>
             <MainAccentTextView>
               <MainAccentTitle>
-                {name}님이 춥다고 답변하셨던 날씨
+                오늘은 {name}님에게 {reportData.result.advices[0]}
               </MainAccentTitle>
               {/* 레포트 처음으로 오는 advice */}
-              <MainAccentText>아ㄴ녕하세요~~</MainAccentText>
+              <MainAccentText>
+                {reportData.result.advices.length == 1
+                  ? '오늘의 날씨는 무난합니다!'
+                  : `${reportData.result.advices[1]}`}
+              </MainAccentText>
             </MainAccentTextView>
           </MainAccentView>
           <MainWeatherView>
@@ -494,7 +554,12 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
               </MainWeatherMaxMinView>
             </MainWeatherInfoView>
             <MainWeatherIconView>
-              <RainWithCloudIcon />
+              {mainData.result.pop > 50 ? (
+                <RainWithCloudIcon />
+              ) : (
+                <CloudyIcon />
+              )}
+              {/* <RainWithCloudIcon /> */}
             </MainWeatherIconView>
           </MainWeatherView>
           {/* 조건부 렌더링: 세 가지 설정이 모두 false일 때 MainExtraWeatherView를 숨깁니다. */}
@@ -520,7 +585,7 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
               {showPrecipitation && (
                 <MainExtraWeatherViewColumn>
                   <MainExtraWeatherTitleView>
-                    <MainExtraWeatherTitle>강수량</MainExtraWeatherTitle>
+                    <MainExtraWeatherTitle>강수확률</MainExtraWeatherTitle>
                   </MainExtraWeatherTitleView>
                   <CloudIcon />
                   <MainExtraWeatherInfoView>
@@ -528,7 +593,7 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
                       {/* 1이면은 비 0이면은 맑음 */}
                       {mainData.result.pop == 0
                         ? '강수없음'
-                        : mainData.result.expectedRain[0] + 'mm'}
+                        : mainData.result.expectedRain[0] + '%'}
                     </MainExtraWeatherInfoText>
                   </MainExtraWeatherInfoView>
                 </MainExtraWeatherViewColumn>

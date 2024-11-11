@@ -1,11 +1,29 @@
 export const BASE_URL = 'https://waither.shop';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-const token = AsyncStorage.getItem('accessToken');
-const accessToken = `Bearer ${token}`;
+// const token = AsyncStorage.getItem('accessToken');
+// const accessToken = `Bearer ${token}`;
+
+let cachedToken = null;
+
+// 토큰을 불러오는 함수
+const getAccessToken = async () => {
+  if (cachedToken) return cachedToken; // 이미 캐시된 토큰이 있으면 바로 반환
+  try {
+    const token = await AsyncStorage.getItem('accessToken');
+    if (token) {
+      cachedToken = `Bearer ${token}`; // 토큰을 캐시
+    }
+    return cachedToken;
+  } catch (error) {
+    console.error('Error loading accesstoken:', error);
+    throw error;
+  }
+};
 
 //레포트 호출
 export const reportGet = async () => {
-  const url = `${BASE_URL}/weather/report?latitude=37.5984434503798&longtitude=126.946053090715`;
+  const accessToken = await getAccessToken();
+  const url = `${BASE_URL}/weather/report?latitude=37.5984434503798&longitude=126.946053090715`;
   const headers = {
     Authorization: accessToken,
     'Content-Type': 'application/json',
@@ -19,6 +37,7 @@ export const reportGet = async () => {
       console.log(response.status);
     }
     const res = await response.json();
+    console.log(res);
     return res;
   } catch (error) {
     console.error('Error fetching: 레포트 GET ', error);
@@ -27,10 +46,8 @@ export const reportGet = async () => {
 
 //메인화면 호출
 export const mainWeatherGet = async () => {
-  const url =
-    'https://waither.shop/weather/main?latitude=37.5984434503798&longitude=126.946053090715';
-  const token = await AsyncStorage.getItem('accessToken');
-  const accessToken = 'Bearer ' + token;
+  const accessToken = await getAccessToken();
+  const url = `${BASE_URL}/weather/main?latitude=37.5984434503798&longitude=126.946053090715`;
   const headers = {
     Authorization: accessToken,
     'Content-Type': 'application/json',
@@ -54,13 +71,7 @@ export const mainWeatherGet = async () => {
   }
 };
 
-// const { isPending, error, data, isFetching } = useQuery({
-//   queryKey: ['settingsData'],
-//   queryFn: customServiceEnabledGet,
-//   staleTime: Infinity,
-// });
-
-//kakao REST API
+//kakao REST API 호출
 //X 경도
 //Y 위도
 export const currentLocationGet = async () => {
