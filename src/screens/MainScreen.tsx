@@ -485,7 +485,7 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
         'rgba(22,115,187, 1)',
       ];
     }
-    // 노을 시간대
+    //노을 시간대
     if (currentTime > 15 && currentTime < 18) {
       return [
         'rgba(179, 166, 155, 1)',
@@ -572,7 +572,7 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
           </MainHeaderCenter>
           <MainHearderRight>
             <MainHeaderRightIconView
-              onPress={() => navigation.navigate('Report')}
+              onPress={() => navigation.navigate('Notifications')}
             >
               <NotificationIcon height={44} />
             </MainHeaderRightIconView>
