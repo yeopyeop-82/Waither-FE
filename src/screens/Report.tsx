@@ -160,6 +160,7 @@ const UserAnswerText = styled.Text`
 `;
 const Percent = styled.Text`
   margin-top: 20px;
+  margin-left: 5%;
   left: 140px;
   color: white;
 `;
@@ -169,6 +170,13 @@ const PercentBar = styled.View`
   height: 19px;
   border: 0.4px solid white;
   border-radius: 15px;
+  background-color: transparent;
+`;
+
+const FillBar = styled(LinearGradient)`
+  height: 100%;
+  border-radius: 15px;
+  width: ${(props) => props.percent}%;
 `;
 
 const WeatherDetailWrapper = styled.View`
@@ -312,6 +320,27 @@ const Report = () => {
     adviceArr.pop();
     return adviceArr;
   };
+  //------------userPerception 정제 함수----------------
+  const refiningUserPerception = (num, percent) => {
+    if (num == null) {
+      return '유저들의 답변이 부족합니다.';
+    }
+    if (num == 1) {
+      return `전체 유저의 ${percent}%가\n오늘 날씨를 매우 춥다고 답변했습니다.`;
+    }
+    if (num == 2) {
+      return `전체 유저의 ${percent}%가\n오늘 날씨를 춥다고 답변했습니다.`;
+    }
+    if (num == 3) {
+      return `전체 유저의 ${percent}%가\n오늘 날씨를 보통이라고 답변했습니다.`;
+    }
+    if (num == 4) {
+      return `전체 유저의 ${percent}%가\n오늘 날씨를 덥다고 답변했습니다.`;
+    }
+    if (num == 5) {
+      return `전체 유저의 ${percent}%가\n오늘 날씨를 매우 덥다고 답변했습니다.`;
+    }
+  };
 
   return (
     <Wrapper>
@@ -406,10 +435,20 @@ const Report = () => {
             <ExplainText>유저들의 답변</ExplainText>
             <UserAnswerView>
               <UserAnswerText>
-                전체 유저의 0%가{'\n'} 오늘 춥다고 답변했습니다.
+                {refiningUserPerception(
+                  reportData.result.userPerception.ans,
+                  reportData.result.userPerception.percentage,
+                )}
               </UserAnswerText>
-              <Percent>0%</Percent>
-              <PercentBar></PercentBar>
+              <Percent>{reportData.result.userPerception.percentage}%</Percent>
+              <PercentBar>
+                <FillBar
+                  percent={reportData.result.userPerception.percentage}
+                  colors={['#90C2FF', '#4D88F7']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                />
+              </PercentBar>
             </UserAnswerView>
             <ExplainText>날씨 세부 사항</ExplainText>
             <WeatherDetailWrapper>

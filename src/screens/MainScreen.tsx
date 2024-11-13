@@ -353,7 +353,7 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
     ) {
       //해가 떠 있을때
       if (time > 6 && time < 18) {
-        return <CloudIcon width={48} height={45} />;
+        return <CloudyIcon width={48} height={45} />;
       }
       //해가 떠 있지 않을때
       else {
