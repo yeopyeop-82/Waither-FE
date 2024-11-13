@@ -348,8 +348,9 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
   const hourlyWeatherIcon = (i, time) => {
     //강수 없음, 구름많음
     if (
-      mainData.result.expectedPty[i] == 0 &&
-      mainData.result.expectedSky[i] == 3
+      (mainData.result.expectedPty[i] == 0 &&
+        mainData.result.expectedSky[i] == 3,
+      4)
     ) {
       //해가 떠 있을때
       if (time > 6 && time < 18) {
