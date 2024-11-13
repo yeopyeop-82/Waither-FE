@@ -478,7 +478,7 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
   const asTimeBackgroundColor = () => {
     const testtime = 22;
     //낮 시간대
-    if (currentTime > 6 && currentTime < 15) {
+    if (currentTime >= 6 && currentTime < 15) {
       return [
         'rgba(143,169,160, 1)',
         'rgba(50,127,188, 1)',
@@ -486,7 +486,7 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
       ];
     }
     //노을 시간대
-    if (currentTime > 15 && currentTime < 18) {
+    if (currentTime >= 15 && currentTime < 18) {
       return [
         'rgba(179, 166, 155, 1)',
         'rgba(110, 131, 149, 1)',

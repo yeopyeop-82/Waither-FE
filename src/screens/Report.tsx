@@ -16,7 +16,7 @@ import CautionIcon from '../assets/images/caution.svg';
 import { GREY_COLOR, MAIN_COLOR } from '../styles/color';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { reportGet } from '../api';
 
 const Wrapper = styled.View`
@@ -84,24 +84,25 @@ const WeatherMessageView = styled.View`
 `;
 
 const WeatherMessageBoxView = styled.View`
-  margin-top: 20px;
+  margin-top: 6.5%;
 `;
 
 const WeatherMessageBox = styled.View`
-  width: auto;
   height: 38px;
   background-color: rgb(117, 154, 240);
   border: 0.4px solid white;
   border-radius: 15px;
-  margin-bottom: 11px;
   margin-left: 12px;
-  align-items: center;
+  padding: 8px 12px;
+  align-items: flex-start;
   justify-content: center;
 `;
 
-const WeahtherMessageText = styled.Text`
+const WeatherMessageText = styled.Text`
   color: white;
   font-weight: 800;
+
+  flex-wrap: wrap;
 `;
 
 const ExplainText = styled.Text`
@@ -124,10 +125,10 @@ const WeatherChangeMessageView = styled.View`
   border: 0.4px solid white;
   flex-direction: row;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 3%;
 `;
 
-const WeahtherChangeTextView = styled.View`
+const WeatherChangeTextView = styled.View`
   flex-direction: column;
   width: 70%;
 `;
@@ -278,42 +279,39 @@ const PollenSubTextView = styled.View`
 
 const Report = () => {
   const navigation = useNavigation();
-  // const { isPending, error, data, isFetching } = useQuery({
-  //   queryKey: ['reportData'],
-  //   queryFn: reportGet,
-  // });
-  // console.log(data);
   const [date, setDate] = useState('');
-  const reportGet = async () => {
-    const url =
-      'https://waither.shop/weather/report?latitude=37.5984434503798&longtitude=126.946053090715';
-    const token = await AsyncStorage.getItem('accessToken');
-    const accessToken = 'Bearer ' + token;
-    const headers = {
-      Authorization: accessToken,
-      'Content-Type': 'application/json',
-    };
 
-    try {
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: headers,
-      });
-      if (!response.ok) {
-        console.log(response);
-        throw new Error('Network response was not ok');
-      }
-      const res = await response.json();
-      setDate(res.result.date);
-      console.log('사용자 온도 민감도', res);
-    } catch (error) {
-      console.error('사용자 온도 민감도', error);
-    }
-  };
+  //-------------react query-----------------
+  const {
+    isPending: isReportDataPending,
+    error: reportDataError,
+    data: reportData,
+    isFetching: isReportDataFetching,
+  } = useSuspenseQuery({
+    queryKey: ['reportData'],
+    queryFn: reportGet,
+    // staleTime: Infinity,
+  });
 
   useEffect(() => {
     reportGet();
   }, []);
+
+  //--------------advice 정제 함수-------------------
+  const removeSpacesAfterDot = (text) => {
+    return text.replace(/\. +/g, '.');
+  };
+
+  const refiningAdvice = () => {
+    var advice = '';
+    //2개의 중요 조언만
+    for (let i = 0; i < 2; i++) {
+      advice += removeSpacesAfterDot(reportData.result.advices[i]);
+    }
+    const adviceArr = advice.split('.');
+    adviceArr.pop();
+    return adviceArr;
+  };
 
   return (
     <Wrapper>
@@ -348,23 +346,13 @@ const Report = () => {
                 style={{ marginTop: 50 }}
               />
               <WeatherMessageView>
-                <WeatherMessageBoxView>
-                  <WeatherMessageBox>
-                    <WeahtherMessageText>
-                      오늘은 바람이 많이 불어요!
-                    </WeahtherMessageText>
-                  </WeatherMessageBox>
-                  <WeatherMessageBox>
-                    <WeahtherMessageText>
-                      오후 7시 경에 비가 올 예정이에요!
-                    </WeahtherMessageText>
-                  </WeatherMessageBox>
-                  <WeatherMessageBox>
-                    <WeahtherMessageText>
-                      오늘은 꽃가루가 많이 날릴 예정이에요!
-                    </WeahtherMessageText>
-                  </WeatherMessageBox>
-                </WeatherMessageBoxView>
+                {refiningAdvice().map((advice, index) => (
+                  <WeatherMessageBoxView key={index}>
+                    <WeatherMessageBox>
+                      <WeatherMessageText>{advice}.</WeatherMessageText>
+                    </WeatherMessageBox>
+                  </WeatherMessageBoxView>
+                ))}
               </WeatherMessageView>
             </MessageView>
             <ExplainText>날씨 변화</ExplainText>
@@ -375,13 +363,22 @@ const Report = () => {
                   height={32}
                   style={{ marginLeft: 18, marginRight: 18 }}
                 />
-                <WeahtherChangeTextView>
+                <WeatherChangeTextView>
                   <WeatherChangeMainText>기온</WeatherChangeMainText>
+                  {/* 수정 */}
                   <WeatherChangeSubText>
-                    어제보다 5도 낮아요!
+                    {reportData.result.weatherChange.tempDifference > 0
+                      ? '어제보다 기온이 높아요!'
+                      : reportData.result.weatherChange.tempDifference < 0
+                        ? '어제보다 기온이 낮아요!'
+                        : '어제와 기온이 같아요!'}
                   </WeatherChangeSubText>
-                </WeahtherChangeTextView>
-                <DownIcon width={22} height={22} />
+                </WeatherChangeTextView>
+                {reportData.result.weatherChange.tempDifference > 0 ? (
+                  <UpIcon width={22} height={22} />
+                ) : reportData.result.weatherChange.tempDifference < 0 ? (
+                  <DownIcon width={22} height={22} />
+                ) : null}
               </WeatherChangeMessageView>
               <WeatherChangeMessageView>
                 <WindIcon
@@ -389,13 +386,21 @@ const Report = () => {
                   height={32}
                   style={{ marginLeft: 18, marginRight: 18 }}
                 />
-                <WeahtherChangeTextView>
+                <WeatherChangeTextView>
                   <WeatherChangeMainText>바람</WeatherChangeMainText>
                   <WeatherChangeSubText>
-                    어제보다 바람이 많이 불어요!
+                    {reportData.result.weatherChange.windChangeStatus > 0
+                      ? '어제보다 바람이 강해요!'
+                      : reportData.result.weatherChange.windChangeStatus < 0
+                        ? '어제보다 바람이 약해요!'
+                        : '어제와 바람 세기가 같아요!'}
                   </WeatherChangeSubText>
-                </WeahtherChangeTextView>
-                <UpIcon width={22} height={22} />
+                </WeatherChangeTextView>
+                {reportData.result.weatherChange.windChangeStatus > 0 ? (
+                  <UpIcon width={22} height={22} />
+                ) : reportData.result.weatherChange.windChangeStatus < 0 ? (
+                  <DownIcon width={22} height={22} />
+                ) : null}
               </WeatherChangeMessageView>
             </WeatherChangeView>
             <ExplainText>유저들의 답변</ExplainText>
