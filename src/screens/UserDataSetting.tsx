@@ -292,7 +292,7 @@ const UserDataSetting = () => {
 
       <TempResponsivenessView>
         <TemperatureMainTitle>
-          <Username>Waither</Username>님의 온도 민감도
+          <Username>{name}</Username>님의 온도 민감도
         </TemperatureMainTitle>
         <TemperatureWrapper>
           <TemperatureOperrand>{Operand}</TemperatureOperrand>
