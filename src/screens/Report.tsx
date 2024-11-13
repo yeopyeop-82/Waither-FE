@@ -342,6 +342,31 @@ const Report = () => {
     }
   };
 
+  //------------풍향 각도에 따른 풍향 데이터 처리 함수---------------------------
+  function getWindDirection(degrees) {
+    if (
+      (degrees >= 0 && degrees < 22.5) ||
+      (degrees >= 337.5 && degrees <= 360)
+    ) {
+      return '북'; // North
+    } else if (degrees >= 22.5 && degrees < 67.5) {
+      return '북동'; // Northeast
+    } else if (degrees >= 67.5 && degrees < 112.5) {
+      return '동'; // East
+    } else if (degrees >= 112.5 && degrees < 157.5) {
+      return '남동'; // Southeast
+    } else if (degrees >= 157.5 && degrees < 202.5) {
+      return '남'; // South
+    } else if (degrees >= 202.5 && degrees < 247.5) {
+      return '남서'; // Southwest
+    } else if (degrees >= 247.5 && degrees < 292.5) {
+      return '서'; // West
+    } else if (degrees >= 292.5 && degrees < 337.5) {
+      return '북서'; // Northwest
+    } else {
+      return '잘못된 각도'; // Invalid angle
+    }
+  }
   return (
     <Wrapper>
       <LinearGradient
@@ -455,15 +480,16 @@ const Report = () => {
               <TempRainWrapper>
                 <TempRainBox style={{ marginRight: 18 }}>
                   <TempRainMainText>평균 온도</TempRainMainText>
-                  <Temp>15'c</Temp>
+                  <Temp>{reportData.result.temp}'C</Temp>
                   <TempRainSubText>
-                    최고: {'18           '}최저:{'12'}
+                    최고: {reportData.result.tempMax}'C
+                    {'        '}최저:{reportData.result.tempMin}'C
                   </TempRainSubText>
                 </TempRainBox>
                 <TempRainBox>
-                  <TempRainMainText>강수량</TempRainMainText>
+                  <TempRainMainText>강수확률</TempRainMainText>
                   <CloudIcon width={38} height={32} style={{ marginTop: 20 }} />
-                  <TempRainSubText>1~3mm</TempRainSubText>
+                  <TempRainSubText>{reportData.result.pop}%</TempRainSubText>
                 </TempRainBox>
               </TempRainWrapper>
 
@@ -471,7 +497,7 @@ const Report = () => {
                 <WindBox>
                   <WindMainText>풍속</WindMainText>
                   <WindIcon width={30} height={26} style={{ marginTop: 20 }} />
-                  <WindSubText>2m/s~4m/s</WindSubText>
+                  <WindSubText>{reportData.result.windDegree}m/s</WindSubText>
                 </WindBox>
                 <WindBox>
                   <WindMainText>풍향</WindMainText>
@@ -480,10 +506,12 @@ const Report = () => {
                     height={39}
                     style={{ marginTop: 20 }}
                   />
-                  <WindSubText>남남동</WindSubText>
+                  <WindSubText>
+                    {getWindDirection(reportData.result.windVector)}
+                  </WindSubText>
                 </WindBox>
               </WindWrapper>
-              <CustomWrapper>
+              {/* <CustomWrapper>
                 <CustomBox>
                   <CustomMainText>미세먼지</CustomMainText>
                   <DustIcon width={60} height={58} style={{ marginTop: 10 }} />
@@ -501,10 +529,10 @@ const Report = () => {
                     <CustomSubText>높음</CustomSubText>
                   </PollenSubTextView>
                 </CustomBox>
-                {/* <CustomBox>
+                <CustomBox>
                   <CustomMainText>예시 테스트</CustomMainText>
-                </CustomBox> */}
-              </CustomWrapper>
+                </CustomBox>
+              </CustomWrapper> */}
             </WeatherDetailWrapper>
           </ReportScrollView>
         </ReportView>
