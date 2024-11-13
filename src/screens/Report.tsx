@@ -362,6 +362,7 @@ const Report = () => {
     return adviceArr;
   };
   //------------userPerception 정제 함수----------------
+  //num을 enum으로 저장해서 관리 -> 유지보수 향상
   const refiningUserPerception = (num, percent) => {
     if (num == null) {
       return '유저들의 답변이 부족합니다.';

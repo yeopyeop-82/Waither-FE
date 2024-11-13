@@ -4,6 +4,7 @@ import styled from 'styled-components/native';
 import NotificationIcon from '../assets/images/ic-main-noti-unread.svg';
 import SettingIcon from '../assets/images/ic-main-settings.svg';
 import RainIcon from '../assets/images/ic_rain.svg';
+import SunIcon from '../assets/images/ic_sunny.svg';
 import RainWithCloudIcon from '../assets/images/ic-weather-rain.svg';
 import SunnyIcon from '../assets/images/ic-weather-sunny.svg';
 import NightCloudIcon from '../assets/images/ic-weather-night-cloudy.svg';
@@ -27,6 +28,7 @@ import { useRecoilState } from 'recoil';
 import { userNameState } from '../recoil/userInitInfoRecoil';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { currentLocationGet, mainWeatherGet, reportGet } from '../api';
+import { red } from 'react-native-reanimated/lib/typescript/reanimated2/Colors';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -133,6 +135,11 @@ const MainWeatherInfoView = styled.View`
 const MainWeatherLocationView = styled.View`
   flex-direction: row;
   align-items: center;
+`;
+
+const SunnyView = styled.View`
+  padding-top: 340%;
+  padding-right: 10%;
 `;
 
 const MainWeatherLocation = styled.Text`
@@ -587,7 +594,7 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
         <MainInfoView>
           <MainAccentView onPress={() => navigation.navigate('Report')}>
             <MainAccentIcon>
-              <RainIcon height={43} width={65} />
+              {isRainy ? <RainIcon height={43} width={65} /> : <SunIcon />}
             </MainAccentIcon>
             <MainAccentTextView>
               {/* main API 예상 강수량 이용*/}
@@ -691,9 +698,7 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
                   <MainExtraWeatherInfoView>
                     <MainExtraWeatherInfoText>
                       {/* 1이면은 비 0이면은 맑음 */}
-                      {mainData.result.pop == 0
-                        ? '강수없음'
-                        : mainData.result.expectedRain[0] + '%'}
+                      {mainData.result.pop + '%'}
                     </MainExtraWeatherInfoText>
                   </MainExtraWeatherInfoView>
                 </MainExtraWeatherViewColumn>

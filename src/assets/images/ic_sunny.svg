@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="85px" height="85px" viewBox="0 0 85 85" version="1.1">
+<defs>
+<image id="image8" width="85" height="85" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFUAAABVCAYAAAA49ahaAAAABmJLR0QA/wD/AP+gvaeTAAAAM0lEQVR4nO3BMQEAAADCoPVPbQo/oAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABOBnE5AAHS1CmDAAAAAElFTkSuQmCC"/>
+<linearGradient id="linear0" gradientUnits="userSpaceOnUse" x1="0.5" y1="-0.01" x2="0.5" y2="1.01" gradientTransform="matrix(69.64614,0,0,69.641544,10.997243,18.998162)">
+<stop offset="0" style="stop-color:rgb(100%,90.196078%,0%);stop-opacity:1;"/>
+<stop offset="1" style="stop-color:rgb(100%,47.843137%,0%);stop-opacity:1;"/>
+</linearGradient>
+<linearGradient id="linear1" gradientUnits="userSpaceOnUse" x1="0.5" y1="-0.01" x2="0.5" y2="1.01" gradientTransform="matrix(69.64614,0,0,69.641544,10.997243,18.998162)">
+<stop offset="0" style="stop-color:rgb(100%,100%,100%);stop-opacity:1;"/>
+<stop offset="1" style="stop-color:rgb(100%,100%,100%);stop-opacity:0;"/>
+</linearGradient>
+</defs>
+<g id="surface1">
+<use xlink:href="#image8"/>
+<path style="fill-rule:nonzero;fill:url(#linear0);stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke:url(#linear1);stroke-miterlimit:4;" d="M 79.641544 53.818934 C 79.641544 72.5 64.499081 87.637868 45.818015 87.637868 C 27.141544 87.637868 11.999081 72.5 11.999081 53.818934 C 11.999081 35.137868 27.141544 20 45.818015 20 C 64.499081 20 79.641544 35.137868 79.641544 53.818934 Z M 79.641544 53.818934 " transform="matrix(0.85,0,0,0.85,0,0)"/>
+</g>
+</svg>
