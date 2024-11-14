@@ -19,9 +19,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { reportGet } from '../api';
 import { captureRef } from 'react-native-view-shot';
-import CameraRoll, {
-  useCameraRoll,
-} from '@react-native-camera-roll/camera-roll';
+import { useCameraRoll } from '@react-native-camera-roll/camera-roll';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -64,7 +62,7 @@ const TodayDate = styled.Text`
 
 const ReportScrollView = styled.ScrollView`
   display: flex;
-  width: 100%;
+  width: 86%;
   flex: 1;
   margin-top: 8px;
   margin-left: 26px;
@@ -302,8 +300,6 @@ const Report = () => {
     return `${year}년 ${month}월 ${day}일`;
   }
 
-  console.log(FormattedDate);
-
   //-------------scrollview 처리-----------------
   const scrollViewRef = useRef(null); // ScrollView의 ref를 생성합니다.
   const scrollToBottom = () => {
@@ -445,7 +441,10 @@ const Report = () => {
         {/* 수정 필요*/}
         <TodayDate>{FormattedDate()}</TodayDate>
         <ReportView>
-          <ReportScrollView ref={scrollViewRef}>
+          <ReportScrollView
+            ref={scrollViewRef}
+            showsVerticalScrollIndicator={false}
+          >
             <MessageView>
               <AskDataboxIcon
                 height={73.28}
