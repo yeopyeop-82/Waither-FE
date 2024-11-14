@@ -345,7 +345,7 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
     for (let i = 0; i < mainData.result.expectedPty.length; i++) {
       if (!foundFirstRain && mainData.result.expectedPty[i] === '1') {
         setIsRainy(true);
-        setIsWhenRainy(time.getHours() + i);
+        setIsWhenRainy(time.getHours() + i + 1);
         foundFirstRain = true;
       } else if (
         foundFirstRain &&
@@ -362,9 +362,8 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
   const hourlyWeatherIcon = (i, time) => {
     //강수 없음, 구름많음
     if (
-      (mainData.result.expectedPty[i] == 0 &&
-        mainData.result.expectedSky[i] == 3,
-      4)
+      mainData.result.expectedPty[i] == 0 &&
+      mainData.result.expectedSky[i] > 1
     ) {
       //해가 떠 있을때
       if (time > 6 && time < 18) {
@@ -392,7 +391,9 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
     }
     //강수 있음, 맑음
     if (
-      mainData.result.expectedPty[i] == 1 &&
+      mainData.result.expectedPty[i] > 0 &&
+      mainData.result.expectedPty[i] != 3 &&
+      mainData.result.expectedPty[i] != 7 &&
       mainData.result.expectedSky[i] == 1
     ) {
       //해가 떠 있을때
@@ -406,8 +407,10 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
     }
     //강수 있음, 구름많음
     if (
-      mainData.result.expectedPty[i] == 1 &&
-      mainData.result.expectedSky[i] == 3
+      mainData.result.expectedPty[i] > 0 &&
+      mainData.result.expectedPty[i] != 3 &&
+      mainData.result.expectedPty[i] != 7 &&
+      mainData.result.expectedSky[i] != 1
     ) {
       //해가 떠 있을때
       if (time > 6 && time < 18) {
@@ -419,7 +422,10 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
       }
     }
     //눈 있음
-    if (mainData.result.expectedPty[i] == 3) {
+    if (
+      mainData.result.expectedPty[i] == 3 ||
+      mainData.result.expectedPty[i] == 7
+    ) {
       //해가 떠 있을때
       if (time > 6 && time < 18) {
         return <AfternoonSnowIcon width={48} height={45} />;
@@ -728,21 +734,19 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
                     </MainExtraWeatherInfoView>
                   </MainExtraWeatherViewColumn>
                 )}
-                {showDust && (
-                  <MainExtraWeatherViewColumn>
-                    <MainExtraWeatherTitleView>
-                      <MainExtraWeatherTitle>미세먼지</MainExtraWeatherTitle>
-                    </MainExtraWeatherTitleView>
-                    <FineDustIcon />
-                    <MainExtraWeatherInfoView>
-                      <MainExtraWeatherInfoText>좋음</MainExtraWeatherInfoText>
-                      <MainExtraWeatherTextDivider />
-                      <MainExtraWeatherInfoText>
-                        20㎍/m³
-                      </MainExtraWeatherInfoText>
-                    </MainExtraWeatherInfoView>
-                  </MainExtraWeatherViewColumn>
-                )}
+                {/* {showDust && ( */}
+                <MainExtraWeatherViewColumn>
+                  <MainExtraWeatherTitleView>
+                    <MainExtraWeatherTitle>습도</MainExtraWeatherTitle>
+                  </MainExtraWeatherTitleView>
+                  <FineDustIcon />
+                  <MainExtraWeatherInfoView>
+                    <MainExtraWeatherInfoText>
+                      {mainData.result.humidity}%
+                    </MainExtraWeatherInfoText>
+                  </MainExtraWeatherInfoView>
+                </MainExtraWeatherViewColumn>
+                {/* )} */}
               </MainExtraWeatherView>
             )}
             <MainWeatherByHourScrollView

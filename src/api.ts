@@ -37,7 +37,7 @@ export const reportGet = async () => {
       console.log(response.status);
     }
     const res = await response.json();
-    console.log('레포트 호출 결과', res);
+    // console.log('레포트 호출 결과', res);
     return res;
   } catch (error) {
     console.error('Error fetching: 레포트 GET ', error);
