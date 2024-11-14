@@ -62,5 +62,8 @@
     </array>
     <key>UIViewControllerBasedStatusBarAppearance</key>
     <false/>
+    <!--사진 저장 라이브러리-->
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>앱이 사진 라이브러리에 접근할 수 있도록 허용해주세요.</string>
   </dict>
 </plist>

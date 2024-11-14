@@ -1,5 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components/native';
 import AskDataboxIcon from '../assets/images/img-ask1-databox-shadow.svg';
 import NavBackIcon from '../assets/images/ic-nav-back.svg';
@@ -18,6 +18,8 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { reportGet } from '../api';
+import { captureRef } from 'react-native-view-shot';
+import { useCameraRoll } from '@react-native-camera-roll/camera-roll';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -50,7 +52,7 @@ const ReportView = styled.View`
   flex: 1;
 `;
 
-const Date = styled.Text`
+const TodayDate = styled.Text`
   color: white;
   font-size: 15px;
   font-weight: 800;
@@ -60,7 +62,7 @@ const Date = styled.Text`
 
 const ReportScrollView = styled.ScrollView`
   display: flex;
-  width: 100%;
+  width: 86%;
   flex: 1;
   margin-top: 8px;
   margin-left: 26px;
@@ -287,7 +289,49 @@ const PollenSubTextView = styled.View`
 
 const Report = () => {
   const navigation = useNavigation();
-  const [date, setDate] = useState('');
+
+  //-------------날짜 처리-------------------
+  function FormattedDate() {
+    const time = new Date();
+    const year = time.getFullYear();
+    const month = String(time.getMonth() + 1).padStart(2, '0');
+    const day = String(time.getDate()).padStart(2, '0');
+
+    return `${year}년 ${month}월 ${day}일`;
+  }
+
+  //-------------scrollview 처리-----------------
+  const scrollViewRef = useRef(null); // ScrollView의 ref를 생성합니다.
+  const scrollToBottom = () => {
+    scrollViewRef.current?.scrollTo({ y: 190, animated: true });
+  };
+
+  //-------------screenshot-------------
+  const viewRef = useRef(null);
+  const [photos, getPhotos, save] = useCameraRoll();
+  const captureScreenshot = async () => {
+    captureRef(viewRef, {
+      format: 'png', // png, jpg 둘다 선택 가능
+      quality: 1, // 0과 1사이
+      // snapshotContentContainer: true, //스크롤 뷰까지 캡쳐하는 옵션
+    })
+      .then((uri) => {
+        alert('캡처가 완료되었습니다!');
+        console.log('Captured screenshot at', uri);
+        save(uri, { type: 'photo' })
+          .then(() => {
+            console.log('이미지 저장 완료');
+          })
+          .catch((error) => {
+            console.error('이미지 저장 에러', error);
+            alert('에러가 발생했습니다! 다시 시도해 주세요!');
+          });
+      })
+      .catch((error) => {
+        console.error('Error capturing screenshot:', error);
+        alert('에러가 발생했습니다! 다시 시도해 주세요!');
+      });
+  };
 
   //-------------react query-----------------
   const {
@@ -300,10 +344,6 @@ const Report = () => {
     queryFn: reportGet,
     // staleTime: Infinity,
   });
-
-  useEffect(() => {
-    reportGet();
-  }, []);
 
   //--------------advice 정제 함수-------------------
   const removeSpacesAfterDot = (text) => {
@@ -321,6 +361,7 @@ const Report = () => {
     return adviceArr;
   };
   //------------userPerception 정제 함수----------------
+  //num을 enum으로 저장해서 관리 -> 유지보수 향상
   const refiningUserPerception = (num, percent) => {
     if (num == null) {
       return '유저들의 답변이 부족합니다.';
@@ -368,7 +409,7 @@ const Report = () => {
     }
   }
   return (
-    <Wrapper>
+    <Wrapper ref={viewRef}>
       <LinearGradient
         colors={[
           'rgba(91, 149, 239, 1)',
@@ -386,13 +427,24 @@ const Report = () => {
           </HeaderBtn>
 
           <HeaderTitle>Report</HeaderTitle>
-          <HeaderBtn>
+          <HeaderBtn
+            onPress={() => {
+              scrollToBottom();
+              setTimeout(() => {
+                captureScreenshot(); // 캡쳐 실행
+              }, 500); // 500ms 대기 후 캡쳐
+            }}
+          >
             <DownLoadIcon style={{ marginRight: 13, marginTop: 4 }} />
           </HeaderBtn>
         </HeaderView>
-        <Date></Date>
+        {/* 수정 필요*/}
+        <TodayDate>{FormattedDate()}</TodayDate>
         <ReportView>
-          <ReportScrollView>
+          <ReportScrollView
+            ref={scrollViewRef}
+            showsVerticalScrollIndicator={false}
+          >
             <MessageView>
               <AskDataboxIcon
                 height={73.28}

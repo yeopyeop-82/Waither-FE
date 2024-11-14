@@ -37,7 +37,7 @@ export const reportGet = async () => {
       console.log(response.status);
     }
     const res = await response.json();
-    console.log(res);
+    // console.log('레포트 호출 결과', res);
     return res;
   } catch (error) {
     console.error('Error fetching: 레포트 GET ', error);
@@ -64,7 +64,6 @@ export const mainWeatherGet = async () => {
     }
     const res = await response.json();
     console.log('메인화면 호출 결과', res);
-    console.log('result', res.result);
     return res;
   } catch (error) {
     console.error('메인화면 호출 결과', error);
