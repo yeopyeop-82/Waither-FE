@@ -54,7 +54,7 @@ const ReportView = styled.View`
   flex: 1;
 `;
 
-const Date = styled.Text`
+const TodayDate = styled.Text`
   color: white;
   font-size: 15px;
   font-weight: 800;
@@ -291,7 +291,18 @@ const PollenSubTextView = styled.View`
 
 const Report = () => {
   const navigation = useNavigation();
-  const [date, setDate] = useState('');
+
+  //-------------날짜 처리-------------------
+  function FormattedDate() {
+    const time = new Date();
+    const year = time.getFullYear();
+    const month = String(time.getMonth() + 1).padStart(2, '0');
+    const day = String(time.getDate()).padStart(2, '0');
+
+    return `${year}년 ${month}월 ${day}일`;
+  }
+
+  console.log(FormattedDate);
 
   //-------------scrollview 처리-----------------
   const scrollViewRef = useRef(null); // ScrollView의 ref를 생성합니다.
@@ -326,10 +337,6 @@ const Report = () => {
       });
   };
 
-  useEffect(() => {
-    console.log(viewRef);
-  });
-
   //-------------react query-----------------
   const {
     isPending: isReportDataPending,
@@ -341,10 +348,6 @@ const Report = () => {
     queryFn: reportGet,
     // staleTime: Infinity,
   });
-
-  useEffect(() => {
-    reportGet();
-  }, []);
 
   //--------------advice 정제 함수-------------------
   const removeSpacesAfterDot = (text) => {
@@ -439,7 +442,8 @@ const Report = () => {
             <DownLoadIcon style={{ marginRight: 13, marginTop: 4 }} />
           </HeaderBtn>
         </HeaderView>
-        <Date></Date>
+        {/* 수정 필요*/}
+        <TodayDate>{FormattedDate()}</TodayDate>
         <ReportView>
           <ReportScrollView ref={scrollViewRef}>
             <MessageView>
