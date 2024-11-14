@@ -311,18 +311,19 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
   } = useSuspenseQuery({
     queryKey: ['mainData'],
     queryFn: mainWeatherGet,
-    // staleTime: Infinity,
+    staleTime: 600000,
   });
 
   const {
     isPending: isLocationDataPending,
     error: locationDataError,
     data: locationData,
+    refetch: isLocationDataRefetch,
     isFetching: isLocationDataFetching,
   } = useSuspenseQuery({
     queryKey: ['currentLocationData'],
     queryFn: currentLocationGet,
-    // staleTime: Infinity,
+    staleTime: 600000,
   });
 
   const {
@@ -334,7 +335,7 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
   } = useSuspenseQuery({
     queryKey: ['reportData'],
     queryFn: reportGet,
-    // staleTime: Infinity,
+    staleTime: 600000,
   });
 
   //---------강수 여부 및 강수 시간 검사 함수------------------------
@@ -582,6 +583,7 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
   const handleRefresh = async () => {
     mainDataRefetch();
     reportDataRefetch();
+    isLocationDataRefetch();
     setIsRefreshing(true);
     setIsRefreshing(false);
   };

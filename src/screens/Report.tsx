@@ -342,7 +342,7 @@ const Report = () => {
   } = useSuspenseQuery({
     queryKey: ['reportData'],
     queryFn: reportGet,
-    // staleTime: Infinity,
+    staleTime: 600000,
   });
 
   //--------------advice 정제 함수-------------------
