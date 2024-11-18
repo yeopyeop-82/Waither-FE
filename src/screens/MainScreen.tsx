@@ -39,7 +39,7 @@ import {
   isWhenRainy,
   isWhenRainyStop,
   rainyCheck,
-} from '../utils/mainFormatData';
+} from '../utils/FormatData/mainFormatData';
 import { getLocation } from '../utils/geolocation';
 
 const Wrapper = styled.View`
@@ -345,7 +345,7 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
 
   useEffect(() => {
     setWDirection(getWindDirection(mainData.result.windVector));
-    rainyCheck(mainData);
+    rainyCheck(mainData.result.expectedPty);
     getLocation();
   }, []);
 
@@ -579,15 +579,19 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
               showsHorizontalScrollIndicator={false}
             >
               <MainWeatherByHourView>
-                {hourlyWeatherData(mainData).map((data, index) => (
-                  <MainWeatherByHourColumn key={index}>
-                    <MainWeatherByHourTitle>{data.time}</MainWeatherByHourTitle>
-                    {data.icon}
-                    <MainWeatherByHourTemperature>
-                      {data.temperature}
-                    </MainWeatherByHourTemperature>
-                  </MainWeatherByHourColumn>
-                ))}
+                {hourlyWeatherData(mainData, mainData.result.expectedTemp).map(
+                  (data, index) => (
+                    <MainWeatherByHourColumn key={index}>
+                      <MainWeatherByHourTitle>
+                        {data.time}
+                      </MainWeatherByHourTitle>
+                      {data.icon}
+                      <MainWeatherByHourTemperature>
+                        {data.temperature}
+                      </MainWeatherByHourTemperature>
+                    </MainWeatherByHourColumn>
+                  ),
+                )}
               </MainWeatherByHourView>
             </MainWeatherByHourScrollView>
           </MainInfoView>

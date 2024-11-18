@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import SunnyIcon from '../assets/images/ic-weather-sunny.svg';
-import NightCloudIcon from '../assets/images/ic-weather-night-cloudy.svg';
-import NightClearIcon from '../assets/images/ic-weather-night-clear.svg';
-import NightRainIcon from '../assets/images/ic-weather-night-rainy.svg';
-import NightSnowIcon from '../assets/images/ic-weather-snow.svg';
-import AfternoonSnowIcon from '../assets/images/ic-weather-snownabitcloudy.svg';
-import ShowerIcon from '../assets/images/ic-shower.svg';
-import CloudyIcon from '../assets/images/ic-cloudy.svg';
-import RainyCloudyIcon from '../assets/images/ic-weather-rainy.svg';
+import SunnyIcon from '../../assets/images/ic-weather-sunny.svg';
+import NightCloudIcon from '../../assets/images/ic-weather-night-cloudy.svg';
+import NightClearIcon from '../../assets/images/ic-weather-night-clear.svg';
+import NightRainIcon from '../../assets/images/ic-weather-night-rainy.svg';
+import NightSnowIcon from '../../assets/images/ic-weather-snow.svg';
+import AfternoonSnowIcon from '../../assets/images/ic-weather-snownabitcloudy.svg';
+import ShowerIcon from '../../assets/images/ic-shower.svg';
+import CloudyIcon from '../../assets/images/ic-cloudy.svg';
+import RainyCloudyIcon from '../../assets/images/ic-weather-rainy.svg';
 
 const time = new Date();
 export const currentTime = time.getHours() % 24;
@@ -67,10 +67,11 @@ export function getWindDirection(degrees: number) {
 export const hourlyWeatherIcon = (
   i: number,
   time: number,
-  data: object,
+  expectedPty: object,
+  expectedSky: object,
 ): React.JSX.Element => {
   //강수 없음, 구름많음
-  if (data.result.expectedPty[i] == 0 && data.result.expectedSky[i] > 1) {
+  if (expectedPty[i] == 0 && expectedSky[i] > 1) {
     //해가 떠 있을때
     if (currentTime > 6 && currentTime < 18) {
       return <CloudyIcon width={48} height={45} />;
@@ -82,7 +83,7 @@ export const hourlyWeatherIcon = (
   }
 
   //강수 없음, 맑음
-  if (data.result.expectedPty[i] == 0 && data.result.expectedSky[i] == 1) {
+  if (expectedPty[i] == 0 && expectedSky[i] == 1) {
     //해가 떠 있을때
     if (currentTime > 6 && currentTime < 18) {
       return <SunnyIcon width={48} height={45} />;
@@ -94,10 +95,10 @@ export const hourlyWeatherIcon = (
   }
   //강수 있음, 맑음
   if (
-    data.result.expectedPty[i] > 0 &&
-    data.result.expectedPty[i] != 3 &&
-    data.result.expectedPty[i] != 7 &&
-    data.result.expectedSky[i] == 1
+    expectedPty[i] > 0 &&
+    expectedPty[i] != 3 &&
+    expectedPty[i] != 7 &&
+    expectedSky[i] == 1
   ) {
     //해가 떠 있을때
     if (currentTime > 6 && currentTime < 18) {
@@ -110,10 +111,10 @@ export const hourlyWeatherIcon = (
   }
   //강수 있음, 구름많음
   if (
-    data.result.expectedPty[i] > 0 &&
-    data.result.expectedPty[i] != 3 &&
-    data.result.expectedPty[i] != 7 &&
-    data.result.expectedSky[i] != 1
+    expectedPty[i] > 0 &&
+    expectedPty[i] != 3 &&
+    expectedPty[i] != 7 &&
+    expectedSky[i] != 1
   ) {
     //해가 떠 있을때
     if (currentTime > 6 && currentTime < 18) {
@@ -125,7 +126,7 @@ export const hourlyWeatherIcon = (
     }
   }
   //눈 있음
-  if (data.result.expectedPty[i] == 3 || data.result.expectedPty[i] == 7) {
+  if (expectedPty[i] == 3 || expectedPty[i] == 7) {
     //해가 떠 있을때
     if (currentTime > 6 && currentTime < 18) {
       return <AfternoonSnowIcon width={48} height={45} />;
@@ -141,20 +142,16 @@ export const hourlyWeatherIcon = (
 export let isRainy = false;
 export let isWhenRainy = 0;
 export let isWhenRainyStop = 0;
-export const rainyCheck = (data) => {
+export const rainyCheck = (expectedPty: object) => {
   let foundFirstRain = false;
   let foundFirstClear = false;
 
-  for (let i = 0; i < data.result.expectedPty.length; i++) {
-    if (!foundFirstRain && data.result.expectedPty[i] === '1') {
+  for (let i = 0; i < expectedPty.length; i++) {
+    if (!foundFirstRain && expectedPty[i] === '1') {
       isRainy = true;
       isWhenRainy = time.getHours() + i + 1;
       foundFirstRain = true;
-    } else if (
-      foundFirstRain &&
-      !foundFirstClear &&
-      data.result.expectedPty[i] === '0'
-    ) {
+    } else if (foundFirstRain && !foundFirstClear && expectedPty[i] === '0') {
       isWhenRainyStop = time.getHours() + i;
       foundFirstClear = true;
       break;
@@ -162,37 +159,67 @@ export const rainyCheck = (data) => {
   }
 };
 
-export const hourlyWeatherData = (data: object) => {
+export const hourlyWeatherData = (data: object, expectedTemp: object) => {
   return [
     {
       time: currentTime + 1 + '시',
-      icon: hourlyWeatherIcon(0, currentTime, data),
-      temperature: data.result.expectedTemp[0] + '°C',
+      icon: hourlyWeatherIcon(
+        0,
+        currentTime,
+        data.result.expectedPty,
+        data.result.expectedSky,
+      ),
+      temperature: expectedTemp[0] + '°C',
     },
     {
       time: currentTime + 2 + '시',
-      icon: hourlyWeatherIcon(1, currentTime + 1, data),
-      temperature: data.result.expectedTemp[1] + '°C',
+      icon: hourlyWeatherIcon(
+        1,
+        currentTime + 1,
+        data.result.expectedPty,
+        data.result.expectedSky,
+      ),
+      temperature: expectedTemp[1] + '°C',
     },
     {
       time: currentTime + 3 + '시',
-      icon: hourlyWeatherIcon(2, currentTime + 1, data),
-      temperature: data.result.expectedTemp[2] + '°C',
+      icon: hourlyWeatherIcon(
+        2,
+        currentTime + 1,
+        data.result.expectedPty,
+        data.result.expectedSky,
+      ),
+      temperature: expectedTemp[2] + '°C',
     },
     {
       time: currentTime + 4 + '시',
-      icon: hourlyWeatherIcon(3, currentTime + 1, data),
-      temperature: data.result.expectedTemp[3] + '°C',
+      icon: hourlyWeatherIcon(
+        3,
+        currentTime + 1,
+        data.result.expectedPty,
+        data.result.expectedSky,
+      ),
+      temperature: expectedTemp[3] + '°C',
     },
     {
       time: currentTime + 5 + '시',
-      icon: hourlyWeatherIcon(4, currentTime + 1, data),
-      temperature: data.result.expectedTemp[4] + '°C',
+      icon: hourlyWeatherIcon(
+        4,
+        currentTime + 1,
+        data.result.expectedPty,
+        data.result.expectedSky,
+      ),
+      temperature: expectedTemp[4] + '°C',
     },
     {
       time: currentTime + 1 + '시',
-      icon: hourlyWeatherIcon(5, currentTime + 1, data),
-      temperature: data.result.expectedTemp[5] + '°C',
+      icon: hourlyWeatherIcon(
+        5,
+        currentTime + 1,
+        data.result.expectedPty,
+        data.result.expectedSky,
+      ),
+      temperature: expectedTemp[5] + '°C',
     },
   ];
 };
