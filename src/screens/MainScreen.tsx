@@ -303,8 +303,6 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
     longtitude: null,
   });
 
-  // const token = AsyncStorage.getItem('accessToken');
-  // const accessToken = `Bearer ${token}`;
   //----------------React Query-----------------
   const {
     isPending: isMainDataPending,
