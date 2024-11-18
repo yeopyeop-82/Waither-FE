@@ -228,7 +228,7 @@ const SettingNotification = () => {
   const [Sunday, setIsSunday] = useState(false);
 
   const [chosenDay, setChosenDay] = useState([]);
-  const [outTime, setOutTime] = useState('');
+  const [outTime, setOutTime] = useState('00:00');
 
   const [selectedAmPm, setSelectedAmPm] = useState('AM');
   const [selectedHour, setSelectedHour] = useState('1');
@@ -441,6 +441,7 @@ const SettingNotification = () => {
         body: body,
       });
       if (!response.ok) {
+        console.log(response);
         throw new Error('Network response was not ok');
       }
       const res = await response.json();
@@ -586,7 +587,7 @@ const SettingNotification = () => {
         headers: headers,
       });
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error(response.status);
       }
       const res = await response.json();
 
@@ -732,8 +733,12 @@ const SettingNotification = () => {
           <TimeSettingBtn onPress={handlePresentModalPress}>
             <TimeSettingInnerView>
               <SettingMainTitle>
-                {parseInt(outTime.slice(0, 3)) >= 13 ? '오후' : '오전'}{' '}
-                {outTime.slice(0, -3)}
+                {outTime == null
+                  ? '오전'
+                  : parseInt(outTime.slice(0, 3)) >= 13
+                    ? '오후'
+                    : '오전'}{' '}
+                {outTime == null ? '00:00' : outTime.slice(0, -3)}
               </SettingMainTitle>
               <SettingSubTitle>
                 설정하신 시간대에 알림을 보내드릴게요.

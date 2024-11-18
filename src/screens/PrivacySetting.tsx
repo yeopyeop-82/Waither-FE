@@ -281,10 +281,11 @@ const PrivacySetting = () => {
       });
 
       if (!response.ok) {
+        console.log(response.status);
         throw new Error('Network response was not ok');
       }
 
-      console.log('로그아웃 성공 status code:', response.status);
+      console.log('로그아웃 성공 status code:', response);
     } catch (error) {
       console.error('로그아웃 에러', error);
     }
@@ -310,9 +311,9 @@ const PrivacySetting = () => {
         throw new Error('Network response was not ok');
       }
 
-      console.log('로그아웃 성공 status code:', response.status);
+      console.log('회원탈퇴 status code:', response.status);
     } catch (error) {
-      console.error('로그아웃 에러', error);
+      console.error('회원탈퇴 에러', error);
     }
   };
 

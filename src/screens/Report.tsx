@@ -1,5 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import React from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components/native';
 import AskDataboxIcon from '../assets/images/img-ask1-databox-shadow.svg';
 import NavBackIcon from '../assets/images/ic-nav-back.svg';
@@ -15,6 +15,11 @@ import PollenIcon from '../assets/images/ic-pollen.svg';
 import CautionIcon from '../assets/images/caution.svg';
 import { GREY_COLOR, MAIN_COLOR } from '../styles/color';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { reportGet } from '../api';
+import { captureRef } from 'react-native-view-shot';
+import { useCameraRoll } from '@react-native-camera-roll/camera-roll';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -47,7 +52,7 @@ const ReportView = styled.View`
   flex: 1;
 `;
 
-const Date = styled.Text`
+const TodayDate = styled.Text`
   color: white;
   font-size: 15px;
   font-weight: 800;
@@ -57,7 +62,7 @@ const Date = styled.Text`
 
 const ReportScrollView = styled.ScrollView`
   display: flex;
-  width: 100%;
+  width: 86%;
   flex: 1;
   margin-top: 8px;
   margin-left: 26px;
@@ -81,24 +86,25 @@ const WeatherMessageView = styled.View`
 `;
 
 const WeatherMessageBoxView = styled.View`
-  margin-top: 20px;
+  margin-top: 6.5%;
 `;
 
 const WeatherMessageBox = styled.View`
-  width: auto;
   height: 38px;
   background-color: rgb(117, 154, 240);
   border: 0.4px solid white;
   border-radius: 15px;
-  margin-bottom: 11px;
   margin-left: 12px;
-  align-items: center;
+  padding: 8px 12px;
+  align-items: flex-start;
   justify-content: center;
 `;
 
-const WeahtherMessageText = styled.Text`
+const WeatherMessageText = styled.Text`
   color: white;
   font-weight: 800;
+
+  flex-wrap: wrap;
 `;
 
 const ExplainText = styled.Text`
@@ -121,10 +127,10 @@ const WeatherChangeMessageView = styled.View`
   border: 0.4px solid white;
   flex-direction: row;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 3%;
 `;
 
-const WeahtherChangeTextView = styled.View`
+const WeatherChangeTextView = styled.View`
   flex-direction: column;
   width: 70%;
 `;
@@ -156,6 +162,7 @@ const UserAnswerText = styled.Text`
 `;
 const Percent = styled.Text`
   margin-top: 20px;
+  margin-left: 5%;
   left: 140px;
   color: white;
 `;
@@ -165,6 +172,13 @@ const PercentBar = styled.View`
   height: 19px;
   border: 0.4px solid white;
   border-radius: 15px;
+  background-color: transparent;
+`;
+
+const FillBar = styled(LinearGradient)`
+  height: 100%;
+  border-radius: 15px;
+  width: ${(props) => props.percent}%;
 `;
 
 const WeatherDetailWrapper = styled.View`
@@ -243,7 +257,7 @@ const CustomWrapper = styled.View`
   height: 138px;
   margin-top: 15px;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: flex-start;
 `;
 
 const CustomBox = styled.View`
@@ -254,6 +268,7 @@ const CustomBox = styled.View`
   border: 0.4px solid white;
   align-items: center;
   justify-content: center;
+  margin-right: 10px;
 `;
 
 const CustomMainText = styled.Text`
@@ -274,8 +289,127 @@ const PollenSubTextView = styled.View`
 
 const Report = () => {
   const navigation = useNavigation();
+
+  //-------------날짜 처리-------------------
+  function FormattedDate() {
+    const time = new Date();
+    const year = time.getFullYear();
+    const month = String(time.getMonth() + 1).padStart(2, '0');
+    const day = String(time.getDate()).padStart(2, '0');
+
+    return `${year}년 ${month}월 ${day}일`;
+  }
+
+  //-------------scrollview 처리-----------------
+  const scrollViewRef = useRef(null); // ScrollView의 ref를 생성합니다.
+  const scrollToBottom = () => {
+    scrollViewRef.current?.scrollTo({ y: 190, animated: true });
+  };
+
+  //-------------screenshot-------------
+  const viewRef = useRef(null);
+  const [photos, getPhotos, save] = useCameraRoll();
+  const captureScreenshot = async () => {
+    captureRef(viewRef, {
+      format: 'png', // png, jpg 둘다 선택 가능
+      quality: 1, // 0과 1사이
+      // snapshotContentContainer: true, //스크롤 뷰까지 캡쳐하는 옵션
+    })
+      .then((uri) => {
+        alert('캡처가 완료되었습니다!');
+        console.log('Captured screenshot at', uri);
+        save(uri, { type: 'photo' })
+          .then(() => {
+            console.log('이미지 저장 완료');
+          })
+          .catch((error) => {
+            console.error('이미지 저장 에러', error);
+            alert('에러가 발생했습니다! 다시 시도해 주세요!');
+          });
+      })
+      .catch((error) => {
+        console.error('Error capturing screenshot:', error);
+        alert('에러가 발생했습니다! 다시 시도해 주세요!');
+      });
+  };
+
+  //-------------react query-----------------
+  const {
+    isPending: isReportDataPending,
+    error: reportDataError,
+    data: reportData,
+    isFetching: isReportDataFetching,
+  } = useSuspenseQuery({
+    queryKey: ['reportData'],
+    queryFn: reportGet,
+    // staleTime: Infinity,
+  });
+
+  //--------------advice 정제 함수-------------------
+  const removeSpacesAfterDot = (text) => {
+    return text.replace(/\. +/g, '.');
+  };
+
+  const refiningAdvice = () => {
+    var advice = '';
+    //2개의 중요 조언만
+    for (let i = 0; i < 2; i++) {
+      advice += removeSpacesAfterDot(reportData.result.advices[i]);
+    }
+    const adviceArr = advice.split('.');
+    adviceArr.pop();
+    return adviceArr;
+  };
+  //------------userPerception 정제 함수----------------
+  //num을 enum으로 저장해서 관리 -> 유지보수 향상
+  const refiningUserPerception = (num, percent) => {
+    if (num == null) {
+      return '유저들의 답변이 부족합니다.';
+    }
+    if (num == 1) {
+      return `전체 유저의 ${percent}%가\n오늘 날씨를 매우 춥다고 답변했습니다.`;
+    }
+    if (num == 2) {
+      return `전체 유저의 ${percent}%가\n오늘 날씨를 춥다고 답변했습니다.`;
+    }
+    if (num == 3) {
+      return `전체 유저의 ${percent}%가\n오늘 날씨를 보통이라고 답변했습니다.`;
+    }
+    if (num == 4) {
+      return `전체 유저의 ${percent}%가\n오늘 날씨를 덥다고 답변했습니다.`;
+    }
+    if (num == 5) {
+      return `전체 유저의 ${percent}%가\n오늘 날씨를 매우 덥다고 답변했습니다.`;
+    }
+  };
+
+  //------------풍향 각도에 따른 풍향 데이터 처리 함수---------------------------
+  function getWindDirection(degrees) {
+    if (
+      (degrees >= 0 && degrees < 22.5) ||
+      (degrees >= 337.5 && degrees <= 360)
+    ) {
+      return '북'; // North
+    } else if (degrees >= 22.5 && degrees < 67.5) {
+      return '북동'; // Northeast
+    } else if (degrees >= 67.5 && degrees < 112.5) {
+      return '동'; // East
+    } else if (degrees >= 112.5 && degrees < 157.5) {
+      return '남동'; // Southeast
+    } else if (degrees >= 157.5 && degrees < 202.5) {
+      return '남'; // South
+    } else if (degrees >= 202.5 && degrees < 247.5) {
+      return '남서'; // Southwest
+    } else if (degrees >= 247.5 && degrees < 292.5) {
+      return '서'; // West
+    } else if (degrees >= 292.5 && degrees < 337.5) {
+      return '북서'; // Northwest
+    } else {
+      return '잘못된 각도'; // Invalid angle
+    }
+  }
   return (
-    <Wrapper>
+    <Wrapper ref={viewRef}>
       <LinearGradient
         colors={[
           'rgba(91, 149, 239, 1)',
@@ -293,13 +427,24 @@ const Report = () => {
           </HeaderBtn>
 
           <HeaderTitle>Report</HeaderTitle>
-          <HeaderBtn>
+          <HeaderBtn
+            onPress={() => {
+              scrollToBottom();
+              setTimeout(() => {
+                captureScreenshot(); // 캡쳐 실행
+              }, 500); // 500ms 대기 후 캡쳐
+            }}
+          >
             <DownLoadIcon style={{ marginRight: 13, marginTop: 4 }} />
           </HeaderBtn>
         </HeaderView>
-        <Date>2024년 8월 23일 (목)</Date>
+        {/* 수정 필요*/}
+        <TodayDate>{FormattedDate()}</TodayDate>
         <ReportView>
-          <ReportScrollView>
+          <ReportScrollView
+            ref={scrollViewRef}
+            showsVerticalScrollIndicator={false}
+          >
             <MessageView>
               <AskDataboxIcon
                 height={73.28}
@@ -307,23 +452,13 @@ const Report = () => {
                 style={{ marginTop: 50 }}
               />
               <WeatherMessageView>
-                <WeatherMessageBoxView>
-                  <WeatherMessageBox>
-                    <WeahtherMessageText>
-                      오늘은 바람이 많이 불어요!
-                    </WeahtherMessageText>
-                  </WeatherMessageBox>
-                  <WeatherMessageBox>
-                    <WeahtherMessageText>
-                      오후 7시 경에 비가 올 예정이에요!
-                    </WeahtherMessageText>
-                  </WeatherMessageBox>
-                  <WeatherMessageBox>
-                    <WeahtherMessageText>
-                      오늘은 꽃가루가 많이 날릴 예정이에요!
-                    </WeahtherMessageText>
-                  </WeatherMessageBox>
-                </WeatherMessageBoxView>
+                {refiningAdvice().map((advice, index) => (
+                  <WeatherMessageBoxView key={index}>
+                    <WeatherMessageBox>
+                      <WeatherMessageText>{advice}.</WeatherMessageText>
+                    </WeatherMessageBox>
+                  </WeatherMessageBoxView>
+                ))}
               </WeatherMessageView>
             </MessageView>
             <ExplainText>날씨 변화</ExplainText>
@@ -334,13 +469,22 @@ const Report = () => {
                   height={32}
                   style={{ marginLeft: 18, marginRight: 18 }}
                 />
-                <WeahtherChangeTextView>
+                <WeatherChangeTextView>
                   <WeatherChangeMainText>기온</WeatherChangeMainText>
+                  {/* 수정 */}
                   <WeatherChangeSubText>
-                    어제보다 5도 낮아요!
+                    {reportData.result.weatherChange.tempDifference > 0
+                      ? '어제보다 기온이 높아요!'
+                      : reportData.result.weatherChange.tempDifference < 0
+                        ? '어제보다 기온이 낮아요!'
+                        : '어제와 기온이 같아요!'}
                   </WeatherChangeSubText>
-                </WeahtherChangeTextView>
-                <DownIcon width={22} height={22} />
+                </WeatherChangeTextView>
+                {reportData.result.weatherChange.tempDifference > 0 ? (
+                  <UpIcon width={22} height={22} />
+                ) : reportData.result.weatherChange.tempDifference < 0 ? (
+                  <DownIcon width={22} height={22} />
+                ) : null}
               </WeatherChangeMessageView>
               <WeatherChangeMessageView>
                 <WindIcon
@@ -348,37 +492,56 @@ const Report = () => {
                   height={32}
                   style={{ marginLeft: 18, marginRight: 18 }}
                 />
-                <WeahtherChangeTextView>
+                <WeatherChangeTextView>
                   <WeatherChangeMainText>바람</WeatherChangeMainText>
                   <WeatherChangeSubText>
-                    어제보다 바람이 많이 불어요!
+                    {reportData.result.weatherChange.windChangeStatus > 0
+                      ? '어제보다 바람이 강해요!'
+                      : reportData.result.weatherChange.windChangeStatus < 0
+                        ? '어제보다 바람이 약해요!'
+                        : '어제와 바람 세기가 같아요!'}
                   </WeatherChangeSubText>
-                </WeahtherChangeTextView>
-                <UpIcon width={22} height={22} />
+                </WeatherChangeTextView>
+                {reportData.result.weatherChange.windChangeStatus > 0 ? (
+                  <UpIcon width={22} height={22} />
+                ) : reportData.result.weatherChange.windChangeStatus < 0 ? (
+                  <DownIcon width={22} height={22} />
+                ) : null}
               </WeatherChangeMessageView>
             </WeatherChangeView>
             <ExplainText>유저들의 답변</ExplainText>
             <UserAnswerView>
               <UserAnswerText>
-                전체 유저의 0%가{'\n'} 오늘 춥다고 답변했습니다.
+                {refiningUserPerception(
+                  reportData.result.userPerception.ans,
+                  reportData.result.userPerception.percentage,
+                )}
               </UserAnswerText>
-              <Percent>0%</Percent>
-              <PercentBar></PercentBar>
+              <Percent>{reportData.result.userPerception.percentage}%</Percent>
+              <PercentBar>
+                <FillBar
+                  percent={reportData.result.userPerception.percentage}
+                  colors={['#90C2FF', '#4D88F7']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                />
+              </PercentBar>
             </UserAnswerView>
             <ExplainText>날씨 세부 사항</ExplainText>
             <WeatherDetailWrapper>
               <TempRainWrapper>
                 <TempRainBox style={{ marginRight: 18 }}>
                   <TempRainMainText>평균 온도</TempRainMainText>
-                  <Temp>5'c</Temp>
+                  <Temp>{reportData.result.temp}'C</Temp>
                   <TempRainSubText>
-                    최고: {'            '}최저:{' '}
+                    최고: {reportData.result.tempMax}'C
+                    {'        '}최저:{reportData.result.tempMin}'C
                   </TempRainSubText>
                 </TempRainBox>
                 <TempRainBox>
-                  <TempRainMainText>강수량</TempRainMainText>
+                  <TempRainMainText>강수확률</TempRainMainText>
                   <CloudIcon width={38} height={32} style={{ marginTop: 20 }} />
-                  <TempRainSubText>1~3mm</TempRainSubText>
+                  <TempRainSubText>{reportData.result.pop}%</TempRainSubText>
                 </TempRainBox>
               </TempRainWrapper>
 
@@ -386,7 +549,7 @@ const Report = () => {
                 <WindBox>
                   <WindMainText>풍속</WindMainText>
                   <WindIcon width={30} height={26} style={{ marginTop: 20 }} />
-                  <WindSubText>2m/s~4m/s</WindSubText>
+                  <WindSubText>{reportData.result.windDegree}m/s</WindSubText>
                 </WindBox>
                 <WindBox>
                   <WindMainText>풍향</WindMainText>
@@ -395,10 +558,12 @@ const Report = () => {
                     height={39}
                     style={{ marginTop: 20 }}
                   />
-                  <WindSubText>남남동</WindSubText>
+                  <WindSubText>
+                    {getWindDirection(reportData.result.windVector)}
+                  </WindSubText>
                 </WindBox>
               </WindWrapper>
-              <CustomWrapper>
+              {/* <CustomWrapper>
                 <CustomBox>
                   <CustomMainText>미세먼지</CustomMainText>
                   <DustIcon width={60} height={58} style={{ marginTop: 10 }} />
@@ -419,7 +584,7 @@ const Report = () => {
                 <CustomBox>
                   <CustomMainText>예시 테스트</CustomMainText>
                 </CustomBox>
-              </CustomWrapper>
+              </CustomWrapper> */}
             </WeatherDetailWrapper>
           </ReportScrollView>
         </ReportView>

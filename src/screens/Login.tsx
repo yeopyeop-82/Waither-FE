@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Modal from 'react-native-modal';
 import { styled } from 'styled-components/native';
 import AppleLogo from '../assets/images/Apple-logo.png';
@@ -19,6 +19,7 @@ import {
   unlink,
   KakaoOAuthToken,
 } from '@react-native-seoul/kakao-login';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -185,26 +186,92 @@ const LoginPopupGoodText = styled.Text`
 // eslint-disable-next-line react/prop-types
 export default function Login({ navigation }) {
   const [isModalVisible, setModalVisible] = useState(false);
-
-  const [profile, setProfile] = useState('');
-
   const withOutLoginOnPress = () => {
     setModalVisible(!isModalVisible);
   };
 
+  const [profile, setProfile] = useState('');
+  const [email, setEmail] = useState('');
+  const [id, setId] = useState(null);
+  const [nickname, setNickname] = useState('');
+  const [accessToken, setAccessToken] = useState('');
+
+  useEffect(() => {
+    setEmail;
+    setId;
+    setNickname;
+  }, [email, id, nickname]);
+
   const signInWithKakao = async (): Promise<void> => {
-    const result: KakaoOAuthToken = await login();
-    getProfile();
-    console.log('로그인 결과', result);
+    try {
+      const result: KakaoOAuthToken = await login();
+      getProfile();
+      setAccessToken(result.accessToken);
+      // console.log('로그인 결과', result);
+      KakaoLoginPost();
+    }
+    catch(err) {
+      console.log('카카오 로그인 에러', err)
+    }
+    
   };
+  //--------------------------------------------------
   const getProfile = async (): Promise<void> => {
     try {
       const profile = await getKakaoProfile();
       setProfile(JSON.stringify(profile));
+      setEmail(profile.email);
+      setNickname(profile.nickname);
+      setId(profile.id);
 
-      console.log('프로필 조회', profile);
+      // console.log('프로필 조회', profile);
     } catch (err) {
       console.error('signOut error', err);
+    }
+  };
+  //--------------------------------------------------
+  const KakaoLoginPost = async () => {
+    const url = 'https://waither.shop/user/oauth/kakao/login';
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+    const body = JSON.stringify({
+      accessToken: accessToken,
+      authId: id,
+      email: email,
+      nickname: nickname,
+    });
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: headers,
+        body: body,
+      });
+
+      if (!response.ok) {
+        console.log(response.status);
+        // throw new Error('Network response was not ok');
+      }
+
+      const res = await response.json();
+
+      //-------------------------------------------------------------------------------
+      if (res.result && res.result.accessToken && res.result.refreshToken) {
+        const { accessToken, refreshToken } = res.result;
+
+        await AsyncStorage.setItem('accessToken', accessToken);
+        await AsyncStorage.setItem('refreshToken', refreshToken);
+        console.log(accessToken);
+        navigation.navigate('MainScreen');
+      } else {
+        console.error('Invalid response structure:', res);
+      }
+      //-------------------------------------------------------------------------------
+
+      console.log('카카오 로그인', res);
+    } catch (error) {
+      console.error('카카오 로그인', error);
     }
   };
   return (
@@ -259,7 +326,7 @@ export default function Login({ navigation }) {
       {/* 화면 구성을 위한 변경 Register -> PasswordReset */}
       <EmailRegister
         onPress={() => {
-          navigation.navigate('Greeting');
+          navigation.navigate('Register');
         }}
       >
         <EmailRegisterText>이메일로 회원가입</EmailRegisterText>

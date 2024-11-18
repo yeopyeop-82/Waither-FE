@@ -1,10 +1,18 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import styled from 'styled-components/native';
 import NotificationIcon from '../assets/images/ic-main-noti-unread.svg';
 import SettingIcon from '../assets/images/ic-main-settings.svg';
 import RainIcon from '../assets/images/ic_rain.svg';
+import SunIcon from '../assets/images/ic_sunny.svg';
 import RainWithCloudIcon from '../assets/images/ic-weather-rain.svg';
+import SunnyIcon from '../assets/images/ic-weather-sunny.svg';
+import NightCloudIcon from '../assets/images/ic-weather-night-cloudy.svg';
+import NightClearIcon from '../assets/images/ic-weather-night-clear.svg';
+import NightRainIcon from '../assets/images/ic-weather-night-rainy.svg';
+import NightSnowIcon from '../assets/images/ic-weather-snow.svg';
+import AfternoonSnowIcon from '../assets/images/ic-weather-snownabitcloudy.svg';
+import SnowIcon from '../assets/images/ic-weather-snow.svg';
 import WaitherIcon from '../assets/images/ic-ask-databox_no_shadow.svg';
 import GpsIcon from '../assets/images/ic_gps.svg';
 import TemIcon from '../assets/images/ic_tem.svg';
@@ -13,11 +21,24 @@ import CloudIcon from '../assets/images/ic_cloud.svg';
 import FineDustIcon from '../assets/images/ic_finedust.svg';
 import ShowerIcon from '../assets/images/ic-shower.svg';
 import CloudyIcon from '../assets/images/ic-cloudy.svg';
+import RainyCloudyIcon from '../assets/images/ic-weather-rainy.svg';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect, NavigationProp } from '@react-navigation/native';
+import { useRecoilState } from 'recoil';
+import { userNameState } from '../recoil/userInitInfoRecoil';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { currentLocationGet, mainWeatherGet, reportGet } from '../api';
+import { RefreshControl } from 'react-native';
 
 const Wrapper = styled.View`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  flex: 1;
+`;
+
+const MainScrollView = styled.ScrollView`
+  width: 100%;
   flex: 1;
 `;
 
@@ -65,7 +86,7 @@ const MainInfoView = styled.View`
   overflow: visible;
 `;
 
-const MainAccentView = styled.View`
+const MainAccentView = styled.TouchableOpacity`
   flex-direction: row;
   align-items: center;
   margin-bottom: 12px;
@@ -85,6 +106,7 @@ const MainAccentIcon = styled.View`
 
 const MainAccentTextView = styled.View`
   flex-direction: column;
+  width: 65%;
 `;
 
 const MainAccentTitle = styled.Text`
@@ -112,12 +134,17 @@ const MainWeatherView = styled.View`
 
 const MainWeatherInfoView = styled.View`
   flex-direction: column;
-  margin-left: 37px;
+  margin-left: 25px;
 `;
 
 const MainWeatherLocationView = styled.View`
   flex-direction: row;
   align-items: center;
+`;
+
+const SunnyView = styled.View`
+  padding-top: 340%;
+  padding-right: 10%;
 `;
 
 const MainWeatherLocation = styled.Text`
@@ -227,7 +254,7 @@ const MainWeatherByHourScrollView = styled.ScrollView`
 `;
 
 const MainWeatherByHourView = styled.View`
-  width: 670px;
+  width: 105%;
   height: 127px;
   background-color: rgba(255, 255, 255, 0.2);
   border-radius: 16px;
@@ -255,68 +282,314 @@ const MainWeatherByHourTemperature = styled.Text`
   margin-top: 7px;
 `;
 
-const MainScreen = ({ navigation }) => {
+type Props = {
+  navigation: NavigationProp<any>;
+};
+
+const MainScreen: React.FC<Props> = ({ navigation }) => {
+  const [showWind, setShowWind] = useState(false);
+  const [showPrecipitation, setShowPrecipitation] = useState(false);
+  const [showDust, setShowDust] = useState(false);
+  const [wDirection, setWDirection] = useState('');
+  const [name, setName] = useRecoilState(userNameState);
+  const [isRainy, setIsRainy] = useState(false);
+  const [isWhenRainy, setIsWhenRainy] = useState(0);
+  const [isWhenRainyStop, setIsWhenRainyStop] = useState(0);
+  const time = new Date();
+  const currentTime = time.getHours() % 24;
+
+  // const token = AsyncStorage.getItem('accessToken');
+  // const accessToken = `Bearer ${token}`;
+  //----------------React Query-----------------
+  const {
+    isPending: isMainDataPending,
+    error: mainDataError,
+    data: mainData,
+    refetch: mainDataRefetch,
+    isFetching: isMainDataFetching,
+    isLoading: isMainDataLoading,
+  } = useSuspenseQuery({
+    queryKey: ['mainData'],
+    queryFn: mainWeatherGet,
+    // staleTime: Infinity,
+  });
+
+  const {
+    isPending: isLocationDataPending,
+    error: locationDataError,
+    data: locationData,
+    isFetching: isLocationDataFetching,
+  } = useSuspenseQuery({
+    queryKey: ['currentLocationData'],
+    queryFn: currentLocationGet,
+    // staleTime: Infinity,
+  });
+
+  const {
+    isPending: isReportDataPending,
+    error: reportDataError,
+    data: reportData,
+    refetch: reportDataRefetch,
+    isFetching: isReportDataFetching,
+  } = useSuspenseQuery({
+    queryKey: ['reportData'],
+    queryFn: reportGet,
+    // staleTime: Infinity,
+  });
+
+  //---------강수 여부 및 강수 시간 검사 함수------------------------
+  const rainyCheck = () => {
+    let foundFirstRain = false;
+    let foundFirstClear = false;
+
+    for (let i = 0; i < mainData.result.expectedPty.length; i++) {
+      if (!foundFirstRain && mainData.result.expectedPty[i] === '1') {
+        setIsRainy(true);
+        setIsWhenRainy(time.getHours() + i + 1);
+        foundFirstRain = true;
+      } else if (
+        foundFirstRain &&
+        !foundFirstClear &&
+        mainData.result.expectedPty[i] === '0'
+      ) {
+        setIsWhenRainyStop(time.getHours() + i);
+        foundFirstClear = true;
+        break;
+      }
+    }
+  };
+  //------------미래 날씨 예측 컴포넌트 데이터, 아이콘 처리 함수--------------------
+  const hourlyWeatherIcon = (i, time) => {
+    //강수 없음, 구름많음
+    if (
+      mainData.result.expectedPty[i] == 0 &&
+      mainData.result.expectedSky[i] > 1
+    ) {
+      //해가 떠 있을때
+      if (time > 6 && time < 18) {
+        return <CloudyIcon width={48} height={45} />;
+      }
+      //해가 떠 있지 않을때
+      else {
+        return <NightCloudIcon width={48} height={45} />;
+      }
+    }
+
+    //강수 없음, 맑음
+    if (
+      mainData.result.expectedPty[i] == 0 &&
+      mainData.result.expectedSky[i] == 1
+    ) {
+      //해가 떠 있을때
+      if (time > 6 && time < 18) {
+        return <SunnyIcon width={48} height={45} />;
+      }
+      //해가 떠 있지 않을때
+      else {
+        return <NightClearIcon width={48} height={45} />;
+      }
+    }
+    //강수 있음, 맑음
+    if (
+      mainData.result.expectedPty[i] > 0 &&
+      mainData.result.expectedPty[i] != 3 &&
+      mainData.result.expectedPty[i] != 7 &&
+      mainData.result.expectedSky[i] == 1
+    ) {
+      //해가 떠 있을때
+      if (time > 6 && time < 18) {
+        return <ShowerIcon width={48} height={45} />;
+      }
+      //해가 떠 있지 않을때
+      else {
+        return <NightRainIcon width={48} height={45} />;
+      }
+    }
+    //강수 있음, 구름많음
+    if (
+      mainData.result.expectedPty[i] > 0 &&
+      mainData.result.expectedPty[i] != 3 &&
+      mainData.result.expectedPty[i] != 7 &&
+      mainData.result.expectedSky[i] != 1
+    ) {
+      //해가 떠 있을때
+      if (time > 6 && time < 18) {
+        return <RainyCloudyIcon width={48} height={45} />;
+      }
+      //해가 떠 있지 않을때
+      else {
+        return <NightRainIcon width={48} height={45} />;
+      }
+    }
+    //눈 있음
+    if (
+      mainData.result.expectedPty[i] == 3 ||
+      mainData.result.expectedPty[i] == 7
+    ) {
+      //해가 떠 있을때
+      if (time > 6 && time < 18) {
+        return <AfternoonSnowIcon width={48} height={45} />;
+      }
+      //해가 떠 있지 않을때
+      else {
+        return <NightSnowIcon width={48} height={45} />;
+      }
+    }
+  };
+
   const hourlyWeatherData = [
     {
-      time: '16시',
-      icon: <ShowerIcon width={48} height={45} />,
-      temperature: '5°C',
+      time: ((time.getHours() + 1) % 24) + '시',
+      icon: hourlyWeatherIcon(0, (time.getHours() + 1) % 24),
+      temperature: mainData.result.expectedTemp[0] + '°C',
     },
     {
-      time: '17시',
-      icon: <CloudyIcon width={48} height={45} />,
-      temperature: '5°C',
+      time: ((time.getHours() + 2) % 24) + '시',
+      icon: hourlyWeatherIcon(1, (time.getHours() + 2) % 24),
+      temperature: mainData.result.expectedTemp[1] + '°C',
     },
     {
-      time: '18시',
-      icon: <CloudyIcon width={48} height={45} />,
-      temperature: '5°C',
+      time: ((time.getHours() + 3) % 24) + '시',
+      icon: hourlyWeatherIcon(2, (time.getHours() + 3) % 24),
+      temperature: mainData.result.expectedTemp[2] + '°C',
     },
     {
-      time: '19시',
-      icon: <CloudyIcon width={48} height={45} />,
-      temperature: '5°C',
+      time: ((time.getHours() + 4) % 24) + '시',
+      icon: hourlyWeatherIcon(3, (time.getHours() + 4) % 24),
+      temperature: mainData.result.expectedTemp[3] + '°C',
     },
     {
-      time: '20시',
-      icon: <CloudyIcon width={48} height={45} />,
-      temperature: '5°C',
+      time: ((time.getHours() + 5) % 24) + '시',
+      icon: hourlyWeatherIcon(4, (time.getHours() + 5) % 24),
+      temperature: mainData.result.expectedTemp[4] + '°C',
     },
     {
-      time: '21시',
-      icon: <CloudyIcon width={48} height={45} />,
-      temperature: '5°C',
-    },
-    {
-      time: '22시',
-      icon: <CloudyIcon width={48} height={45} />,
-      temperature: '5°C',
-    },
-    {
-      time: '23시',
-      icon: <CloudyIcon width={48} height={45} />,
-      temperature: '5°C',
-    },
-    {
-      time: '00시',
-      icon: <CloudyIcon width={48} height={45} />,
-      temperature: '5°C',
-    },
-    {
-      time: '01시',
-      icon: <CloudyIcon width={48} height={45} />,
-      temperature: '5°C',
+      time: ((time.getHours() + 6) % 24) + '시',
+      icon: hourlyWeatherIcon(5, (time.getHours() + 6) % 24),
+      temperature: mainData.result.expectedTemp[5] + '°C',
     },
   ];
+  //------------풍향 각도에 따른 풍향 데이터 처리 함수---------------------------
+  function getWindDirection(degrees) {
+    if (
+      (degrees >= 0 && degrees < 22.5) ||
+      (degrees >= 337.5 && degrees <= 360)
+    ) {
+      return '북'; // North
+    } else if (degrees >= 22.5 && degrees < 67.5) {
+      return '북동'; // Northeast
+    } else if (degrees >= 67.5 && degrees < 112.5) {
+      return '동'; // East
+    } else if (degrees >= 112.5 && degrees < 157.5) {
+      return '남동'; // Southeast
+    } else if (degrees >= 157.5 && degrees < 202.5) {
+      return '남'; // South
+    } else if (degrees >= 202.5 && degrees < 247.5) {
+      return '남서'; // Southwest
+    } else if (degrees >= 247.5 && degrees < 292.5) {
+      return '서'; // West
+    } else if (degrees >= 292.5 && degrees < 337.5) {
+      return '북서'; // Northwest
+    } else {
+      return '잘못된 각도'; // Invalid angle
+    }
+  }
+  //----------------시간대에 따른 배경 그레디언트 설정 함수----------------
+
+  const asTimeBackgroundColor = () => {
+    const testtime = 22;
+    //낮 시간대
+    if (currentTime >= 6 && currentTime < 15) {
+      return [
+        'rgba(143,169,160, 1)',
+        'rgba(50,127,188, 1)',
+        'rgba(22,115,187, 1)',
+      ];
+    }
+    //노을 시간대
+    if (currentTime >= 15 && currentTime < 18) {
+      return [
+        'rgba(179, 166, 155, 1)',
+        'rgba(110, 131, 149, 1)',
+        'rgba(118, 123, 127, 1)',
+      ];
+    }
+    //밤 시간대
+    else {
+      return ['rgba(114,120,167,1)', 'rgba(23,60,90,1)', 'rgba(16,26,34,1)'];
+    }
+  };
+
+  useEffect(() => {
+    setWDirection(getWindDirection(mainData.result.windVector));
+    rainyCheck();
+  }, []);
+
+  //----------------------written by yeop----------------------
+  const fetchUserSettings = async () => {
+    const token = await AsyncStorage.getItem('accessToken'); // 토큰 가져오기
+
+    try {
+      const response = await fetch(
+        'https://waither.shop/user/setting/display',
+        {
+          method: 'GET',
+          headers: {
+            accept: '*/*',
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const result = await response.json();
+      if (result.code === '200') {
+        const { wind, precipitation, dust } = result.result;
+        setShowWind(wind);
+        setShowPrecipitation(precipitation);
+        setShowDust(dust);
+      }
+    } catch (error) {
+      console.error('Error fetching settings:', error);
+    }
+
+    try {
+      const response = await fetch('https://waither.shop/user/setting/mypage', {
+        method: 'GET',
+        headers: {
+          accept: '*/*',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const result = await response.json();
+      if (result.code === '200') {
+        setName(result.result.nickname);
+      }
+    } catch (error) {
+      console.error('Error fetching userName: ', error);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchUserSettings(); // 화면이 포커스를 받을 때마다 설정값을 새로 가져옴
+    }, []),
+  );
+
+  //---------------------새로 고침-----------------------
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefresh = async () => {
+    mainDataRefetch();
+    reportDataRefetch();
+    setIsRefreshing(true);
+    setIsRefreshing(false);
+  };
 
   return (
     <Wrapper>
       <LinearGradient
-        colors={[
-          'rgba(179, 166, 155, 1)',
-          'rgba(110, 131, 149, 1)',
-          'rgba(118, 123, 127, 1)',
-        ]}
+        colors={asTimeBackgroundColor()}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         locations={[0.0416, 0.5188, 0.9765]}
@@ -340,96 +613,160 @@ const MainScreen = ({ navigation }) => {
             </MainHeaderRightIconView>
           </MainHearderRight>
         </MainHeader>
-        <MainInfoView>
-          <MainAccentView>
-            <MainAccentIcon>
-              <RainIcon height={43} width={65} />
-            </MainAccentIcon>
-            <MainAccentTextView>
-              <MainAccentTitle>비가 오네요. 우산 챙기세요 !</MainAccentTitle>
-              <MainAccentText>15:30에 그칠 예정입니다.</MainAccentText>
-            </MainAccentTextView>
-          </MainAccentView>
-          <MainAccentView>
-            <MainAccentIcon>
-              <WaitherIcon height={50} width={50} />
-            </MainAccentIcon>
-            <MainAccentTextView>
-              <MainAccentTitle>OO님이 춥다고 답변하셨던 날씨</MainAccentTitle>
-              <MainAccentText>오늘은 따뜻하게 입으세요 !</MainAccentText>
-            </MainAccentTextView>
-          </MainAccentView>
-          <MainWeatherView>
-            <MainWeatherInfoView>
-              <MainWeatherLocationView>
-                <GpsIcon height={12} width={12} />
-                <MainWeatherLocation>경기도 용인시 기흥구</MainWeatherLocation>
-              </MainWeatherLocationView>
-              <MainWeatherTemView>
-                <MainWeatherTem>5</MainWeatherTem>
-                <MainWeatherTemDegree>°C</MainWeatherTemDegree>
-              </MainWeatherTemView>
-              <MainWeatherMaxMinView>
-                <TemIcon height={20} width={13} style={{ marginRight: 5 }} />
-                <MainWeatherMaxMinText>최저 0°C</MainWeatherMaxMinText>
-                <Divider />
-                <MainWeatherMaxMinText>최고 7°C</MainWeatherMaxMinText>
-              </MainWeatherMaxMinView>
-            </MainWeatherInfoView>
-            <MainWeatherIconView>
-              <RainWithCloudIcon />
-            </MainWeatherIconView>
-          </MainWeatherView>
-          <MainExtraWeatherView>
-            <MainExtraWeatherViewColumn>
-              <MainExtraWeatherTitleView>
-                <MainExtraWeatherTitle>풍향/풍속</MainExtraWeatherTitle>
-              </MainExtraWeatherTitleView>
-              <WindIcon />
-              <MainExtraWeatherInfoView>
-                <MainExtraWeatherInfoText>남동</MainExtraWeatherInfoText>
-                <MainExtraWeatherTextDivider />
-                <MainExtraWeatherInfoText>2m/s~4m/s</MainExtraWeatherInfoText>
-              </MainExtraWeatherInfoView>
-            </MainExtraWeatherViewColumn>
-            <MainExtraWeatherViewColumn>
-              <MainExtraWeatherTitleView>
-                <MainExtraWeatherTitle>강수량</MainExtraWeatherTitle>
-              </MainExtraWeatherTitleView>
-              <CloudIcon />
-              <MainExtraWeatherInfoView>
-                <MainExtraWeatherInfoText>1~3mm</MainExtraWeatherInfoText>
-              </MainExtraWeatherInfoView>
-            </MainExtraWeatherViewColumn>
-            <MainExtraWeatherViewColumn>
-              <MainExtraWeatherTitleView>
-                <MainExtraWeatherTitle>풍향/풍속</MainExtraWeatherTitle>
-              </MainExtraWeatherTitleView>
-              <FineDustIcon />
-              <MainExtraWeatherInfoView>
-                <MainExtraWeatherInfoText>좋음</MainExtraWeatherInfoText>
-                <MainExtraWeatherTextDivider />
-                <MainExtraWeatherInfoText>20㎍/m³</MainExtraWeatherInfoText>
-              </MainExtraWeatherInfoView>
-            </MainExtraWeatherViewColumn>
-          </MainExtraWeatherView>
-          <MainWeatherByHourScrollView
-            horizontal={true}
-            showsHorizontalScrollIndicator={false}
-          >
-            <MainWeatherByHourView>
-              {hourlyWeatherData.map((data, index) => (
-                <MainWeatherByHourColumn key={index}>
-                  <MainWeatherByHourTitle>{data.time}</MainWeatherByHourTitle>
-                  {data.icon}
-                  <MainWeatherByHourTemperature>
-                    {data.temperature}
-                  </MainWeatherByHourTemperature>
-                </MainWeatherByHourColumn>
-              ))}
-            </MainWeatherByHourView>
-          </MainWeatherByHourScrollView>
-        </MainInfoView>
+        <MainScrollView
+          scrollEnabled={true}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={handleRefresh}
+            />
+          }
+        >
+          <MainInfoView>
+            <MainAccentView onPress={() => navigation.navigate('Report')}>
+              <MainAccentIcon>
+                {isRainy ? <RainIcon height={43} width={65} /> : <SunIcon />}
+              </MainAccentIcon>
+              <MainAccentTextView>
+                {/* main API 예상 강수량 이용*/}
+                <MainAccentTitle>
+                  {isRainy == true
+                    ? '비가 오네요. 우산 챙기세요 !'
+                    : '오늘은 비가 오지 않을 예정입니다!'}
+                </MainAccentTitle>
+                <MainAccentText>
+                  {isRainy == true
+                    ? `${isWhenRainy}시부터 비가 내려${`\n`}${isWhenRainyStop}시에 멈출 예정입니다!`
+                    : '대체적으로 맑을 예정입니다!'}
+                </MainAccentText>
+              </MainAccentTextView>
+            </MainAccentView>
+            <MainAccentView onPress={() => navigation.navigate('Report')}>
+              <MainAccentIcon>
+                <WaitherIcon height={50} width={50} />
+              </MainAccentIcon>
+              <MainAccentTextView>
+                <MainAccentTitle>
+                  오늘은 {name}님에게 {reportData.result.advices[0]}
+                </MainAccentTitle>
+                {/* 레포트 처음으로 오는 advice */}
+                <MainAccentText>
+                  {reportData.result.advices.length == 1
+                    ? '오늘의 날씨는 무난합니다!'
+                    : `${reportData.result.advices[1]}`}
+                </MainAccentText>
+              </MainAccentTextView>
+            </MainAccentView>
+            <MainWeatherView>
+              <MainWeatherInfoView>
+                <MainWeatherLocationView>
+                  <GpsIcon height={12} width={12} />
+                  <MainWeatherLocation>
+                    {locationData.documents[0].road_address.region_1depth_name +
+                      ' ' +
+                      locationData.documents[0].road_address.region_2depth_name}
+                  </MainWeatherLocation>
+                </MainWeatherLocationView>
+                <MainWeatherTemView>
+                  {/*  */}
+                  <MainWeatherTem>{mainData.result.temp}</MainWeatherTem>
+                  <MainWeatherTemDegree>°C</MainWeatherTemDegree>
+                </MainWeatherTemView>
+                <MainWeatherMaxMinView>
+                  <TemIcon height={20} width={13} style={{ marginRight: 5 }} />
+                  <MainWeatherMaxMinText>
+                    {/*  */}
+                    최저 {mainData.result.tempMin}°C
+                  </MainWeatherMaxMinText>
+                  <Divider />
+                  <MainWeatherMaxMinText>
+                    {/*  */}
+                    최고 {mainData.result.tempMax}°C
+                  </MainWeatherMaxMinText>
+                </MainWeatherMaxMinView>
+              </MainWeatherInfoView>
+              <MainWeatherIconView>
+                {/* 날씨가 맑으며 18시가 지났으면 night 버전 && pop이 50 이상이면 rainy */}
+                {time.getHours() % 24 > 18 ? (
+                  mainData.result.pop >= 50 ? (
+                    <NightRainIcon />
+                  ) : (
+                    <NightClearIcon />
+                  )
+                ) : mainData.result.pop < 50 ? (
+                  <SunnyIcon />
+                ) : (
+                  <RainWithCloudIcon />
+                )}
+              </MainWeatherIconView>
+            </MainWeatherView>
+            {/* 조건부 렌더링: 세 가지 설정이 모두 false일 때 MainExtraWeatherView를 숨깁니다. */}
+            {(showWind || showPrecipitation || showDust) && (
+              <MainExtraWeatherView>
+                {showWind && (
+                  <MainExtraWeatherViewColumn>
+                    <MainExtraWeatherTitleView>
+                      <MainExtraWeatherTitle>풍향/풍속</MainExtraWeatherTitle>
+                    </MainExtraWeatherTitleView>
+                    <WindIcon />
+                    <MainExtraWeatherInfoView>
+                      <MainExtraWeatherInfoText>
+                        {wDirection}
+                      </MainExtraWeatherInfoText>
+                      <MainExtraWeatherTextDivider />
+                      <MainExtraWeatherInfoText>
+                        {mainData.result.windDegree}m/s
+                      </MainExtraWeatherInfoText>
+                    </MainExtraWeatherInfoView>
+                  </MainExtraWeatherViewColumn>
+                )}
+                {showPrecipitation && (
+                  <MainExtraWeatherViewColumn>
+                    <MainExtraWeatherTitleView>
+                      <MainExtraWeatherTitle>강수확률</MainExtraWeatherTitle>
+                    </MainExtraWeatherTitleView>
+                    <CloudIcon />
+                    <MainExtraWeatherInfoView>
+                      <MainExtraWeatherInfoText>
+                        {/* 1이면은 비 0이면은 맑음 */}
+                        {mainData.result.pop + '%'}
+                      </MainExtraWeatherInfoText>
+                    </MainExtraWeatherInfoView>
+                  </MainExtraWeatherViewColumn>
+                )}
+                {/* {showDust && ( */}
+                <MainExtraWeatherViewColumn>
+                  <MainExtraWeatherTitleView>
+                    <MainExtraWeatherTitle>습도</MainExtraWeatherTitle>
+                  </MainExtraWeatherTitleView>
+                  <FineDustIcon />
+                  <MainExtraWeatherInfoView>
+                    <MainExtraWeatherInfoText>
+                      {mainData.result.humidity}%
+                    </MainExtraWeatherInfoText>
+                  </MainExtraWeatherInfoView>
+                </MainExtraWeatherViewColumn>
+                {/* )} */}
+              </MainExtraWeatherView>
+            )}
+            <MainWeatherByHourScrollView
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+            >
+              <MainWeatherByHourView>
+                {hourlyWeatherData.map((data, index) => (
+                  <MainWeatherByHourColumn key={index}>
+                    <MainWeatherByHourTitle>{data.time}</MainWeatherByHourTitle>
+                    {data.icon}
+                    <MainWeatherByHourTemperature>
+                      {data.temperature}
+                    </MainWeatherByHourTemperature>
+                  </MainWeatherByHourColumn>
+                ))}
+              </MainWeatherByHourView>
+            </MainWeatherByHourScrollView>
+          </MainInfoView>
+        </MainScrollView>
       </LinearGradient>
     </Wrapper>
   );

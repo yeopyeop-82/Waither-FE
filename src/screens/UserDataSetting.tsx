@@ -231,9 +231,7 @@ const UserDataSetting = () => {
         method: 'GET',
         headers: headers,
       });
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
+
       const res = await response.json();
       setTempREsponsiveness(res.result.weight);
       renderTempResponsiveness(res.result.weight);
@@ -294,7 +292,7 @@ const UserDataSetting = () => {
 
       <TempResponsivenessView>
         <TemperatureMainTitle>
-          <Username>Waither</Username>님의 온도 민감도
+          <Username>{name}</Username>님의 온도 민감도
         </TemperatureMainTitle>
         <TemperatureWrapper>
           <TemperatureOperrand>{Operand}</TemperatureOperrand>
