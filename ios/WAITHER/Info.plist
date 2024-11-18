@@ -33,6 +33,10 @@
     </array>
     <key>CFBundleVersion</key>
     <string>1</string>
+    <!-- <key>BGTaskSchedulerPermittedIdentifiers</key>
+    <array>
+        <string>com.transistorsoft.fetch</string>
+    </array> -->
     <key>BGTaskSchedulerPermittedIdentifiers</key>
     <array>
         <string>com.transistorsoft.fetch</string>

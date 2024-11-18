@@ -29,6 +29,7 @@ import { userNameState } from '../recoil/userInitInfoRecoil';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { currentLocationGet, mainWeatherGet, reportGet } from '../api';
 import { RefreshControl } from 'react-native';
+import Geolocation from 'react-native-geolocation-service';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -297,9 +298,11 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
   const [isWhenRainyStop, setIsWhenRainyStop] = useState(0);
   const time = new Date();
   const currentTime = time.getHours() % 24;
+  const [location, setLocation] = useState({
+    latitude: null,
+    longtitude: null,
+  });
 
-  // const token = AsyncStorage.getItem('accessToken');
-  // const accessToken = `Bearer ${token}`;
   //----------------React Query-----------------
   const {
     isPending: isMainDataPending,
@@ -524,6 +527,7 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
   useEffect(() => {
     setWDirection(getWindDirection(mainData.result.windVector));
     rainyCheck();
+    getLocation();
   }, []);
 
   //----------------------written by yeop----------------------
@@ -586,6 +590,27 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
     isLocationDataRefetch();
     setIsRefreshing(true);
     setIsRefreshing(false);
+  };
+
+  //-------------------현재 위치 받아오기------------------
+  const getLocation = () => {
+    Geolocation.getCurrentPosition(
+      async (pos) => {
+        setLocation({
+          latitude: pos.coords.latitude,
+          longtitude: pos.coords.longitude,
+        });
+        console.log('스케줄 함수 속 위치 불러오가: ', location);
+      },
+      (error) => {
+        console.log(error);
+      },
+      {
+        enableHighAccuracy: true, //고정밀 위치 설정
+        timeout: 5000, //5초안에 정보 습득 실패 시 재호출
+        maximumAge: 60000, //10분 동안은 캐쉬된 위치 정보 허용
+      },
+    );
   };
 
   return (
