@@ -4,10 +4,14 @@
 #import <React/RCTLinkingManager.h>
 #import "RNSplashScreen.h"
 #import <RNKakaoLogins.h>
+#import "RNBackgroundFetch.h"
+#import <TSBackgroundFetch/TSBackgroundFetch.h>
+
 
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+  
 {
   self.moduleName = @"main";
 
@@ -19,7 +23,11 @@
   [super application:application didFinishLaunchingWithOptions:launchOptions];
   //SplashScreen
   [RNSplashScreen show];  // 추가
-  return YES; // 추가 
+  // [RNBackgroundFetch configure];
+//  [RNBackgroundFetch setDelegate:self];
+  //[REQUIRED] Register BackgroundFetch
+  [[TSBackgroundFetch sharedInstance] didFinishLaunching];
+  return YES; // 추가
 }
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
@@ -65,6 +73,13 @@
 {
   return [super application:application didReceiveRemoteNotification:userInfo fetchCompletionHandler:completionHandler];
 }
+
+
+//// Optional: method for handling background fetch events
+//- (void)performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
+//{
+//  [RNBackgroundFetch performFetchWithCompletionHandler:completionHandler];
+//}
 
 
 @end

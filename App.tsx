@@ -1,6 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import SplashScreen from 'react-native-splash-screen';
 import Toast from 'react-native-toast-message';
 import { RecoilRoot } from 'recoil';
@@ -28,19 +28,137 @@ import PrivacySetting from './src/screens/PrivacySetting';
 import MainScreen from './src/screens/MainScreen';
 import Notifications from './src/screens/Notifications';
 import Report from './src/screens/Report';
-import WebView from 'react-native-webview';
 import Web from './src/screens/Web';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import BackgroundFetch from 'react-native-background-fetch';
+import Geolocation from 'react-native-geolocation-service';  
+import { Platform } from 'react-native';
+import { AppState } from 'react-native';
+
+async function requestPermission() {
+  try {
+    if (Platform.OS === 'ios') {
+      return await Geolocation.requestAuthorization('always');
+    }
+  } catch (e) {
+    console.log(e);
+  }
+}
 
 export default function App() {
   const queryClient = new QueryClient();
   const Stack = createNativeStackNavigator();
+  const [appState, setAppState] = useState(AppState.currentState);
+  const [location, setLocation] = useState({
+    latitude: null,
+    longtitude: null,
+  });
+
+  //-----------------------------------------
   useEffect(() => {
     if (SplashScreen) {
       SplashScreen.hide();
     }
+    backgroundStart();
+    const subscription = AppState.addEventListener(
+      'change',
+      handleAppStateChange,
+    );
+    return () => {
+      subscription.remove();
+    };
   }, []);
 
+  useEffect(() => {
+    if (location.latitude && location.longtitude) {
+      console.log('위치 업데이트됨:', location);
+    }
+  }, [location]);
+  //-----------------------------------------
+
+  const handleAppStateChange = (nextAppState) => {
+    console.log('현재 앱 상태:', nextAppState);
+    setAppState(nextAppState);
+  };
+  //-----------------------------------------
+  const backgroundStart = () => {
+    BackgroundFetch.configure(
+      {
+        minimumFetchInterval: 15,
+        forceAlarmManager: true,
+        stopOnTerminate: false,
+        startOnBoot: true,
+        requiredNetworkType: BackgroundFetch.NETWORK_TYPE_NONE,
+        requiresCharging: false,
+        requiresDeviceIdle: false,
+        requiresBatteryNotLow: false,
+        requiresStorageNotLow: false,
+      },
+      async (taskId) => {
+        console.log('[js] 백그라운드 페치 이벤트 수신:', taskId);
+        //-----------------------------------------
+        switch (taskId) {
+          case 'com.transistorsoft.fetch':
+            requestPermission().then((result) => {
+              if (result === 'granted') {
+                Geolocation.getCurrentPosition(
+                  async (pos) => {
+                    setLocation({
+                      latitude: pos.coords.latitude,
+                      longtitude: pos.coords.longitude,
+                    });
+                    console.log('스케줄 함수 속 위치 불러오가: ', location);
+                  },
+                  (error) => {
+                    console.log(error);
+                  },
+                  {
+                    enableHighAccuracy: true,
+                    timeout: 3600,
+                    maximumAge: 3600,
+                  },
+                );
+              }
+            });
+            console.log('사용자 위치 전송, 백그라운드 성공');
+            console.log('스케쥴 성공 후 위치 출력', location);
+            break;
+          default:
+            console.log('기본 페치 작업');
+            break;
+        }
+        BackgroundFetch.finish(taskId);
+      },
+      (error) => {
+        console.log('[js] RNBackgroundFetch를 시작하지 못했습니다:', error);
+      },
+    );
+    //-----------------------------------------
+    BackgroundFetch.scheduleTask({
+      taskId: 'com.transistorsoft.fetch',
+      forceAlarmManager: true,
+      delay: 1000,
+      periodic: true,
+    });
+
+    console.log('백그라운드 작업 예약 완료');
+    //-----------------------------------------
+    BackgroundFetch.status((status) => {
+      switch (status) {
+        case BackgroundFetch.STATUS_RESTRICTED:
+          console.log('BackgroundFetch가 제한됨');
+          break;
+        case BackgroundFetch.STATUS_DENIED:
+          console.log('BackgroundFetch가 거부됨');
+          break;
+        case BackgroundFetch.STATUS_AVAILABLE:
+          console.log('BackgroundFetch가 활성화되었습니다');
+          break;
+      }
+    });
+  };
+
+  //==========================================================
   return (
     <QueryClientProvider client={queryClient}>
       <RecoilRoot>
