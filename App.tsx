@@ -31,7 +31,7 @@ import Report from './src/screens/Report';
 import Web from './src/screens/Web';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import BackgroundFetch from 'react-native-background-fetch';
-import Geolocation from 'react-native-geolocation-service';  
+import Geolocation from 'react-native-geolocation-service';
 import { Platform } from 'react-native';
 import { AppState } from 'react-native';
 
@@ -51,7 +51,7 @@ export default function App() {
   const [appState, setAppState] = useState(AppState.currentState);
   const [location, setLocation] = useState({
     latitude: null,
-    longtitude: null,
+    longitude: null,
   });
 
   //-----------------------------------------
@@ -59,6 +59,8 @@ export default function App() {
     if (SplashScreen) {
       SplashScreen.hide();
     }
+
+    //-------------백그라운드 관련---------------------
     backgroundStart();
     const subscription = AppState.addEventListener(
       'change',
@@ -70,17 +72,16 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (location.latitude && location.longtitude) {
+    if (location.latitude && location.longitude) {
       console.log('위치 업데이트됨:', location);
     }
   }, [location]);
-  //-----------------------------------------
-
+  // -----------------현재 앱 상태 확인--------------------
   const handleAppStateChange = (nextAppState) => {
     console.log('현재 앱 상태:', nextAppState);
     setAppState(nextAppState);
   };
-  //-----------------------------------------
+  // -----------------------------------------
   const backgroundStart = () => {
     BackgroundFetch.configure(
       {
@@ -89,10 +90,10 @@ export default function App() {
         stopOnTerminate: false,
         startOnBoot: true,
         requiredNetworkType: BackgroundFetch.NETWORK_TYPE_NONE,
-        requiresCharging: false,
+        requiresCharging: false, //충전 필요시
         requiresDeviceIdle: false,
-        requiresBatteryNotLow: false,
-        requiresStorageNotLow: false,
+        requiresBatteryNotLow: false, //배터리가 낮으면 백그라운드 실행X
+        requiresStorageNotLow: false, //저장공간이 낮으면 백그라운드 실행X
       },
       async (taskId) => {
         console.log('[js] 백그라운드 페치 이벤트 수신:', taskId);
@@ -105,7 +106,7 @@ export default function App() {
                   async (pos) => {
                     setLocation({
                       latitude: pos.coords.latitude,
-                      longtitude: pos.coords.longitude,
+                      longitude: pos.coords.longitude,
                     });
                     console.log('스케줄 함수 속 위치 불러오가: ', location);
                   },
@@ -114,8 +115,8 @@ export default function App() {
                   },
                   {
                     enableHighAccuracy: true,
-                    timeout: 3600,
-                    maximumAge: 3600,
+                    timeout: 5000,
+                    maximumAge: 60000,
                   },
                 );
               }
