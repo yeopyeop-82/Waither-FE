@@ -223,3 +223,12 @@ export const hourlyWeatherData = (data: object, expectedTemp: object) => {
     },
   ];
 };
+
+export const refiningMainAdvice = (advices: object) => {
+  let notRefinedAdvice = advices[1];
+  const refinedAdvice = notRefinedAdvice
+    .split('.')
+    .map((advice) => advice.trim())
+    .filter((advice) => advice !== ''); //빈 문자열은 제거
+  return refinedAdvice.join('.\n') + '.';
+};

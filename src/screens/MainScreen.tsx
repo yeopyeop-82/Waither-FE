@@ -39,8 +39,10 @@ import {
   isWhenRainy,
   isWhenRainyStop,
   rainyCheck,
+  refiningMainAdvice,
 } from '../utils/FormatData/mainFormatData';
 import { getLocation } from '../utils/geolocation';
+import { refiningAdvice } from '../utils/FormatData/reportFormatData';
 
 const Wrapper = styled.View`
   flex-direction: column;
@@ -478,7 +480,7 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
                 <MainAccentText>
                   {reportData.result.advices.length == 1
                     ? '오늘의 날씨는 무난합니다!'
-                    : `${reportData.result.advices[1]}`}
+                    : `${refiningMainAdvice(reportData.result.advices)}`}
                 </MainAccentText>
               </MainAccentTextView>
             </MainAccentView>
