@@ -404,10 +404,10 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleRefresh = async () => {
+    setIsRefreshing(true);
     mainDataRefetch();
     reportDataRefetch();
     isLocationDataRefetch();
-    setIsRefreshing(true);
     setIsRefreshing(false);
   };
 
